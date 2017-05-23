@@ -9,43 +9,66 @@
 
 library(shiny)
 library(dplyr)
+library(rCharts)
 
+# Load standard data
 load('enrollment.rdata')
-programtype <- c('Academic Programs', 'Special Programs')
+
+# Create selection options
+programType <- c('Choose One', 'Academic Programs', 'Special Programs')
+
 acad <- unique(enroll$subject)
-special <- c('CalWORKS', 'CARE', 'EOPS', 'Diop', 'DSPS')
-lookup <- c(calwork = 'CalWORKS',
-             care = 'CARE',
-             eops = 'EOPS',
-             diop = 'Diop',
-             dsps = 'DSPS')
+acad <- acad[order(acad)]
+
+term <- unique(enroll$term)
+
+trends <- c('Collegewide','Program')
+
+special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
+             Diop = 'diop', DSPS = 'dsps', Puente = 'puente')
+
+demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
+          'Disability Status' = 'disability', Ethnicity = 'ethnicity',
+          'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
+          'Online' = 'online', 'Veteran Status' = 'veteran',
+          'Foster Youth Status' = 'foster')
 
 
-# Define UI for application that draws a histogram
+# Define UI
 shinyUI(fluidPage(
 
   # Application title
   titlePanel("The CRC Hawkdash"),
 
-  # Sidebar with a slider input for number of bins
+  # Inputs
   sidebarLayout(
     sidebarPanel(
-       selectInput('progType', 'Select a program type', programtype)
+
+      selectInput('college', 'Would you like to see Collegewide data
+                  or data in a program?', trends),
+
+      conditionalPanel(condition = "input.college == 'Program'",
+      selectInput('progType', 'Select a program type', programType),
+
+      conditionalPanel(
+        condition = "input.progType == 'Academic Programs'",
+        selectInput('acad', 'Select program(s) by clicking in the box'
+                    , acad, multiple = TRUE)),
+
+      conditionalPanel(
+        condition = "input.progType == 'Special Programs'",
+        selectInput('special', 'Select a program', special))),
+
+      selectInput('term', 'What terms would you like to see? Click in
+                  the box below', term, multiple = TRUE),
+
+      selectInput('demo', 'Would you like to view trends for
+                  a particular demographic group?', demo)
     ),
-
-  conditionalPanel(
-    condition = "input.progType == 'Academic Programs'",
-    selectInput('acad', 'Select program(s)', acad)
-  ),
-
-  conditionalPanel(
-    condition = "input.progType == 'Special Programs'",
-    selectInput('special', 'Select Program', special)
-  ),
 
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("distPlot")
+       showOutput('hist', lib = 'nvd3')
     )
   )
 ))
