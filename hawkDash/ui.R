@@ -8,9 +8,18 @@
 #
 
 library(shiny)
+library(dplyr)
 
-enroll <- load('enrollment.rdata')
-programtype <- c('Academic Program', 'Student Services Program')
+load('enrollment.rdata')
+programtype <- c('Academic Programs', 'Special Programs')
+acad <- unique(enroll$subject)
+special <- c('CalWORKS', 'CARE', 'EOPS', 'Diop', 'DSPS')
+lookup <- c(calwork = 'CalWORKS',
+             care = 'CARE',
+             eops = 'EOPS',
+             diop = 'Diop',
+             dsps = 'DSPS')
+
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -23,6 +32,16 @@ shinyUI(fluidPage(
     sidebarPanel(
        selectInput('progType', 'Select a program type', programtype)
     ),
+
+  conditionalPanel(
+    condition = "input.progType == 'Academic Programs'",
+    selectInput('acad', 'Select program(s)', acad)
+  ),
+
+  conditionalPanel(
+    condition = "input.progType == 'Special Programs'",
+    selectInput('special', 'Select Program', special)
+  ),
 
     # Show a plot of the generated distribution
     mainPanel(
