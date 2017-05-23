@@ -11,26 +11,49 @@ library(shiny)
 
 load('enrollment.rdata')
 
-
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-  temp <- reactive({
+  success <- reactive({
     demo <- input$demo
-    dots <- lapply(list("term", demo), as.symbol)
 
-    if (input$college == 'Collegewide' & input$demo != 'None') {
+    # Determine the group by factors, if none is selected only put term
+    dots <- list("term", demo)
+    dots <- dots[!dots == 'None']
+    dots <- lapply(dots, as.symbol)
+
+
+    temp <- enroll %>%
+      subset(term %in% input$term) %>%
+      group_by_(.dots = dots) %>%
+      summarise(avg = mean(success))
+
+    if (input$college != 'Collegewide' & input$progType == 'Academic Programs')
+      {
       temp <- enroll %>%
-        subset(term %in% input$term) %>%
+        subset(term %in% input$term & subject %in% input$acad) %>%
         group_by_(.dots = dots) %>%
         summarise(avg = mean(success))
     }
 
-    else {temp <- data.frame(a = 1:4, b = 5:8, c = 1:4)}
+    if (input$college != 'Collegewide' & input$progType == 'Special Programs') {
+      newNames <- names(enroll)
+      newNames[newNames == input$special] <- 'filt'
+      names(enroll) <- newNames
 
-    names(temp)[2] <- "demo_col"
+      temp <- enroll %>%
+        subset(term %in% input$term & !is.na(filt)) %>%
+        group_by_(.dots = dots) %>%
+        summarise(avg = mean(success))
+
+      newNames <- names(enroll)
+      newNames[newNames == 'filt'] <- input$special
+      names(enroll) <- newNames
+    }
+
+
     temp <- data.frame(temp)
     temp})
 
-    output$table <- renderTable({temp()})
+    output$table <- renderTable({success()})
 
 })
