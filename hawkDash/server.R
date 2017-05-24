@@ -11,46 +11,39 @@ library(shiny)
 
 load('enrollment.rdata')
 
-# Define server logic required to draw a histogram
+# Define server logic
 shinyServer(function(input, output) {
   success <- reactive({
     demo <- input$demo
 
-    # Determine the group by factors, if none is selected only put term
-    dots <- list("term", demo)
+    # Determine filter columns, subject by default.
+    filtCol <- 'subject'
+    filtCol[input$progType == 'Special Programs'] <- input$special
+    oldNames <- names(enroll)
+    names(enroll)[names(enroll) == filtCol] <- 'filt'
+    
+    # Determine the group by factors, if "None" is selected only put term
+    dots <- c("term", demo)
     dots <- dots[!dots == 'None']
-    dots <- lapply(dots, as.symbol)
 
-
+    # Calculate collegewide by default
     temp <- enroll %>%
       subset(term %in% input$term) %>%
       group_by_(.dots = dots) %>%
       summarise(avg = mean(success))
 
-    if (input$college != 'Collegewide' & input$progType == 'Academic Programs')
-      {
+    # If Special Program is selected do this
+    if (input$college != 'Collegewide') {
+
+      # Do the disag
       temp <- enroll %>%
-        subset(term %in% input$term & subject %in% input$acad) %>%
+        subset(term %in% input$term & 
+               (filt == input$acad | !is.na(filt))) %>%
         group_by_(.dots = dots) %>%
         summarise(avg = mean(success))
     }
 
-    if (input$college != 'Collegewide' & input$progType == 'Special Programs') {
-      newNames <- names(enroll)
-      newNames[newNames == input$special] <- 'filt'
-      names(enroll) <- newNames
-
-      temp <- enroll %>%
-        subset(term %in% input$term & !is.na(filt)) %>%
-        group_by_(.dots = dots) %>%
-        summarise(avg = mean(success))
-
-      newNames <- names(enroll)
-      newNames[newNames == 'filt'] <- input$special
-      names(enroll) <- newNames
-    }
-
-
+    names(enroll) <- oldNames
     temp <- data.frame(temp)
     temp})
 
