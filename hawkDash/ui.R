@@ -52,7 +52,7 @@ shinyUI(fluidPage(
 
       conditionalPanel(
         condition = "input.progType == 'Academic Programs'",
-        selectInput('acad', 'Select program(s) by clicking in the box'
+        selectInput('acad', 'Select program(s) by clicking in the box below.'
                     , acad, multiple = TRUE)),
 
       conditionalPanel(
@@ -60,7 +60,7 @@ shinyUI(fluidPage(
         selectInput('special', 'Select a program', special))),
 
       selectInput('term', 'What terms would you like to see? Click in
-                  the box below', term, multiple = TRUE),
+                  the box below.', term, multiple = TRUE),
 
       selectInput('demo', 'Would you like to view trends for
                   a particular demographic group?', demo)

@@ -14,15 +14,16 @@ load('enrollment.rdata')
 # Define server logic
 shinyServer(function(input, output) {
   success <- reactive({
-    demo <- input$demo
 
     # Determine filter columns, subject by default.
+    prog <- input$progType
     filtCol <- 'subject'
-    filtCol[input$progType == 'Special Programs'] <- input$special
+    filtCol[prog == 'Special Programs'] <- input$special
     oldNames <- names(enroll)
     names(enroll)[names(enroll) == filtCol] <- 'filt'
     
     # Determine the group by factors, if "None" is selected only put term
+    demo <- input$demo
     dots <- c("term", demo)
     dots <- dots[!dots == 'None']
 
@@ -38,7 +39,7 @@ shinyServer(function(input, output) {
       # Do the disag
       temp <- enroll %>%
         subset(term %in% input$term & 
-               (filt == input$acad | !is.na(filt))) %>%
+               (filt %in% input$acad  | !is.na(filt))) %>%
         group_by_(.dots = dots) %>%
         summarise(avg = mean(success))
     }
