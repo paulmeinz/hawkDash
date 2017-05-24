@@ -56,6 +56,7 @@ shinyServer(function(input, output, session) {
                     data = success(), 
                     type = "multiBarChart",
                     width = session$clientData[["output_plot1_width"]])
+        n1$chart(showControls = F, reduceXTicks = F)
       }
       
       if (length(success()) <= 2) {
@@ -68,13 +69,11 @@ shinyServer(function(input, output, session) {
       n1$addParams(dom = 'hist')
       n1$chart(color = c('blue', 'orange', 'brown', 'green', 'red'))
       n1$chart(forceY = c(0,100))
-      n1$chart(reduceXTicks = F, showControls = F)
       n1$chart(tooltipContent = "#! function(key, x, y, e){ 
       return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
       '<strong>' + y + '%' + '</strong>' +' in ' + x
       } !#")
       n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
-      
       return(n1)
       })
 
