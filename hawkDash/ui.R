@@ -20,6 +20,9 @@ programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 acad <- unique(enroll$subject)
 acad <- acad[order(acad)]
 
+compare <- c('None','Compare to Collegewide',
+             'Evaluate Equity')
+
 term <- unique(enroll$term)
 
 trends <- c('Collegewide','Program')
@@ -63,7 +66,9 @@ shinyUI(fluidPage(
                   the box below.', term, multiple = TRUE),
 
       selectInput('demo', 'Would you like to view trends for
-                  a particular demographic group?', demo)
+                  a particular demographic group?', demo),
+      
+      selectInput('compare','Perform a Comparison', compare)
     ),
 
     # Show a plot of the generated distribution

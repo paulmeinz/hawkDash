@@ -32,7 +32,8 @@ shinyServer(function(input, output, session) {
     temp <- enroll %>%
       subset(term %in% input$term) %>%
       group_by_(.dots = dots) %>%
-      summarise(avg = mean(success))
+      summarise(Success = mean(success), num = sum(success), den = n()) %>%
+      mutate(overallSuc = sum(num)/sum(den))
 
     # If program is selected...
     if (input$college != 'Collegewide') {
@@ -42,25 +43,29 @@ shinyServer(function(input, output, session) {
         subset(term %in% input$term & 
                (filt %in% input$acad  | input$special == filt)) %>%
         group_by_(.dots = dots) %>%
-        summarise(avg = mean(success))
+        summarise(Success = mean(success), num = sum(success), den = n()) %>%
+        mutate(ovarallSuc = sum(num)/sum(den))
     }
 
     names(enroll) <- oldNames
     temp <- data.frame(temp)
-    if (length(temp) >= 3) {names(temp)[2] <- 'demo_col'}
+    if (length(temp) >= 7) {names(temp)[2] <- 'demo_col'}
     temp})
 
+  
+  
+# output
     output$hist <- renderChart({
-      if (length(success()) >= 3) {
-        n1 <- nPlot(avg ~ demo_col, group = "term", 
+      if (length(success()) >= 6) {
+        n1 <- nPlot(Success ~ demo_col, group = "term", 
                     data = success(), 
                     type = "multiBarChart",
                     width = session$clientData[["output_plot1_width"]])
         n1$chart(showControls = F, reduceXTicks = F)
       }
       
-      if (length(success()) <= 2) {
-        n1 <- nPlot(avg ~ term, 
+      if (length(success()) <= 5) {
+        n1 <- nPlot(Success ~ term, 
                     data = success(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot1_width"]])
