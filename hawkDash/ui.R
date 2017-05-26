@@ -33,7 +33,7 @@ special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
 demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Disability Status' = 'disability', Ethnicity = 'ethnicity',
           'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
-          'Online' = 'online', 'Veteran Status' = 'veteran',
+          'Gender' = 'gender','Online' = 'online', 'Veteran Status' = 'veteran',
           'Foster Youth Status' = 'foster')
 
 
