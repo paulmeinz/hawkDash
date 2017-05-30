@@ -28,6 +28,7 @@ special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
 # Compare options
 compare <- c('None','Compare to Collegewide',
              'Evaluate Equity')
+compareE <- c('No','Yes')
 
 # Term selections
 term <- unique(enroll$term)
@@ -57,7 +58,39 @@ shinyUI(fluidPage(
     tabPanel(title = 'Matriculation (SSSP)'),
 
 #---------------------------ENROLLMENT TAB--------------------------------------
-    tabPanel(title = 'Enrollment'),
+    tabPanel(title = 'Enrollment',
+      sidebarLayout(
+        sidebarPanel(
+          selectInput('collegeE', 'Would you like to see Collegewide data
+                      or data in a program?', trends),
+                 
+          conditionalPanel(condition = "input.collegeE == 'Program'",
+            selectInput('progTypeS', 'Select a program type', programType),
+                                  
+          conditionalPanel(condition = "input.progTypeE == 'Academic Programs'",
+            selectInput('acadE', 
+                        'Select program(s) by clicking in the box below.',
+                        acad, multiple = TRUE)),
+                                  
+          conditionalPanel(condition = "input.progTypeE == 'Special Programs'",
+            selectInput('specialE', 'Select a program', special))),
+                 
+          selectInput('termE', 'What terms would you like to see? Click in
+                      the box below.', term, multiple = TRUE),
+                 
+          selectInput('demoE', 'Would you like to view trends for
+                      a particular demographic group?', demo),
+                 
+          selectInput('compareE','Evaluate Equity?', compareE)
+        ),
+               
+               # Show a plot of the generated distribution
+        mainPanel(
+          chartOutput('histE', lib = 'nvd3'),
+          plotOutput("plot2")
+        )
+      )           
+    ),
 
 #---------------------------COURSE SUCCESS TAB----------------------------------
     tabPanel(title = 'Course Success', 
