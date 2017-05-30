@@ -31,7 +31,7 @@ compare <- c('None','Compare to Collegewide',
 
 # Term selections
 term <- unique(enroll$term)
-term <- term(order(term))
+term <- term[order(term)]
 
 # Demographic options
 demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
@@ -55,12 +55,11 @@ shinyUI(fluidPage(
   # Inputs
   sidebarLayout(
     sidebarPanel(
-
       selectInput('college', 'Would you like to see Collegewide data
                   or data in a program?', trends),
 
       conditionalPanel(condition = "input.college == 'Program'",
-      selectInput('progType', 'Select a program type', programType),
+        selectInput('progType', 'Select a program type', programType),
 
       conditionalPanel(
         condition = "input.progType == 'Academic Programs'",

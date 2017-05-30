@@ -29,10 +29,8 @@ shinyServer(function(input, output, session) {
     # Store collegewide for comparisons
     college <- temp
     
-    # If program is selected...
+    # If program is selected do this disag
     if (input$college != 'Collegewide') {
-
-      # Do the disag
       temp <- enroll %>%
         subset(term %in% input$term & 
                (filt %in% input$acad  | input$special == filt)) %>%
@@ -52,18 +50,25 @@ shinyServer(function(input, output, session) {
       names(temp)[2] <- 'demo_col'
       names(college)[2] <- 'demo_col'
     }
+    
     if (input$compare == 'Evaluate Equity') {
-      if (input$demo != 'None') 
-        {temp$Success <- temp$Success/temp$overallSuc * 100}
-      if (input$demo == 'None') 
-        {temp$Success <- temp$Success/temp$Success * 100}
+      if (input$demo != 'None') {
+        temp$Success <- temp$Success/temp$overallSuc * 100
+      }
+      
+      if (input$demo == 'None') {
+        temp$Success <- temp$Success/temp$Success * 100
+      }
+      
     }
+    
     if (input$compare == 'Compare to Collegewide') {
       if (input$demo == 'None') {
         temp <- temp %>% 
           left_join(college, by = c('term' = 'term')) %>%
           mutate(Success = Success.x - Success.y)
       }
+      
       if (input$demo != 'None') {
         temp <- temp %>% 
           left_join(college, 
