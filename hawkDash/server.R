@@ -26,8 +26,8 @@ shinyServer(function(input, output, session) {
     temp <- enroll %>%
       subset(term %in% input$termE) %>%
       group_by_(.dots = dots) %>%
-      summarise(dup = n(), undup = n_distinct(emplid)) %>%
-      mutate(prop = undup/sum(undup))
+      summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
+      mutate(Proportion = Unduplicated/sum(Unduplicated))
     
     # Save the collegewide
     college <- temp
@@ -38,8 +38,8 @@ shinyServer(function(input, output, session) {
         subset(term %in% input$termE & 
                  (filt %in% input$acadE  | input$specialE == filt)) %>%
         group_by_(.dots = dots) %>%
-        summarise(dup = n(), undup = n_distinct(emplid)) %>%
-        mutate(prop = undup/sum(undup))
+        summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
+        mutate(Proportion = Unduplicated/sum(Unduplicated))
     }
     
     if (input$demoE != 'None') {
@@ -51,14 +51,14 @@ shinyServer(function(input, output, session) {
       temp <- temp %>%
         left_join(college, 
                   by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
-        mutate(prop = prop.x/prop.y) %>%
-        select(-c(prop.x, dup.y, undup.y, prop.y))
+        mutate(Proportion = Proportion.x - Proportion.y) %>%
+        select(-c(Proportion.x, Duplicated.y, Unduplicated.y, Proportion.y))
     }
     
     
     if (input$demoE =='None') {
       temp <- gather(temp, 'Type', 'Enrollment', 2:3) %>%
-        select(-prop)
+        select(-Proportion)
       temp$termCont <- as.numeric(temp$term)
     }
     
@@ -73,6 +73,37 @@ shinyServer(function(input, output, session) {
                   data = enrollment(), 
                   type = "lineChart",
                   width = session$clientData[["output_plot2_width"]])
+      
+      # Create javascript code to modify x ticks (Wacky)
+      x <- unique(enroll$term)
+      y <- ''
+      for (i in x) {
+        if (y == '') {
+          y <- paste("'", i, "'")
+        } else {
+          y <- paste(y, ",'", i, "'")
+        }
+      }
+      
+      # Execute code and set other features
+      code <- paste("#!function(x) {keys = [", y, "]","
+                    return keys[x-1]}!#", sep = '')
+      n1$xAxis(tickFormat = code, rotateLabels = -30)
+      n1$chart(forceY = c(.9 * min(enrollment()$Enrollment),
+                          1.1 * max(enrollment()$Enrollment)))
+      n1$chart(color = c('blue', 'orange'))
+      n1$chart(tooltipContent = "#! function(key, x, y, e){ 
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+          x + ': ' + '<strong>' + y + '</strong>'
+      } !#")
+    }
+    
+    if (input$demoE != 'None') {
+      n1 <- nPlot(Proportion ~ demo_col, group = "term", 
+                  data = enrollment(), 
+                  type = "multiBarChart",
+                  width = session$clientData[["output_plot2_width"]])
+      n1$chart(showControls = F, reduceXTicks = F)
     }
     
     n1$addParams(dom = 'histE')
