@@ -77,7 +77,11 @@ shinyServer(function(input, output, session) {
       } 
     }
     
+    # Suppress small Ns
     print(temp)
+    if (length(temp[,1]) > 0) {
+      temp[temp$den <= 20, 'Success'] <- -1
+    }
     
     temp})
 
@@ -121,10 +125,15 @@ shinyServer(function(input, output, session) {
                  width=50)
       }
       
-      #n1$chart(tooltipContent = "#! function(key, x, y, e){ 
-      #return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-      #'<strong>' + y + '%' + '</strong>' +' in ' + x
-      #} !#")
+      n1$chart(tooltipContent = "#! function(key, x, y, e){ 
+      if (y > -1) {
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+        x + ': ' + '<strong>' + y + '%' + '</strong>'
+      }
+
+      return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+        x + ': ' + '<strong>' + 'Sample size too small'+ '</strong>'
+      } !#")
       return(n1)
       })
 
