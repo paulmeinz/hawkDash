@@ -4,14 +4,47 @@ load('enrollment.rdata')
 
 # Define server logic
 shinyServer(function(input, output, session) {
+
   
+#-----------------------ENROLLMENT DASH-----------------------------------------
+  enrollment <- reactive({
+    # Determine filter columns, subject by default.
+    prog <- input$progTypeE
+    filtCol <- 'subject'
+    filtCol[prog == 'Special Programs'] <- input$specialE
+    oldNames <- names(enroll)
+    names(enroll)[names(enroll) == filtCol] <- 'filt'
+    names(enroll)
+    
+    # Determine the group by factors, if "None" is selected only put term
+    demo <- input$demoS
+    dots <- c("term", demo)
+    dots <- dots[!dots == 'None']
+    
+    # Calculate collegewide by default
+    temp <- enroll %>%
+      subset(term %in% input$termS) %>%
+      group_by_(.dots = dots) %>%
+      summarise(duplicated = n(), unduplicated = n_distinct()) %>%
+      mutate(proportion = unduplicated/sum(unduplicated))
+    
+    print(temp)
+    
+    hello <- 'Hello World'
+  })
+  
+  
+  #output
+  output$histE <- renderText({enrollment()})
+
+    
+#-----------------------SUCCESS DASH--------------------------------------------  
   success <- reactive({
 
     # Determine filter columns, subject by default.
     prog <- input$progTypeS
     filtCol <- 'subject'
     filtCol[prog == 'Special Programs'] <- input$specialS
-    oldNames <- names(enroll)
     names(enroll)[names(enroll) == filtCol] <- 'filt'
     
     # Determine the group by factors, if "None" is selected only put term
@@ -38,12 +71,6 @@ shinyServer(function(input, output, session) {
         summarise(Success = mean(success), num = sum(success), den = n()) %>%
         mutate(overallSuc = sum(num)/sum(den))
     }
-    
-    # Restore old names so things don't get wacky.
-    names(enroll) <- oldNames
-    temp <- data.frame(temp)
-    college <- data.frame(college)
-    
     
     # Final manipulateions based on input
     if (input$demoS != 'None') {
@@ -79,14 +106,13 @@ shinyServer(function(input, output, session) {
       } 
     }
     
-    print(temp)
-    
     # Suppress small Ns
     if (length(temp[,1]) > 0) {
       temp <- temp[temp$den >= 20, ]
     }
     
-    print(temp)
+    temp$termcont <- as.numeric(temp$term)
+    
     temp})
 
   
@@ -106,6 +132,7 @@ shinyServer(function(input, output, session) {
                     data = success(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot1_width"]])
+        
       }
       
       # Set axis based on comparison

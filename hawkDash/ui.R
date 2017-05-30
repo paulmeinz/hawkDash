@@ -65,7 +65,7 @@ shinyUI(fluidPage(
                       or data in a program?', trends),
                  
           conditionalPanel(condition = "input.collegeE == 'Program'",
-            selectInput('progTypeS', 'Select a program type', programType),
+            selectInput('progTypeE', 'Select a program type', programType),
                                   
           conditionalPanel(condition = "input.progTypeE == 'Academic Programs'",
             selectInput('acadE', 
@@ -86,8 +86,7 @@ shinyUI(fluidPage(
                
                # Show a plot of the generated distribution
         mainPanel(
-          chartOutput('histE', lib = 'nvd3'),
-          plotOutput("plot2")
+          textOutput('histE')
         )
       )           
     ),
