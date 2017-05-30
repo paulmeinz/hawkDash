@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
       names(college)[2] <- 'demo_col'
     }
     
-    if (input$compareE == 'Yes') {
+    if (input$compareE == 'Yes' & input$demoE != 'None') {
       temp <- temp %>%
         left_join(college, 
                   by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
@@ -56,14 +56,29 @@ shinyServer(function(input, output, session) {
     }
     
     
-    print(temp)
+    if (input$demoE =='None') {
+      temp <- gather(temp, 'Type', 'Enrollment', 2:3) %>%
+        select(-prop)
+      temp$termCont <- as.numeric(temp$term)
+    }
     
-    hello <- 'Hello World'
+    temp
   })
   
   
   #output
-  output$histE <- renderText({enrollment()})
+  output$histE <- renderChart({
+    if(input$demoE == 'None') {
+      n1 <- nPlot(Enrollment ~ termCont, group = "Type", 
+                  data = enrollment(), 
+                  type = "lineChart",
+                  width = session$clientData[["output_plot2_width"]])
+    }
+    
+    n1$addParams(dom = 'histE')
+    
+    return(n1)
+  })
 
     
 #-----------------------SUCCESS DASH--------------------------------------------  
