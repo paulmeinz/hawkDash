@@ -8,6 +8,7 @@ shinyServer(function(input, output, session) {
   
 #-----------------------ENROLLMENT DASH-----------------------------------------
   enrollment <- reactive({
+    
     # Determine filter columns, subject by default.
     prog <- input$progTypeE
     filtCol <- 'subject'
@@ -17,16 +18,34 @@ shinyServer(function(input, output, session) {
     names(enroll)
     
     # Determine the group by factors, if "None" is selected only put term
-    demo <- input$demoS
+    demo <- input$demoE
     dots <- c("term", demo)
     dots <- dots[!dots == 'None']
     
     # Calculate collegewide by default
     temp <- enroll %>%
-      subset(term %in% input$termS) %>%
+      subset(term %in% input$termE) %>%
       group_by_(.dots = dots) %>%
-      summarise(duplicated = n(), unduplicated = n_distinct()) %>%
-      mutate(proportion = unduplicated/sum(unduplicated))
+      summarise(dup = n(), undup = n_distinct(emplid)) %>%
+      mutate(prop = undup/sum(undup))
+    
+    # Save the collegewide
+    college <- temp
+    
+    # If program is selected do this disag
+    if (input$collegeE != 'Collegewide') {
+      temp <- enroll %>%
+        subset(term %in% input$termE & 
+                 (filt %in% input$acadE  | input$specialE == filt)) %>%
+        group_by_(.dots = dots) %>%
+        summarise(dup = n(), undup = n_distinct(emplid)) %>%
+        mutate(prop = undup/sum(undup))
+    }
+    
+    if (input$demoE != 'None') {
+      names(temp)[2] <- 'demo_col'
+    }
+    
     
     print(temp)
     

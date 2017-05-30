@@ -11,7 +11,8 @@ load('enrollment.rdata')
 
 ################################################################################
 
-#---------------------ENROLLMENT/COURSE SUCCESS DASHBOARD OPTIONS---------------
+
+#------------------ENROLLMENT/COURSE SUCCESS DASHBOARD OPTIONS------------------
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
