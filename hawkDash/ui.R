@@ -5,22 +5,35 @@ library(rCharts)
 # Load standard data
 load('enrollment.rdata')
 
-# Create selection options
+################################################################################
+
+#                         DEFINE BUTTON OPTIONS
+
+################################################################################
+
+# COURSE SUCCESS DASHBOARD OPTIONS
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
+# Type of trend evaluation
+trends <- c('Collegewide','Program')
+
+# Academic programs
 acad <- unique(enroll$subject)
 acad <- acad[order(acad)]
 
-compare <- c('None','Compare to Collegewide',
-             'Evaluate Equity')
-
-term <- unique(enroll$term)
-
-trends <- c('Collegewide','Program')
-
+# Special (non academic) programs
 special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
              Diop = 'diop', DSPS = 'dsps', Puente = 'puente')
 
+# Compare options
+compare <- c('None','Compare to Collegewide',
+             'Evaluate Equity')
+
+# Term selections
+term <- unique(enroll$term)
+term <- term(order(term))
+
+# Demographic options
 demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Disability Status' = 'disability', Ethnicity = 'ethnicity',
           'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
@@ -28,7 +41,12 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Foster Youth Status' = 'foster')
 
 
-# Define UI
+################################################################################
+
+#                                Define UI
+
+################################################################################
+
 shinyUI(fluidPage(
 
   # Application title
