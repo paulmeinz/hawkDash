@@ -78,7 +78,6 @@ shinyServer(function(input, output, session) {
     }
     
     # Suppress small Ns
-    print(temp)
     if (length(temp[,1]) > 0) {
       temp[temp$den <= 20, 'Success'] <- -1
     }

@@ -11,7 +11,7 @@ load('enrollment.rdata')
 
 ################################################################################
 
-# COURSE SUCCESS DASHBOARD OPTIONS
+#---------------------COURSE SUCCESS DASHBOARD OPTIONS--------------------------
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
@@ -49,40 +49,49 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
 
 shinyUI(fluidPage(
 
-  # Application title
-  titlePanel("The CRC Hawkdash"),
+  navbarPage(title = 'The CRC Hawkdash',
+#---------------------------ACCESS TAB------------------------------------------
+    tabPanel(title = 'Applications (Access)'),
 
-  # Inputs
-  sidebarLayout(
-    sidebarPanel(
-      selectInput('college', 'Would you like to see Collegewide data
+#---------------------------MATRICULATION TAB-----------------------------------
+    tabPanel(title = 'Matriculation (SSSP)'),
+
+#---------------------------ENROLLMENT TAB--------------------------------------
+    tabPanel(title = 'Enrollment'),
+
+#---------------------------COURSE SUCCESS TAB----------------------------------
+    tabPanel(title = 'Course Success', 
+      sidebarLayout(
+        sidebarPanel(
+          selectInput('college', 'Would you like to see Collegewide data
                   or data in a program?', trends),
 
-      conditionalPanel(condition = "input.college == 'Program'",
-        selectInput('progType', 'Select a program type', programType),
+          conditionalPanel(condition = "input.college == 'Program'",
+            selectInput('progType', 'Select a program type', programType),
 
-      conditionalPanel(
-        condition = "input.progType == 'Academic Programs'",
-        selectInput('acad', 'Select program(s) by clicking in the box below.'
-                    , acad, multiple = TRUE)),
+          conditionalPanel(condition = "input.progType == 'Academic Programs'",
+            selectInput('acad', 
+                        'Select program(s) by clicking in the box below.',
+                         acad, multiple = TRUE)),
 
-      conditionalPanel(
-        condition = "input.progType == 'Special Programs'",
-        selectInput('special', 'Select a program', special))),
+          conditionalPanel(condition = "input.progType == 'Special Programs'",
+            selectInput('special', 'Select a program', special))),
 
-      selectInput('term', 'What terms would you like to see? Click in
-                  the box below.', term, multiple = TRUE),
+          selectInput('term', 'What terms would you like to see? Click in
+                      the box below.', term, multiple = TRUE),
 
-      selectInput('demo', 'Would you like to view trends for
-                  a particular demographic group?', demo),
+          selectInput('demo', 'Would you like to view trends for
+                      a particular demographic group?', demo),
       
-      selectInput('compare','Perform a Comparison', compare)
-    ),
+          selectInput('compare','Perform a Comparison', compare)
+        ),
 
     # Show a plot of the generated distribution
-    mainPanel(
-       chartOutput('hist', lib = 'nvd3'),
-       plotOutput("plot1")
+        mainPanel(
+          chartOutput('hist', lib = 'nvd3'),
+          plotOutput("plot1")
+        )
+      )
     )
   )
 ))
