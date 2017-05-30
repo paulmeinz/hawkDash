@@ -1,6 +1,7 @@
 library(shiny)
 library(dplyr)
 library(rCharts)
+library(tidyr)
 
 # Load standard data
 load('enrollment.rdata')
@@ -81,8 +82,10 @@ shinyUI(fluidPage(
                  
           selectInput('demoE', 'Would you like to view trends for
                       a particular demographic group?', demo),
-                 
-          selectInput('compareE','Evaluate Equity?', compareE)
+          
+          conditionalPanel(condition = "input.demoE != 'None'
+                           & input.collegeE == 'Program'",       
+            selectInput('compareE','Evaluate Equity?', compareE))
         ),
                
                # Show a plot of the generated distribution

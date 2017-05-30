@@ -44,6 +44,15 @@ shinyServer(function(input, output, session) {
     
     if (input$demoE != 'None') {
       names(temp)[2] <- 'demo_col'
+      names(college)[2] <- 'demo_col'
+    }
+    
+    if (input$compareE == 'Yes') {
+      temp <- temp %>%
+        left_join(college, 
+                  by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
+        mutate(prop = prop.x/prop.y) %>%
+        select(-c(prop.x, dup.y, undup.y, prop.y))
     }
     
     
