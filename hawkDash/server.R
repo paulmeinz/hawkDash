@@ -34,7 +34,7 @@ shinyServer(function(input, output, session) {
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
-      mutate(Proportion = Unduplicated/sum(Unduplicated))
+      mutate(Proportion = Unduplicated/sum(Unduplicated) * 100)
     
     # Save the collegewide
     college <- temp
@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
                  (filt %in% input$acadE  | input$specialE == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
-        mutate(Proportion = Unduplicated/sum(Unduplicated))
+        mutate(Proportion = Unduplicated/sum(Unduplicated) * 100)
     }
     
     if (input$demoE != 'None') {
@@ -58,8 +58,9 @@ shinyServer(function(input, output, session) {
       temp <- temp %>%
         left_join(college, 
                   by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
-        mutate(Proportion = Proportion.x - Proportion.y) %>%
-        select(-c(Proportion.x, Duplicated.y, Unduplicated.y, Proportion.y))
+        mutate(Proportion = Proportion.x/Proportion.y * 100) %>%
+        select(-c(Proportion.x, Duplicated.y, Unduplicated.y, Proportion.y)) %>%
+        rename(Unduplicated = Unduplicated.x)
     }
     
     
@@ -68,6 +69,14 @@ shinyServer(function(input, output, session) {
         select(-Proportion)
       temp$termCont <- as.numeric(temp$term)
     }
+    
+    # Suppress small Ns
+    print(temp)
+    
+    if (length(temp[,1]) > 0 & input$demoE != 'None') {
+      temp <- temp[temp$Unduplicated >= 10, ]
+    }
+    print(temp)
     
     temp
   })
@@ -109,10 +118,12 @@ shinyServer(function(input, output, session) {
                     return tickvalues}!#", sep = '')
       
       # Execute code and set other features
-      n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-               rotateLabels = -30)
+      n1$xAxis(axisLabel = 'Term', tickFormat = codeForm, tickValues = codeVal, 
+               width = 50)
       n1$chart(forceY = c(.9 * min(enrollment()$Enrollment),
-                          1.1 * max(enrollment()$Enrollment)))
+                          1.1 * max(enrollment()$Enrollment)),
+               margin = list(left = 63, bottom = 63, right = 63))
+      n1$yAxis(axisLabel='Enrollment', width=50)
       n1$chart(color = c('blue', 'orange'), size = 5)
       n1$chart(tooltipContent = "#! function(key, x, y, e){ 
         return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
@@ -126,6 +137,28 @@ shinyServer(function(input, output, session) {
                   type = "multiBarChart",
                   width = session$clientData[["output_plot2_width"]])
       n1$chart(showControls = F, reduceXTicks = F)
+      n1$chart(color = c('blue', 'orange', 'brown', 'green', 'red'),
+               forceY = c(0,100))
+      n1$chart(tooltipContent = "#! function(key, x, y){ 
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+          x + ': ' + '<strong>' + y + '%' + '</strong>'
+      } !#")
+      n1$yAxis(axisLabel = 'Proportion of Students (%)', width = 50)
+    }
+    
+    if (input$demoE != 'None' & input$compareE == 'Yes') {
+      n1 <- nPlot(Proportion ~ demo_col, group = "term", 
+                  data = enrollment(), 
+                  type = "multiBarChart",
+                  width = session$clientData[["output_plot2_width"]])
+      n1$chart(showControls = F, reduceXTicks = F)
+      n1$chart(color = c('blue', 'orange', 'brown', 'green', 'red'),
+               forceY = c(0,max(enrollment()$Proportion) + 10))
+      n1$chart(tooltipContent = "#! function(key, x, y){ 
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+          x + ': ' + '<strong>' + y + '</strong>'
+      } !#")
+      n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
     }
     
     n1$addParams(dom = 'histE')
@@ -162,8 +195,6 @@ shinyServer(function(input, output, session) {
       group_by_(.dots = dots) %>%
       summarise(Success = mean(success), num = sum(success), den = n()) %>%
       mutate(overallSuc = sum(num)/sum(den))
-    
-    print(temp)
 
     # Store collegewide for comparisons
     college <- temp
@@ -245,11 +276,19 @@ shinyServer(function(input, output, session) {
       if (input$compareS == 'None') {
         n1$chart(forceY = c(0,100))
         n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
+        n1$chart(tooltipContent = "#! function(key, x, y){ 
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+          x + ': ' + '<strong>' + y + '%' + '</strong>'
+        } !#")
       }
 
       if (input$compareS == 'Evaluate Equity') {
-        n1$chart(forceY = c(0, max(success()$Success) + 20))
+        n1$chart(forceY = c(0, max(success()$Success) + 10))
         n1$yAxis(axisLabel='Proportionality Index', width=50)
+        n1$chart(tooltipContent = "#! function(key, x, y){ 
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+          x + ': ' + '<strong>' + y + '</strong>'
+        } !#")
       }
       
       if (input$compareS == 'Compare to Collegewide') {
@@ -257,15 +296,16 @@ shinyServer(function(input, output, session) {
         n1$yAxis(axisLabel =
                    'Program Success Rate (%) - Collegewide Success Rate (%)', 
                  width=50)
+        n1$chart(tooltipContent = "#! function(key, x, y){ 
+        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+          x + ': ' + '<strong>' + y + '%' + '</strong>'
+        } !#")
       }
       
       n1$addParams(dom = 'histS')
       n1$chart(color = c('blue', 'orange', 'brown', 'green', 'red'))
       
-      n1$chart(tooltipContent = "#! function(key, x, y, e){ 
-        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-          x + ': ' + '<strong>' + y + '%' + '</strong>'
-      } !#")
+
       
       return(n1)
       })
