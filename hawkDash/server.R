@@ -22,9 +22,16 @@ shinyServer(function(input, output, session) {
     dots <- c("term", demo)
     dots <- dots[!dots == 'None']
     
+    # Determine terms and make a regex pattern
+    terms <- input$termE
+    terms[is.null(terms)] <- 'None'
+    if (length(terms) > 1) {
+      terms <- paste(terms[1], "|", terms[2], sep = '')
+    }
+    
     # Calculate collegewide by default
     temp <- enroll %>%
-      subset(term %in% input$termE) %>%
+      subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
       mutate(Proportion = Unduplicated/sum(Unduplicated))
@@ -35,7 +42,7 @@ shinyServer(function(input, output, session) {
     # If program is selected do this disag
     if (input$collegeE != 'Collegewide') {
       temp <- enroll %>%
-        subset(term %in% input$termE & 
+        subset(seq_along(term) %in% grep(terms, term) &
                  (filt %in% input$acadE  | input$specialE == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
@@ -85,9 +92,10 @@ shinyServer(function(input, output, session) {
         }
       }
       
-      # Execute code and set other features
       code <- paste("#!function(x) {keys = [", y, "]","
                     return keys[x-1]}!#", sep = '')
+      
+      # Execute code and set other features
       n1$xAxis(tickFormat = code, rotateLabels = -30)
       n1$chart(forceY = c(.9 * min(enrollment()$Enrollment),
                           1.1 * max(enrollment()$Enrollment)))
@@ -125,13 +133,23 @@ shinyServer(function(input, output, session) {
     demo <- input$demoS
     dots <- c("term", demo)
     dots <- dots[!dots == 'None']
+    
+    # Determine terms and make a regex pattern
+    terms <- input$termS
+    terms[is.null(terms)] <- 'None'
+    if (length(terms) > 1) {
+      terms <- paste(terms[1], "|", terms[2], sep = '')
+    }
+    
 
     # Calculate collegewide by default
     temp <- enroll %>%
-      subset(term %in% input$termS) %>%
+      subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(Success = mean(success), num = sum(success), den = n()) %>%
       mutate(overallSuc = sum(num)/sum(den))
+    
+    print(temp)
 
     # Store collegewide for comparisons
     college <- temp
@@ -139,7 +157,7 @@ shinyServer(function(input, output, session) {
     # If program is selected do this disag
     if (input$collegeS != 'Collegewide') {
       temp <- enroll %>%
-        subset(term %in% input$termS & 
+        subset(seq_along(term) %in% grep(terms, term) & 
                (filt %in% input$acadS  | input$specialS == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(Success = mean(success), num = sum(success), den = n()) %>%

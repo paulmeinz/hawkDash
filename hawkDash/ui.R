@@ -33,8 +33,7 @@ compare <- c('None','Compare to Collegewide',
 compareE <- c('No','Yes')
 
 # Term selections
-term <- unique(enroll$term)
-term <- term[order(term)]
+term <- c('Fall','Spring')
 
 # Demographic options
 demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
@@ -77,8 +76,8 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.progTypeE == 'Special Programs'",
             selectInput('specialE', 'Select a program', special))),
                  
-          selectInput('termE', 'What terms would you like to see? Click in
-                      the box below.', term, multiple = TRUE),
+          checkboxGroupInput('termE', 'What terms would you like to see?', 
+                      term, inline = TRUE),
                  
           selectInput('demoE', 'Would you like to view trends for
                       a particular demographic group?', demo),
@@ -114,8 +113,8 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.progTypeS == 'Special Programs'",
             selectInput('specialS', 'Select a program', special))),
 
-          selectInput('termS', 'What terms would you like to see? Click in
-                      the box below.', term, multiple = TRUE),
+          checkboxGroupInput('termS', 'What terms would you like to see?', 
+                      term, inline = TRUE),
 
           selectInput('demoS', 'Would you like to view trends for
                       a particular demographic group?', demo),
