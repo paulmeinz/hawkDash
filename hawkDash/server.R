@@ -23,7 +23,8 @@ shinyServer(function(input, output, session) {
     
     # Remove columns of the data that cause duplication IN terms
     data <- enroll %>%
-      select(-class_rec_key, -subject, -success)
+      select(-class_rec_key, -subject, -success) %>%
+      filter(strm > 1143) # we dont have data before spring 14
     data <- unique(data)
     
     # Determine which sssp elements should be used and calculate appropriately
@@ -36,10 +37,12 @@ shinyServer(function(input, output, session) {
     }
     
     # Disaggregate
+    data <- data[data$exempt == 'not exempt',]
+    
     temp <- data %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      summarise(Proportion = mean(Proportion))
+      summarise(Proportion = mean(Proportion), HC = n_distinct(emplid))
     
     
     
