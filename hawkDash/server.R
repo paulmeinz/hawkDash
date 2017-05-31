@@ -22,14 +22,16 @@ shinyServer(function(input, output, session) {
     dots <- c("term", demo)
     dots <- dots[!dots == 'None']
     
-    # Determine terms and make a regex pattern
+    # Determine terms and make a regex pattern for filtering
     terms <- input$termE
     terms[is.null(terms)] <- 'None'
     if (length(terms) > 1) {
       terms <- paste(terms[1], "|", terms[2], sep = '')
     }
     
-    # Calculate collegewide by default
+    # Calculate collegewide enrollment by default
+    # Have to do some voodoo magic in the left join because numbers will be
+    # duplicated otherwise
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
@@ -44,7 +46,7 @@ shinyServer(function(input, output, session) {
     # Save the collegewide
     college <- temp
     
-    # If program is selected do this disag
+    # If program is selected do this disag (same as above but with program filt)
     if (input$collegeE != 'Collegewide') {
       temp <- enroll %>%
         subset(seq_along(term) %in% grep(terms, term) &
@@ -60,11 +62,13 @@ shinyServer(function(input, output, session) {
         mutate(Proportion = Unduplicated/undup * 100)
     }
     
+    # If a demo is selected label the appropriate column (for general plot)
     if (input$demoE != 'None') {
       names(temp)[2] <- 'demo_col'
       names(college)[2] <- 'demo_col'
     }
     
+    # If compare is selected and demo is not none calculated a prop index
     if (input$compareE == 'Yes' & input$demoE != 'None') {
       temp <- temp %>%
         left_join(college, 
@@ -74,13 +78,14 @@ shinyServer(function(input, output, session) {
         rename(Unduplicated = Unduplicated.x)
     }
     
+    # If no demo is selected restructure the data to plot dup/undup
     if (input$demoE =='None') {
       temp <- gather(temp, 'Type', 'Enrollment', 2:3) %>%
         select(-Proportion)
       temp$termCont <- as.numeric(temp$term)
     }
     
-    # Suppress small Ns
+    # Suppress small Ns so that prop indexes arent outliers.
     if (length(temp[,1]) > 0 & input$demoE != 'None') {
       temp <- temp[temp$Unduplicated >= 10, ]
     }
@@ -89,8 +94,12 @@ shinyServer(function(input, output, session) {
   })
   
   
-  #output
+  
+  # ENROLLMENT DASH OUTPUT
+  
   output$histE <- renderChart({
+    
+    # General plot if no demo selected
     if(input$demoE == 'None') {
       n1 <- nPlot(Enrollment ~ termCont, group = "Type", 
                   data = enrollment(), 
@@ -141,6 +150,7 @@ shinyServer(function(input, output, session) {
                width = 50)
     }
     
+    # General plot if demo is selected
     if (input$demoE != 'None') {
       n1 <- nPlot(Proportion ~ demo_col, group = "term", 
                   data = enrollment(), 
@@ -160,6 +170,7 @@ shinyServer(function(input, output, session) {
                width = 50)
     }
     
+    # General plot if compare is 'Yes'
     if (input$demoE != 'None' & input$compareE == 'Yes') {
       n1 <- nPlot(Proportion ~ demo_col, group = "term", 
                   data = enrollment(), 
@@ -198,7 +209,7 @@ shinyServer(function(input, output, session) {
     dots <- c("term", demo)
     dots <- dots[!dots == 'None']
     
-    # Determine terms and make a regex pattern
+    # Determine terms and make a regex pattern for filtering later
     terms <- input$termS
     terms[is.null(terms)] <- 'None'
     if (length(terms) > 1) {
@@ -232,6 +243,7 @@ shinyServer(function(input, output, session) {
       names(college)[2] <- 'demo_col'
     }
     
+    # If equity comparison is slected divide by overall success
     if (input$compareS == 'Evaluate Equity') {
       if (input$demoS != 'None') {
         temp$Success <- temp$Success/temp$overallSuc * 100
@@ -243,6 +255,7 @@ shinyServer(function(input, output, session) {
       
     }
     
+    # If compare to collegewide is selected subtract collegewide
     if (input$compareS == 'Compare to Collegewide') {
       if (input$demoS == 'None') {
         temp <- temp %>% 
@@ -271,16 +284,21 @@ shinyServer(function(input, output, session) {
 
   
   
-# output
+# SUCCESS DASH OUTPUT
+  
     output$histS <- renderChart({
+      
+      # General plot for when demos are selected
       if (input$demoS != 'None') {
         n1 <- nPlot(Success ~ demo_col, group = "term", 
                     data = success(), 
                     type = "multiBarChart",
                     width = session$clientData[["output_plot1_width"]])
+        
         n1$chart(showControls = F, reduceXTicks = F)
       }
       
+      # General plot for when no demos selected
       if (input$demoS == 'None') {
         n1 <- nPlot(Success ~ term, 
                     data = success(), 
@@ -319,10 +337,9 @@ shinyServer(function(input, output, session) {
         } !#")
       }
       
+      # Make sure the plot displays
       n1$addParams(dom = 'histS')
       n1$chart(color = c('blue', 'orange', 'brown', 'green', 'red'))
-      
-
       
       return(n1)
       })
