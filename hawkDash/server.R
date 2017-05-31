@@ -40,7 +40,6 @@ shinyServer(function(input, output, session) {
                   summarise(undup = n_distinct(emplid))) %>%
       mutate(Proportion = Unduplicated/undup * 100)
       
-    print(temp)
     
     # Save the collegewide
     college <- temp
@@ -52,7 +51,13 @@ shinyServer(function(input, output, session) {
                  (filt %in% input$acadE  | input$specialE == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
-        mutate(Proportion = Unduplicated/sum(Unduplicated) * 100)
+        left_join(undup <- enroll %>%
+                    subset(seq_along(term) %in% grep(terms, term) &
+                             (filt %in% input$acadE  | 
+                                input$specialE == filt)) %>%
+                    group_by(term) %>%
+                    summarise(undup = n_distinct(emplid))) %>%
+        mutate(Proportion = Unduplicated/undup * 100)
     }
     
     if (input$demoE != 'None') {
@@ -79,8 +84,6 @@ shinyServer(function(input, output, session) {
     if (length(temp[,1]) > 0 & input$demoE != 'None') {
       temp <- temp[temp$Unduplicated >= 10, ]
     }
-
-    print(temp)
     
     temp
   })
