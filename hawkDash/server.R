@@ -7,7 +7,47 @@ shinyServer(function(input, output, session) {
 
   
 #-----------------------MATRICULATION DASH--------------------------------------  
+  matriculation <- reactive({
   
+    # Determine the group by factors, if "None" is selected only put term
+    demo <- input$demoM
+    dots <- c("term", demo)
+    dots <- dots[!dots == 'None', drop = F]
+    
+    # Determine terms and make a regex pattern for filtering
+    terms <- input$termM
+    terms[is.null(terms)] <- 'None'
+    if (length(terms) > 1) {
+      terms <- paste(terms[1], "|", terms[2], sep = '')
+    }
+    
+    # Remove columns of the data that cause duplication IN terms
+    data <- enroll %>%
+      select(-class_rec_key, -subject, -success)
+    data <- unique(data)
+    
+    # Determine which sssp elements should be used and calculate appropriately
+    if (length(input$sssp) > 1) {
+      x <- data[,input$sssp]
+      data$Proportion <- rowSums(x)/length(input$sssp)
+      data$Proportion[data$Proportion < 100] <- 0
+    } else {
+      names(data)[names(data) == input$sssp] <- 'Proportion'
+    }
+    
+    # Disaggregate
+    temp <- data %>%
+      subset(seq_along(term) %in% grep(terms, term)) %>%
+      group_by_(.dots = dots) %>%
+      summarise(Proportion = mean(Proportion))
+    
+    
+    
+    print(temp)
+    'hello world'    
+  })
+  
+    output$histM <- renderText({matriculation()})
 #-----------------------ENROLLMENT DASH-----------------------------------------
   enrollment <- reactive({
     

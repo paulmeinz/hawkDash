@@ -43,7 +43,8 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Foster Youth Status' = 'foster')
 
 # Output Options
-sssp <- c('Assessment', 'Ed Plan', 'Orientation')
+sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
+          Orientation = 'orientation')
 
 
 ################################################################################
@@ -77,7 +78,7 @@ shinyUI(fluidPage(
                
                # Show a plot of the generated distribution
         mainPanel(
-          chartOutput('histM', lib = 'nvd3'),
+          textOutput('histM'),
           plotOutput("plot3")
         )
       )           
