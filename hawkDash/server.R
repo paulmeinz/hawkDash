@@ -34,7 +34,13 @@ shinyServer(function(input, output, session) {
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
-      mutate(Proportion = Unduplicated/sum(Unduplicated) * 100)
+      left_join(undup <- enroll %>%
+                  subset(seq_along(term) %in% grep(terms, term)) %>%
+                  group_by(term) %>%
+                  summarise(undup = n_distinct(emplid))) %>%
+      mutate(Proportion = Unduplicated/undup * 100)
+      
+    print(temp)
     
     # Save the collegewide
     college <- temp
@@ -74,6 +80,8 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$Unduplicated >= 10, ]
     }
 
+    print(temp)
+    
     temp
   })
   
@@ -145,7 +153,8 @@ shinyServer(function(input, output, session) {
                  x + ': ' + '<strong>' + y + '%' + '</strong>'
                } !#")
       
-      n1$yAxis(axisLabel = 'Proportion of Students (%)', width = 50)
+      n1$yAxis(axisLabel = 'Proportion of UNDUPLICATED Students (%)', 
+               width = 50)
     }
     
     if (input$demoE != 'None' & input$compareE == 'Yes') {
