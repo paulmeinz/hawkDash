@@ -13,7 +13,7 @@ load('enrollment.rdata')
 ################################################################################
 
 
-#------------------ENROLLMENT/COURSE SUCCESS DASHBOARD OPTIONS------------------
+#--------------ENROLLMENT/SUCCESS/MATRICULATION DASHBOARD OPTIONS---------------
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
@@ -42,6 +42,9 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Gender' = 'gender','Online' = 'online', 'Veteran Status' = 'veteran',
           'Foster Youth Status' = 'foster')
 
+# Output Options
+sssp <- c('Assessment', 'Ed Plan', 'Orientation')
+
 
 ################################################################################
 
@@ -56,7 +59,29 @@ shinyUI(fluidPage(
     tabPanel(title = 'Applications (Access)'),
 
 #---------------------------MATRICULATION TAB-----------------------------------
-    tabPanel(title = 'Matriculation (SSSP)'),
+    tabPanel(title = 'Matriculation (SSSP)',
+      sidebarLayout(
+        sidebarPanel(
+          checkboxGroupInput('sssp', 'View data on students
+                             that completed (check all that apply):', sssp),
+                 
+          checkboxGroupInput('termM', 'What terms would you like to see?', 
+                             term, inline = TRUE),
+                 
+          selectInput('demoM', 'Would you like to view trends for
+                      a particular demographic group?', demo),
+                 
+          conditionalPanel(condition = "input.demoM != 'None'",       
+          selectInput('compareM','Evaluate Equity?', compareE))
+                 ),
+               
+               # Show a plot of the generated distribution
+        mainPanel(
+          chartOutput('histM', lib = 'nvd3'),
+          plotOutput("plot3")
+        )
+      )           
+    ),
 
 #---------------------------ENROLLMENT TAB--------------------------------------
     tabPanel(title = 'Enrollment',
