@@ -92,14 +92,28 @@ shinyServer(function(input, output, session) {
         }
       }
       
-      code <- paste("#!function(x) {keys = [", y, "]","
+      codeForm <- paste("#!function(x) {keys = [", y, "]","
                     return keys[x-1]}!#", sep = '')
       
+      x <- unique(as.numeric(enrollment()$term))
+      y <- ''
+      for (i in x) {
+        if (y == '') {
+          y <- paste("'", i, "'")
+        } else {
+          y <- paste(y, ",'", i, "'")
+        }
+      }
+      
+      codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
+                    return tickvalues}!#", sep = '')
+      
       # Execute code and set other features
-      n1$xAxis(tickFormat = code, rotateLabels = -30)
+      n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
+               rotateLabels = -30)
       n1$chart(forceY = c(.9 * min(enrollment()$Enrollment),
                           1.1 * max(enrollment()$Enrollment)))
-      n1$chart(color = c('blue', 'orange'))
+      n1$chart(color = c('blue', 'orange'), size = 5)
       n1$chart(tooltipContent = "#! function(key, x, y, e){ 
         return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
           x + ': ' + '<strong>' + y + '</strong>'
