@@ -1,6 +1,16 @@
 library(shiny)
 
+# Load enrollment data
 load('enrollment.rdata')
+
+# Create matriculation data
+# Remove columns of the data that cause duplication IN terms
+matric <- enroll %>%
+  select(-class_rec_key, -subject, -success) %>%
+  filter(strm > 1143) # we dont have data before spring 14
+
+# Deduplify so students dont get double counted in a term
+matric <- unique(matric)
 
 # Define server logic
 shinyServer(function(input, output, session) {
@@ -21,41 +31,71 @@ shinyServer(function(input, output, session) {
       terms <- paste(terms[1], "|", terms[2], sep = '')
     }
     
-    # Remove columns of the data that cause duplication IN terms
-    data <- enroll %>%
-      select(-class_rec_key, -subject, -success) %>%
-      filter(strm > 1143) # we dont have data before spring 14
-    
-    # Deduplify so students dont get double counted in a term
-    data <- unique(data)
-    
     # Filter out exempt students if they should not be included
     if (input$exempt == 'No') {
-      data <- data[data$exempt == 'not exempt',]  
+      matric <- matric[matric$exempt == 'not exempt',]  
     }
     
     # Determine which sssp elements should be used and calculate appropriately
     if (length(input$sssp) > 1) {
-      x <- data[,input$sssp]
-      data$Proportion <- rowSums(x)/length(input$sssp)
-      data$Proportion[data$Proportion < 100] <- 0
+      x <- matric[,input$sssp]
+      matric$Proportion <- rowSums(x)/length(input$sssp)
+      matric$Proportion[matric$Proportion < 100] <- 0
     } else {
-      names(data)[names(data) == input$sssp] <- 'Proportion'
+      names(matric)[names(matric) == input$sssp] <- 'Proportion'
+    }
+    
+    if (is.null(input$sssp)) {
+      matric$Proportion <- 0
     }
     
     # Disaggregate
-    temp <- data %>%
+    temp <- matric %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      summarise(Proportion = mean(Proportion), HC = n_distinct(emplid))
+      summarise(Proportion = mean(Proportion), HC = n_distinct(emplid)) %>%
+      left_join(overall <- matric %>%
+                  group_by(term) %>%
+                  summarise(College = mean(Proportion))) %>%
+      mutate(Equity = Proportion/College * 100)
     
+    if (input$demoM != 'None') {
+      names(temp)[2] <- 'demo_col'
+    }
     
-    
-    print(temp)
-    'hello world'    
+    temp
   })
   
-    output$histM <- renderText({matriculation()})
+# MATRICULATION DASH OUTPUT   
+    output$histM <- renderChart({
+      if (input$compareM == 'No' | input$demoM == 'None') {
+        n1 <- nPlot(Proportion ~ term,  
+                    data = matriculation(), 
+                    type = "discreteBarChart",
+                    width = session$clientData[["output_plot3_width"]])
+      }
+      
+      if (input$compareM == 'No' & input$demoM != 'None') {
+        n1 <- nPlot(Proportion ~ demo_col, group = "term", 
+                    data = matriculation(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot3_width"]])
+        
+        n1$chart(showControls = F, reduceXTicks = F)
+      }
+      
+      if (input$compareM == 'Yes' & input$demoM != 'None') {
+        n1 <- nPlot(Equity ~ demo_col, group = "term", 
+                    data = matriculation(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot3_width"]])
+        
+        n1$chart(showControls = F, reduceXTicks = F)
+      }
+      
+      n1$addParams(dom = 'histM')
+      return(n1)
+    })
 #-----------------------ENROLLMENT DASH-----------------------------------------
   enrollment <- reactive({
     
