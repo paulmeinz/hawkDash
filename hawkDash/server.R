@@ -158,6 +158,7 @@ shinyServer(function(input, output, session) {
       
       # Create javascript code to modify x ticks (Wacky)
       x <- unique(enroll$term)
+      x <- x[order(x)]
       y <- ''
       for (i in x) {
         if (y == '') {
@@ -184,8 +185,8 @@ shinyServer(function(input, output, session) {
                     return tickvalues}!#", sep = '')
       
       # Execute code and set other features
-      n1$chart(forceY = c(.9 * min(enrollment()$Enrollment),
-                          1.1 * max(enrollment()$Enrollment)),
+      n1$chart(forceY = c(floor(.9 * min(enrollment()$Enrollment)),
+                          floor(1.1 * max(enrollment()$Enrollment))),
                margin = list(left = 63, bottom = 63, right = 63),
                color = c('blue', 'orange'), size = 5, 
                tooltipContent = "#! 
@@ -195,9 +196,8 @@ shinyServer(function(input, output, session) {
                  } !#")
       
       n1$yAxis(axisLabel='Enrollment', width=50)
-      n1$xAxis(axisLabel = 'Term', tickFormat = codeForm, 
-               tickValues = codeVal, 
-               width = 50)
+      n1$xAxis(axisLabel = 'Term', tickFormat = codeForm, tickValues = codeVal, 
+               width = 50, rotateLabels = -25)
     }
     
     # General plot if demo is selected
