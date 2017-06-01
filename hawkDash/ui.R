@@ -43,7 +43,7 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Foster Youth Status' = 'foster')
 
 # Exemption status
-exempt <- c('Yes','No')
+exempt <- c('No','Yes')
 
 # Output Options
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
@@ -67,13 +67,14 @@ shinyUI(fluidPage(
       sidebarLayout(
         sidebarPanel(
           checkboxGroupInput('sssp', 'View data on students
-                             that completed (check all that apply):', sssp),
+                             that completed (check all that apply):', sssp,
+                             selected = c('assess','edPlan', 'orientation')),
           
           selectInput('exempt', 'Include students who were exempted, 
                       grandfathered, or new transfer matriculated?', exempt),
                  
           checkboxGroupInput('termM', 'What terms would you like to see?', 
-                             term, inline = TRUE),
+                             term, inline = TRUE, selected = 'Fall'),
                  
           selectInput('demoM', 'Would you like to view trends for
                       a particular demographic group?', demo),
@@ -109,7 +110,7 @@ shinyUI(fluidPage(
             selectInput('specialE', 'Select a program', special))),
                  
           checkboxGroupInput('termE', 'What terms would you like to see?', 
-                      term, inline = TRUE),
+                      term, inline = TRUE, selected = 'Fall'),
                  
           selectInput('demoE', 'Would you like to view trends for
                       a particular demographic group?', demo),
@@ -146,7 +147,7 @@ shinyUI(fluidPage(
             selectInput('specialS', 'Select a program', special))),
 
           checkboxGroupInput('termS', 'What terms would you like to see?', 
-                      term, inline = TRUE),
+                      term, inline = TRUE, selected = 'Fall'),
 
           selectInput('demoS', 'Would you like to view trends for
                       a particular demographic group?', demo),
