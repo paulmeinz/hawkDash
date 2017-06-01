@@ -12,6 +12,10 @@ matric <- enroll %>%
 # Deduplify so students dont get double counted in a term
 matric <- unique(matric)
 
+# Set Colors
+colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999", 
+            "#F0E442", "#000000", "#56B4E9", "#CC79A7", "#999900" )
+
 # Define server logic
 shinyServer(function(input, output, session) {
 
@@ -73,6 +77,13 @@ shinyServer(function(input, output, session) {
                     data = matriculation(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot3_width"]])
+        
+        n1$chart(forceY = c(0,100), 
+                 color = colors,
+                 tooltipContent = "#! function(key, x, y){ 
+                 return x + ': ' + '<strong>' + y + '%' + '</strong>'
+                 } !#")
+        #n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
       }
       
       if (input$compareM == 'No' & input$demoM != 'None') {
@@ -81,7 +92,14 @@ shinyServer(function(input, output, session) {
                     type = "multiBarChart",
                     width = session$clientData[["output_plot3_width"]])
         
-        n1$chart(showControls = F, reduceXTicks = F)
+        n1$chart(showControls = F, reduceXTicks = F,
+                 color = colors,
+                 forceY = c(0, 100),
+                 tooltipContent = "#! 
+                 function(key, x, y){ 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 x + ': ' + '<strong>' + y + '%' '</strong>'
+                 } !#")
       }
       
       if (input$compareM == 'Yes' & input$demoM != 'None') {
@@ -90,7 +108,14 @@ shinyServer(function(input, output, session) {
                     type = "multiBarChart",
                     width = session$clientData[["output_plot3_width"]])
         
-        n1$chart(showControls = F, reduceXTicks = F)
+        n1$chart(showControls = F, reduceXTicks = F,
+                 color = colors,
+                 forceY = c(0,max(enrollment()$Proportion) + 10),
+                 tooltipContent = "#! 
+                 function(key, x, y){ 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 x + ': ' + '<strong>' + y + '</strong>'
+                 } !#")
       }
       
       n1$addParams(dom = 'histM')
@@ -228,7 +253,7 @@ shinyServer(function(input, output, session) {
       n1$chart(forceY = c(floor(.9 * min(enrollment()$Enrollment)),
                           floor(1.1 * max(enrollment()$Enrollment))),
                margin = list(left = 63, bottom = 63, right = 63),
-               color = c('blue', 'orange'), size = 5, 
+               color = colors, size = 5, 
                tooltipContent = "#! 
                  function(key, x, y, e){ 
                    return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
@@ -248,7 +273,7 @@ shinyServer(function(input, output, session) {
                   width = session$clientData[["output_plot2_width"]])
       
       n1$chart(showControls = F, reduceXTicks = F, 
-               color = c('blue', 'orange', 'brown', 'green', 'red'),
+               color = colors,
                forceY = c(0,100), 
                tooltipContent = "#! 
                function(key, x, y){ 
@@ -268,7 +293,7 @@ shinyServer(function(input, output, session) {
                   width = session$clientData[["output_plot2_width"]])
       
       n1$chart(showControls = F, reduceXTicks = F,
-               color = c('blue', 'orange', 'brown', 'green', 'red'),
+               color = colors,
                forceY = c(0,max(enrollment()$Proportion) + 10),
                tooltipContent = "#! 
                function(key, x, y){ 
@@ -429,7 +454,7 @@ shinyServer(function(input, output, session) {
       
       # Make sure the plot displays
       n1$addParams(dom = 'histS')
-      n1$chart(color = c('blue', 'orange', 'brown', 'green', 'red'))
+      n1$chart(color = colors)
       
       return(n1)
       })
