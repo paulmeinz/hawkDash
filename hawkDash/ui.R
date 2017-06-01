@@ -42,6 +42,9 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Gender' = 'gender','Online' = 'online', 'Veteran Status' = 'veteran',
           'Foster Youth Status' = 'foster')
 
+# Exemption status
+exempt <- c('Yes','No')
+
 # Output Options
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
           Orientation = 'orientation')
@@ -65,6 +68,9 @@ shinyUI(fluidPage(
         sidebarPanel(
           checkboxGroupInput('sssp', 'View data on students
                              that completed (check all that apply):', sssp),
+          
+          selectInput('exempt', 'Include students who were exempted, 
+                      grandfathered, or new transfer matriculated?', exempt),
                  
           checkboxGroupInput('termM', 'What terms would you like to see?', 
                              term, inline = TRUE),

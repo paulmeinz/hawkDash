@@ -25,7 +25,14 @@ shinyServer(function(input, output, session) {
     data <- enroll %>%
       select(-class_rec_key, -subject, -success) %>%
       filter(strm > 1143) # we dont have data before spring 14
+    
+    # Deduplify so students dont get double counted in a term
     data <- unique(data)
+    
+    # Filter out exempt students if they should not be included
+    if (input$exempt == 'No') {
+      data <- data[data$exempt == 'not exempt',]  
+    }
     
     # Determine which sssp elements should be used and calculate appropriately
     if (length(input$sssp) > 1) {
@@ -37,8 +44,6 @@ shinyServer(function(input, output, session) {
     }
     
     # Disaggregate
-    data <- data[data$exempt == 'not exempt',]
-    
     temp <- data %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
