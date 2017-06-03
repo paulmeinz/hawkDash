@@ -7,7 +7,7 @@ load('enrollment.rdata')
 # Remove columns of the data that cause duplication IN terms
 matric <- enroll %>%
   select(-class_rec_key, -subject, -success) %>%
-  filter(strm > 1143) # we dont have data before spring 14
+  filter(strm > 1143) # we dont have data in spring 14 or before
 
 # Deduplify so students dont get double counted in a term
 matric <- unique(matric)
@@ -57,26 +57,33 @@ shinyServer(function(input, output, session) {
     temp <- matric %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      summarise(Proportion = mean(Proportion), HC = n_distinct(emplid)) %>%
+      summarise(Prop = mean(Proportion),
+                EarnedProg = sum(Proportion)/100,
+                HCProg = n_distinct(emplid)) %>%
       left_join(overall <- matric %>%
                   group_by(term) %>%
-                  summarise(College = mean(Proportion), 
-                            Earned = sum(Proportion)/100)) %>%
-      mutate(Equity = Proportion/College * 100)
+                  summarise(EarnedCol = sum(Proportion)/100,
+                            HCCol = n_distinct(emplid))) %>%
+      mutate(outRep = EarnedProg/EarnedCol * 100, 
+             colRep = HCProg/HCCol * 100) %>%
+      mutate(Equity = outRep/colRep * 100)
     
     if (input$demoM != 'None') {
       names(temp)[2] <- 'demo_col'
     }
     
-    temp$Proportion <- round(temp$Proportion, 2)
-    temp$College <- round(temp$College, 2)
+    temp$outRep <- round(temp$outRep, 2)
+    temp$colRep <- round(temp$colRep, 2)
+ 
+    print(temp)
+    
     temp
   })
   
 # MATRICULATION DASH OUTPUT   
     output$histM <- renderChart({
       if (input$compareM == 'No' | input$demoM == 'None') {
-        n1 <- nPlot(Proportion ~ term,  
+        n1 <- nPlot(Prop ~ term,  
                     data = matriculation(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot3_width"]])
@@ -86,16 +93,16 @@ shinyServer(function(input, output, session) {
                  tooltipContent = "#! function(key, x, y, e){ 
                  return x + ': ' + '<strong>' + y + '%' + '</strong>' 
                    + '<br/>' +
-                   '<strong>' + e.point.Earned + '</strong>' + 
+                   '<strong>' + e.point.EarnedCol + '</strong>' + 
                    ' out of ' + 
-                   '<strong>' + e.point.HC + '</strong>' +
+                   '<strong>' + e.point.HCCol + '</strong>' +
                    ' students'
                  } !#")
         n1$yAxis(axisLabel='Proportion of Students (%)', width=50)
       }
       
       if (input$compareM == 'No' & input$demoM != 'None') {
-        n1 <- nPlot(Proportion ~ demo_col, group = "term", 
+        n1 <- nPlot(Prop ~ demo_col, group = "term", 
                     data = matriculation(), 
                     type = "multiBarChart",
                     width = session$clientData[["output_plot3_width"]])
@@ -106,9 +113,9 @@ shinyServer(function(input, output, session) {
                  tooltipContent = "#! function(key, x, y, e){ 
                  return x + ': ' + '<strong>' + y + '%' + '</strong>' 
                    + '<br/>' +
-                   '<strong>' + e.point.Earned + '</strong>' + 
+                   '<strong>' + e.point.EarnedProg + '</strong>' + 
                    ' out of ' + 
-                   '<strong>' + e.point.HC + '</strong>' +
+                   '<strong>' + e.point.HCProg + '</strong>' +
                    ' students'
                  } !#")
       }
@@ -126,8 +133,8 @@ shinyServer(function(input, output, session) {
                  function(key, x, y, e){ 
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
                    x + ': ' + '<strong>' + y + '</strong>' + '<br/>' +
-                   e.point.Proportion + '% in the ' + key +
-                   'group divided by the collegewide rate of ' + e.point.College
+                   'Outcome representation: ' + e.point.outRep + '%' + '<br/>' +
+                   'Collegewide representation :' + e.point.colRep + '%'
                  } !#")
       }
       
@@ -218,6 +225,7 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$Unduplicated >= 10, ]
     }
     
+    print(temp)
     temp
   })
   
