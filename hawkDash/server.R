@@ -60,13 +60,16 @@ shinyServer(function(input, output, session) {
       summarise(Proportion = mean(Proportion), HC = n_distinct(emplid)) %>%
       left_join(overall <- matric %>%
                   group_by(term) %>%
-                  summarise(College = mean(Proportion))) %>%
+                  summarise(College = mean(Proportion), 
+                            Earned = sum(Proportion)/100)) %>%
       mutate(Equity = Proportion/College * 100)
     
     if (input$demoM != 'None') {
       names(temp)[2] <- 'demo_col'
     }
     
+    temp$Proportion <- round(temp$Proportion, 2)
+    temp$College <- round(temp$College, 2)
     temp
   })
   
@@ -80,10 +83,15 @@ shinyServer(function(input, output, session) {
         
         n1$chart(forceY = c(0,100), 
                  color = colors,
-                 tooltipContent = "#! function(key, x, y){ 
-                 return x + ': ' + '<strong>' + y + '%' + '</strong>'
+                 tooltipContent = "#! function(key, x, y, e){ 
+                 return x + ': ' + '<strong>' + y + '%' + '</strong>' 
+                   + '<br/>' +
+                   '<strong>' + e.point.Earned + '</strong>' + 
+                   ' out of ' + 
+                   '<strong>' + e.point.HC + '</strong>' +
+                   ' students'
                  } !#")
-        #n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
+        n1$yAxis(axisLabel='Proportion of Students (%)', width=50)
       }
       
       if (input$compareM == 'No' & input$demoM != 'None') {
@@ -92,13 +100,16 @@ shinyServer(function(input, output, session) {
                     type = "multiBarChart",
                     width = session$clientData[["output_plot3_width"]])
         
-        n1$chart(showControls = F, reduceXTicks = F,
+        n1$chart(forceY = c(0,100), 
                  color = colors,
-                 forceY = c(0, 100),
-                 tooltipContent = "#! 
-                 function(key, x, y){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 x + ': ' + '<strong>' + y + '%' '</strong>'
+                 showControls = F, reduceXTicks = F, 
+                 tooltipContent = "#! function(key, x, y, e){ 
+                 return x + ': ' + '<strong>' + y + '%' + '</strong>' 
+                   + '<br/>' +
+                   '<strong>' + e.point.Earned + '</strong>' + 
+                   ' out of ' + 
+                   '<strong>' + e.point.HC + '</strong>' +
+                   ' students'
                  } !#")
       }
       
@@ -110,11 +121,13 @@ shinyServer(function(input, output, session) {
         
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(0,max(enrollment()$Proportion) + 10),
+                 forceY = c(0,max(matriculation()$Equity) + 10),
                  tooltipContent = "#! 
-                 function(key, x, y){ 
+                 function(key, x, y, e){ 
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 x + ': ' + '<strong>' + y + '</strong>'
+                   x + ': ' + '<strong>' + y + '</strong>' + '<br/>' +
+                   e.point.Proportion + '% in the ' + key +
+                   'group divided by the collegewide rate of ' + e.point.College
                  } !#")
       }
       
@@ -426,9 +439,9 @@ shinyServer(function(input, output, session) {
       if (input$compareS == 'None') {
         n1$chart(forceY = c(0,100))
         n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
-        n1$chart(tooltipContent = "#! function(key, x, y){ 
+        n1$chart(tooltipContent = "#! function(key, x, y, e){ 
         return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-          x + ': ' + '<strong>' + y + '%' + '</strong>'
+          x + ': ' + '<strong>' + y + '%' + '</strong>' + e.point.den
         } !#")
       }
 
