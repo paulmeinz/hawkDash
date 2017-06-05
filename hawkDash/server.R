@@ -74,8 +74,6 @@ shinyServer(function(input, output, session) {
     
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
- 
-    print(temp)
     
     temp
   })
@@ -98,7 +96,9 @@ shinyServer(function(input, output, session) {
                    '<strong>' + e.point.HCCol + '</strong>' +
                    ' students'
                  } !#")
-        n1$yAxis(axisLabel='Proportion of Students (%)', width=50)
+        
+        n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
+                 width=50)
       }
       
       if (input$compareM == 'No' & input$demoM != 'None') {
@@ -132,9 +132,13 @@ shinyServer(function(input, output, session) {
                  tooltipContent = "#! 
                  function(key, x, y, e){ 
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                   x + ': ' + '<strong>' + y + '</strong>' + '<br/>' +
-                   'Outcome representation: ' + e.point.outRep + '%' + '<br/>' +
-                   'Collegewide representation :' + e.point.colRep + '%'
+                   '<p>' + x + ': ' + '<strong>' + y + '</strong>' + '</p>' + 
+                   '<p>' +
+                   'This group constituted ' + e.point.colRep + 
+                   '% of students at the College' + '<br/>' +
+                   'and ' + e.point.outRep + '% of students who ' +
+                   'completed the selected outcomes.' +
+                   '</p>'
                  } !#")
       }
       
@@ -297,9 +301,14 @@ shinyServer(function(input, output, session) {
                color = colors,
                forceY = c(0,100), 
                tooltipContent = "#! 
-               function(key, x, y){ 
+               function(key, x, y, e){ 
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 x + ': ' + '<strong>' + y + '%' + '</strong>'
+                   '<p>' + 
+                   x + ': ' + '<strong>' + y + '%' + '</strong>' + 
+                   '</p>' +
+                   '<p>' + e.point.Unduplicated + ' out of ' + 
+                   e.point.undup + ' unduplicated students' +
+                   '</p>'
                } !#")
       
       n1$yAxis(axisLabel = 'Proportion of UNDUPLICATED Students (%)', 
