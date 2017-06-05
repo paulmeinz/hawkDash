@@ -19,7 +19,7 @@ load('enrollment.rdata')
 outcome <- c('Applicant Counts', '% of Applicants that Enroll')
 
 # Population
-egusd <- c('Yes','No')
+egusd <- c('No','Yes')
 
 # Demographic selections for disaggregation
 demoA <- c(None = 'None', 'Enrollment Status' = 'status', 
@@ -83,19 +83,22 @@ shinyUI(fluidPage(
           radioButtons('egusd', 'Look at EGUSD applicants only?', egusd,
                        inline = TRUE),
           
-          checkboxGroupInput('termA','What terms would you like to see?', term),
+          checkboxGroupInput('termA','What terms would you like to see?', term,
+                             selected = 'Fall'),
           
           selectInput('demoA', 'Would you like to see data for a particular
                       demographic group?', demoA),
           
-          conditionalPanel(condition = "input.demoA != 'None'",       
+          conditionalPanel(condition = "input.demoA != 'None' &
+                           input$outcome = '% of Applicants that Enroll'",       
                            selectInput('compareA','Evaluate Equity?', compare))
           
         ),
         
         # Show plot
         mainPanel(
-          textOutput('histA')
+          chartOutput('histA', lib = 'nvd3'),
+          plotOutput("plot4")
         )
        
       )

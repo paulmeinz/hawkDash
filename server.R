@@ -22,6 +22,7 @@ shinyServer(function(input, output, session) {
 
 #-----------------------ACCESS DASH---------------------------------------------
   acc <- reactive({
+    
     # Determine the group by factors, if "None" is selected only put term
     demo <- input$demoA
     dots <- c("term", demo)
@@ -44,20 +45,131 @@ shinyServer(function(input, output, session) {
       group_by_(.dots = dots) %>%
       summarise(headcount = n_distinct(emplid), enrolled = mean(enroll),
                 tot = sum(enroll)) %>%
-      mutate(rep = headcount/sum(headcount) * 100, 
-             avgEnrolled = sum(tot)/sum(headcount)) %>%
+      mutate(repAll = headcount/sum(headcount) * 100, 
+             avgEnrolled = sum(tot)/sum(headcount),
+             repOut = tot/sum(tot) * 100, outTot = tot/100) %>%
       mutate(equity = enrolled/avgEnrolled) %>%
-      select(-c(tot, avgEnrolled))
+      select(-c(avgEnrolled, tot))
     
     if (length(temp[,1]) > 0 & input$demoA != 'None') {
       temp <- temp[temp$headcount >= 10, ]
     }
     
+    if (input$demoA != 'None') {
+      names(temp)[2] <- 'demo_col'
+    }
     
+    temp$termCont <- as.numeric(temp$term)
     
-    'hello world'  
+    temp
   })
-    output$histA <- renderText({acc()})
+  
+# ACCESS DASH OUTPUT  
+    output$histA <- renderChart({
+      
+      if (input$demoA == 'None') {
+        if (input$outcome == 'Applicant Counts') {
+          n1 <- nPlot(headcount ~ termCont,
+                      data = acc(), 
+                      type = "lineChart",
+                      width = session$clientData[["output_plot4_width"]])
+          
+          # Create javascript code to modify x ticks (Wacky)
+          x <- unique(access$term)
+          x <- x[order(x)]
+          y <- ''
+          for (i in x) {
+            if (y == '') {
+              y <- paste("'", i, "'")
+            } else {
+              y <- paste(y, ",'", i, "'")
+            }
+          }
+          
+          codeForm <- paste("#!function(x) {keys = [", y, "]","
+                            return keys[x-1]}!#", sep = '')
+          
+          x <- unique(as.numeric(acc()$term))
+          y <- ''
+          for (i in x) {
+            if (y == '') {
+              y <- paste("'", i, "'")
+            } else {
+              y <- paste(y, ",'", i, "'")
+            }
+          }
+          
+          codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
+                         return tickvalues}!#", sep = '')
+          
+          # Execute code and set other features
+          n1$chart(forceY = c(floor(.9 * min(acc()$headcount)),
+                              floor(1.1 * max(acc()$headcount))),
+                   margin = list(left = 63, bottom = 63, right = 63),
+                   color = colors, size = 5,
+                   showLegend = FALSE,
+                   tooltipContent = "#! 
+                   function(key, x, y, e){ 
+                     return  x + ': ' + '<strong>' + y + 
+                     '</strong>' + ' applicants'
+                   } !#")
+          
+          n1$yAxis(axisLabel='Number of Applicants', width=50)
+          n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
+                   width = 50, rotateLabels = -25)
+        }
+        
+        if (input$outcome == '% of Applicants that Enroll') {
+          n1 <- nPlot(enrolled ~ term,
+                      data = acc(), 
+                      type = "discreteBarChart",
+                      width = session$clientData[["output_plot4_width"]])
+          n1$yAxis(axisLabel='% of Applicants Who Enrolled', width=50)
+          n1$xAxis(rotateLabels = -25)
+          n1$chart(forceY = c(0,100), tooltipContent = "#! 
+          function(key, x, y, e){ 
+            return '<p>' + '<strong>' + x + '</strong>' + '</p>' + 
+              '<p>' + 
+                'Enrollment Rate: ' + '<strong>' + y + '%' + '</strong>' + 
+              '</p>' +
+              '<p>' +
+                e.point.outTot + ' out of ' + e.point.headcount + '</br>' +
+                'applicants enrolled after applying' +
+              '</p>'
+          } !#")
+        }
+      }
+      
+      if (input$demoA != 'None' & 
+          input$outcome == '% of Applicants that Enroll') {
+        n1 <- nPlot(enrolled ~ demo_col, group = "term", 
+                    data = acc(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot4_width"]])
+        
+        n1$chart(showControls = F, reduceXTicks = F, 
+                 color = colors,
+                 forceY = c(0,100), 
+                 tooltipContent = "#! 
+                 function(key, x, y, e){ 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 '<p>' + 
+                 x + ': ' + '<strong>' + y + '%' + '</strong>' + 
+                 '</p>' +
+                 '<p>' + e.point.outTot + ' out of ' + 
+                 e.point.headcount + ' applicants' + '<br/>' +
+                 'in this group enrolled after applying.'
+                 '</p>'
+                 } !#")
+        
+        n1$yAxis(axisLabel = '% of Applicants Who Enrolled (%)', 
+                 width = 50)  
+      }
+      
+      n1$addParams(dom = 'histA')
+      return(n1)
+      
+      })
   
 #-----------------------MATRICULATION DASH--------------------------------------  
   matriculation <- reactive({
@@ -153,6 +265,7 @@ shinyServer(function(input, output, session) {
         
         n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
                  width=50)
+        n1$xAxis(rotateLabels = -25)
       }
       
       if (input$compareM == 'No' & input$demoM != 'None') {
