@@ -40,6 +40,21 @@ shinyServer(function(input, output, session) {
       matric <- matric[matric$exempt == 'not exempt',]  
     }
     
+    # The basic skills/online flag creats duplication in the outcome variable
+    if (input$demoM != 'basicskills') {
+      matric <- matric %>%
+        select(-basicskills)
+      
+      matric <- unique(matric)
+    }
+    
+    if (input$demoM != 'online') {
+      matric <- matric %>%
+        select(-online)
+      
+      matric <- unique(matric)
+    }
+    
     # Determine which sssp elements should be used and calculate appropriately
     if (length(input$sssp) > 1) {
       x <- matric[,input$sssp]
@@ -74,6 +89,8 @@ shinyServer(function(input, output, session) {
     
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
+    
+    print(temp)
     
     temp
   })
