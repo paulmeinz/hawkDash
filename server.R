@@ -441,9 +441,6 @@ shinyServer(function(input, output, session) {
       temp <- gather(temp, 'Type', 'Success', c(2,4))
       temp$termCont <- as.numeric(temp$term)
       temp$Success <- round(temp$Success, 2)
-      
-      print(temp)
-
     }
     
     # Suppress small Ns
@@ -479,7 +476,6 @@ shinyServer(function(input, output, session) {
                     data = success(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot1_width"]])
-        
       }
       
       # When compare to college is selected
@@ -523,7 +519,7 @@ shinyServer(function(input, output, session) {
                    e.point.den + ' total enrollments.' +
                  '</p>'
       } !#")
-    }
+      }
 
       if (input$compareDem == 'Yes' & input$demoS != 'None') {
         n1$chart(forceY = c(0, max(success()$Success) + 10))
