@@ -1,7 +1,8 @@
 library(shiny)
 
-# Load enrollment data
+# Load enrollment and application data
 load('enrollment.rdata')
+load('access.rdata')
 
 # Create matriculation data
 # Remove columns of the data that cause duplication IN terms
@@ -20,8 +21,43 @@ colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999",
 shinyServer(function(input, output, session) {
 
 #-----------------------ACCESS DASH---------------------------------------------
-  access <- reactive({'hello world'})
-    output$histA <- renderText({access()})
+  acc <- reactive({
+    # Determine the group by factors, if "None" is selected only put term
+    demo <- input$demoA
+    dots <- c("term", demo)
+    dots <- dots[!dots == 'None', drop = F]
+    
+    # Determine terms and make a regex pattern for filtering
+    terms <- input$termA
+    terms[is.null(terms)] <- 'None'
+    if (length(terms) > 1) {
+      terms <- paste(terms[1], "|", terms[2], sep = '')
+    }
+    
+    # Filter Elk Grove only
+    if (input$egusd == 'Yes') {
+      access <- access[access$egusd == 'egusd',]
+    }
+      
+    temp <- access %>%
+      subset(seq_along(term) %in% grep(terms, term)) %>%
+      group_by_(.dots = dots) %>%
+      summarise(headcount = n_distinct(emplid), enrolled = mean(enroll),
+                tot = sum(enroll)) %>%
+      mutate(rep = headcount/sum(headcount) * 100, 
+             avgEnrolled = sum(tot)/sum(headcount)) %>%
+      mutate(equity = enrolled/avgEnrolled) %>%
+      select(-c(tot, avgEnrolled))
+    
+    if (length(temp[,1]) > 0 & input$demoA != 'None') {
+      temp <- temp[temp$headcount >= 10, ]
+    }
+    
+    
+    
+    'hello world'  
+  })
+    output$histA <- renderText({acc()})
   
 #-----------------------MATRICULATION DASH--------------------------------------  
   matriculation <- reactive({
