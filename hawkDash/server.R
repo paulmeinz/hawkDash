@@ -384,7 +384,8 @@ shinyServer(function(input, output, session) {
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(Success = mean(success), num = sum(success), den = n()) %>%
-      mutate(overallSuc = sum(num)/sum(den))
+      mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
+             progProp = den/sum(den) * 100)
 
     # Store collegewide for comparisons
     college <- temp
@@ -396,17 +397,18 @@ shinyServer(function(input, output, session) {
                (filt %in% input$acadS  | input$specialS == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(Success = mean(success), num = sum(success), den = n()) %>%
-        mutate(overallSuc = sum(num)/sum(den))
+        mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
+               progProp = den/sum(den) * 100)
     }
     
-    # Final manipulateions based on input
+    # Final manipulations based on input
     if (input$demoS != 'None') {
       names(temp)[2] <- 'demo_col'
       names(college)[2] <- 'demo_col'
     }
     
     # If equity comparison is slected divide by overall success
-    if (input$compareS == 'Evaluate Equity') {
+    if (input$compareS == 'Evaluate Equity' & input$demoS != 'None') {
       if (input$demoS != 'None') {
         temp$Success <- temp$Success/temp$overallSuc * 100
       }
@@ -440,7 +442,8 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$den >= 20, ]
     }
     
-    print(temp)
+    temp$outProp <- round(temp$outProp, 2)
+    temp$progProp <- round(temp$progProp, 2)
     
     temp})
 
@@ -470,22 +473,56 @@ shinyServer(function(input, output, session) {
       }
       
       # Set axis based on comparison
-      if (input$compareS == 'None') {
+      if (input$compareS == 'None' | input$demoS == 'None') {
         n1$chart(forceY = c(0,100))
         n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
         n1$chart(tooltipContent = "#! function(key, x, y, e){ 
-        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-          x + ': ' + '<strong>' + y + '%' + '</strong>' + e.point.den
+        return '<p>' + '<strong>' + x + '</strong>' + '</p>' + 
+          '<p>' + 
+            'Success Rate: ' + '<strong>' + y + '%' + '</strong>' + 
+          '</p>' +
+          '<p>' +
+            e.point.num/100 + ' successful enrollments out of' + '</br>' +
+            e.point.den + ' total enrollments' +
+          '</p>'
         } !#")
       }
+      
+      if (input$compareS == 'None' & input$demoS != 'None') {
+        n1$chart(forceY = c(0,100))
+        n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
+        n1$chart(tooltipContent = "#! function(key, x, y, e){ 
+                 return '<p>' + 
+                   '<strong>' + key + ': ' + '</strong>' + x +
+                 '</p>' + 
+                 '<p>' + 
+                   'Success Rate: ' + '<strong>' + y + '%' + '</strong>' + 
+                 '</p>' +
+                 '<p>' +
+                   e.point.num/100 + ' successful enrollments out of' + 
+                   '</br>' +
+                   e.point.den + ' total enrollments' +
+                 '</p>'
+      } !#")
+    }
 
-      if (input$compareS == 'Evaluate Equity') {
+      if (input$compareS == 'Evaluate Equity' & input$demoS != 'None') {
         n1$chart(forceY = c(0, max(success()$Success) + 10))
         n1$yAxis(axisLabel='Proportionality Index', width=50)
-        n1$chart(tooltipContent = "#! function(key, x, y){ 
-        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-          x + ': ' + '<strong>' + y + '</strong>'
-        } !#")
+        n1$chart(tooltipContent = "#! 
+               function(key, x, y, e){ 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 '<p>' + x + ': ' + '<strong>' + y + '</strong>' + '</p>' + 
+                 '<p>' +
+                    'This group constituted ' + e.point.outProp + '%' + 
+                   '<br/>' + 
+                   ' of successful enrollments and ' + 
+                   '<br/>' +
+                   e.point.progProp + '% of students ' + 
+                   '<br/>' +
+                   'in the selected program(s).' +
+                 '</p>'
+               } !#")
       }
       
       if (input$compareS == 'Compare to Collegewide') {
