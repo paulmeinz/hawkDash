@@ -90,8 +90,6 @@ shinyServer(function(input, output, session) {
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
     
-    print(temp)
-    
     temp
   })
   
@@ -332,7 +330,7 @@ shinyServer(function(input, output, session) {
                    '</p>' +
                    '<p>' + e.point.Unduplicated + ' out of ' + 
                    e.point.undup + ' unduplicated students' + '<br/>' +
-                   'in the selected program(s)'
+                   'in the selected program(s).'
                    '</p>'
                } !#")
       
@@ -427,13 +425,7 @@ shinyServer(function(input, output, session) {
     
     # If equity comparison is slected divide by overall success
     if (input$compareDem == 'Yes' & input$demoS != 'None') {
-      if (input$demoS != 'None') {
-        temp$Success <- temp$Success/temp$overallSuc * 100
-      }
-      
-      if (input$demoS == 'None') {
-        temp$Success <- temp$Success/temp$Success * 100
-      }
+      temp$Success <- temp$Success/temp$overallSuc * 100
       temp$outProp <- round(temp$outProp, 2)
       temp$progProp <- round(temp$progProp, 2)
       
@@ -441,20 +433,17 @@ shinyServer(function(input, output, session) {
     
     # If compare to collegewide is selected subtract collegewide
     if (input$compareCol == 'Yes' & input$demoS == 'None') {
-      if (input$demoS == 'None') {
-        temp <- temp %>% 
-          left_join(college, by = c('term' = 'term')) %>%
-          mutate(Success = Success.x - Success.y) %>%
-          rename(den = den.x)
-      }
+      temp <- temp %>% 
+        left_join(college, by = c('term' = 'term')) %>%
+        rename(Program = Success.x, Collegewide = Success.y, den = den.x) %>%
+        select(-c(num.x, overallSuc.x, outProp.x, progProp.x,
+                  num.y, den.y, overallSuc.y, outProp.y, progProp.y))
+      temp <- gather(temp, 'Type', 'Success', c(2,4))
+      temp$termCont <- as.numeric(temp$term)
+      temp$Success <- round(temp$Success, 2)
       
-      if (input$demoS != 'None') {
-        temp <- temp %>% 
-          left_join(college, 
-                    by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
-          mutate(Success = Success.x - Success.y) %>%
-          rename(den = den.x)
-      } 
+      print(temp)
+
     }
     
     # Suppress small Ns
@@ -485,12 +474,20 @@ shinyServer(function(input, output, session) {
       }
       
       # General plot for when no demos selected
-      if (input$demoS == 'None') {
+      if (input$demoS == 'None' & input$compareCol == 'No') {
         n1 <- nPlot(Success ~ term, 
                     data = success(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot1_width"]])
         
+      }
+      
+      # When compare to college is selected
+      if (input$demoS == 'None' & input$compareCol == 'Yes') {
+      n1 <- nPlot(Success ~ termCont, group = "Type", 
+                  data = success(), 
+                  type = "lineChart",
+                  width = session$clientData[["output_plot1_width"]])
       }
       
       # Set axis based on comparison
@@ -504,9 +501,10 @@ shinyServer(function(input, output, session) {
           '</p>' +
           '<p>' +
             e.point.num/100 + ' successful enrollments out of' + '</br>' +
-            e.point.den + ' total enrollments' +
+            e.point.den + ' total enrollments.' +
           '</p>'
         } !#")
+        n1$xAxis(rotateLabels = -25)
       }
       
       if (input$compareDem == 'No' & input$demoS != 'None') {
@@ -522,7 +520,7 @@ shinyServer(function(input, output, session) {
                  '<p>' +
                    e.point.num/100 + ' successful enrollments out of' + 
                    '</br>' +
-                   e.point.den + ' total enrollments' +
+                   e.point.den + ' total enrollments.' +
                  '</p>'
       } !#")
     }
@@ -539,7 +537,7 @@ shinyServer(function(input, output, session) {
                    '<br/>' + 
                    ' of successful enrollments and ' + 
                    '<br/>' +
-                   e.point.progProp + '% of students ' + 
+                   e.point.progProp + '% of enrollments ' + 
                    '<br/>' +
                    'in the selected program(s).' +
                  '</p>'
@@ -549,12 +547,49 @@ shinyServer(function(input, output, session) {
       if (input$compareCol == 'Yes' & input$demoS == 'None') {
         n1$chart(forceY = c(-20,20))
         n1$yAxis(axisLabel =
-                   'Program Success Rate (%) - Collegewide Success Rate (%)', 
+                   'Program Success Rate (%)', 
                  width=50)
-        n1$chart(tooltipContent = "#! function(key, x, y){ 
-        return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-          x + ': ' + '<strong>' + y + '%' + '</strong>'
-        } !#")
+        
+        # Create javascript code to modify x ticks (Wacky)
+        x <- unique(enroll$term)
+        x <- x[order(x)]
+        y <- ''
+        for (i in x) {
+          if (y == '') {
+            y <- paste("'", i, "'")
+          } else {
+            y <- paste(y, ",'", i, "'")
+          }
+        }
+        
+        codeForm <- paste("#!function(x) {keys = [", y, "]","
+                          return keys[x-1]}!#", sep = '')
+        
+        x <- unique(as.numeric(success()$term))
+        y <- ''
+        for (i in x) {
+          if (y == '') {
+            y <- paste("'", i, "'")
+          } else {
+            y <- paste(y, ",'", i, "'")
+          }
+        }
+        
+        codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
+                    return tickvalues}!#", sep = '')
+        
+        # Execute code and set other features
+        n1$chart(forceY = c(0, 100),
+                 margin = list(left = 63, bottom = 63, right = 63),
+                 color = colors, size = 5, 
+                 tooltipContent = "#! 
+                 function(key, x, y, e){ 
+                   return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                   x + ': ' + '<strong>' + y + '%' + '</strong>'
+                 } !#")
+        
+        n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
+                 rotateLabels = -25)
       }
       
       # Make sure the plot displays
