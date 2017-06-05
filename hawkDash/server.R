@@ -134,10 +134,14 @@ shinyServer(function(input, output, session) {
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
                    '<p>' + x + ': ' + '<strong>' + y + '</strong>' + '</p>' + 
                    '<p>' +
-                   'This group constituted ' + e.point.colRep + 
-                   '% of students at the College' + '<br/>' +
-                   'and ' + e.point.outRep + '% of students who ' +
-                   'completed the selected outcomes.' +
+                     'This group constituted ' + e.point.outRep + '%' + 
+                     '<br/>' + 
+                     'of students completing the' +
+                     '<br/>' +
+                     'selected outcome(s) and' + 
+                     '<br/>' +
+                     e.point.colRep + '% of students collegewide.' + 
+                     '<br/>'
                    '</p>'
                  } !#")
       }
@@ -213,8 +217,12 @@ shinyServer(function(input, output, session) {
         left_join(college, 
                   by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
         mutate(Proportion = Proportion.x/Proportion.y * 100) %>%
-        select(-c(Proportion.x, Duplicated.y, Unduplicated.y, Proportion.y)) %>%
-        rename(Unduplicated = Unduplicated.x)
+        select(-c(Duplicated.x, Duplicated.y, Unduplicated.y,
+                  undup.x, undup.y)) %>%
+        rename(Unduplicated = Unduplicated.x, progProp = Proportion.x,
+               colProp = Proportion.y)
+      temp$progProp <- round(temp$progProp, 2)
+      temp$colProp <- round(temp$colProp, 2)
     }
     
     # If no demo is selected restructure the data to plot dup/undup
@@ -229,7 +237,6 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$Unduplicated >= 10, ]
     }
     
-    print(temp)
     temp
   })
   
@@ -307,7 +314,8 @@ shinyServer(function(input, output, session) {
                    x + ': ' + '<strong>' + y + '%' + '</strong>' + 
                    '</p>' +
                    '<p>' + e.point.Unduplicated + ' out of ' + 
-                   e.point.undup + ' unduplicated students' +
+                   e.point.undup + ' unduplicated students' + '<br/>' +
+                   'in the selected program(s)'
                    '</p>'
                } !#")
       
@@ -326,9 +334,18 @@ shinyServer(function(input, output, session) {
                color = colors,
                forceY = c(0,max(enrollment()$Proportion) + 10),
                tooltipContent = "#! 
-               function(key, x, y){ 
+               function(key, x, y, e){ 
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 x + ': ' + '<strong>' + y + '</strong>'
+                   '<p>' + x + ': ' + '<strong>' + y + '</strong>' + '</p>' + 
+                   '<p>' +
+                     'This group constituted ' + e.point.progProp + '%' + 
+                     '<br/>' + 
+                     ' of students in the selected' + 
+                     '<br/>' +
+                     ' program(s) and ' + e.point.colProp + '% of students ' + 
+                     '<br/>' +
+                     'collegewide.' +
+                   '</p>'
                } !#")
       
       n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
@@ -423,7 +440,7 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$den >= 20, ]
     }
     
-    temp$termcont <- as.numeric(temp$term)
+    print(temp)
     
     temp})
 
