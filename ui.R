@@ -5,12 +5,29 @@ library(tidyr)
 
 # Load standard data
 load('enrollment.rdata')
+load('access.rdata')
 
 ################################################################################
 
 #                         DEFINE BUTTON OPTIONS
 
 ################################################################################
+
+
+#--------------------------ACCESS DASHBOARD OPTIONS-----------------------------
+
+# Outcome variable
+outcome <- c('Applicant Counts', '% of Applicants that Enroll')
+
+# Population
+egusd <- c('Yes','No')
+
+# Demographic selections for disaggregation
+demoA <- c('First Generation' = 'firstgen', 'Enrollment Status' = 'status',
+           Ethnicity = 'ethnicity', 'Interested in DSPS' = 'dsps',
+           'Interested in CalWORKS' = 'calworks', 'Interested in EOPS' = 'eops',
+           Gender = 'gender', 'Veteran Status' = 'veteran',
+           'Foster youth' = 'foster')
 
 
 #--------------ENROLLMENT/SUCCESS/MATRICULATION DASHBOARD OPTIONS---------------
