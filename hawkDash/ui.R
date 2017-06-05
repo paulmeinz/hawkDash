@@ -28,9 +28,7 @@ special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
              Diop = 'diop', DSPS = 'dsps', Puente = 'puente')
 
 # Compare options
-compare <- c('None','Compare to Collegewide',
-             'Evaluate Equity')
-compareE <- c('No','Yes')
+compare <- c('No','Yes')
 
 # Term selections
 term <- c('Fall','Spring')
@@ -80,7 +78,7 @@ shinyUI(fluidPage(
                       a particular demographic group?', demo),
                  
           conditionalPanel(condition = "input.demoM != 'None'",       
-          selectInput('compareM','Evaluate Equity?', compareE))
+          selectInput('compareM','Evaluate Equity?', compare))
                  ),
                
                # Show a plot of the generated distribution
@@ -117,7 +115,7 @@ shinyUI(fluidPage(
           
           conditionalPanel(condition = "input.demoE != 'None'
                            & input.collegeE == 'Program'",       
-            selectInput('compareE','Evaluate Equity?', compareE))
+            selectInput('compareE','Evaluate Equity?', compare))
         ),
                
                # Show a plot of the generated distribution
