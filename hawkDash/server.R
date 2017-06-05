@@ -401,6 +401,7 @@ shinyServer(function(input, output, session) {
                progProp = den/sum(den) * 100)
     }
     
+    
     # Final manipulations based on input
     if (input$demoS != 'None') {
       names(temp)[2] <- 'demo_col'
@@ -408,7 +409,7 @@ shinyServer(function(input, output, session) {
     }
     
     # If equity comparison is slected divide by overall success
-    if (input$compareS == 'Evaluate Equity' & input$demoS != 'None') {
+    if (input$compareDem == 'Yes' & input$demoS != 'None') {
       if (input$demoS != 'None') {
         temp$Success <- temp$Success/temp$overallSuc * 100
       }
@@ -416,11 +417,13 @@ shinyServer(function(input, output, session) {
       if (input$demoS == 'None') {
         temp$Success <- temp$Success/temp$Success * 100
       }
+      temp$outProp <- round(temp$outProp, 2)
+      temp$progProp <- round(temp$progProp, 2)
       
     }
     
     # If compare to collegewide is selected subtract collegewide
-    if (input$compareS == 'Compare to Collegewide') {
+    if (input$compareCol == 'Yes' & input$demoS == 'None') {
       if (input$demoS == 'None') {
         temp <- temp %>% 
           left_join(college, by = c('term' = 'term')) %>%
@@ -442,8 +445,9 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$den >= 20, ]
     }
     
-    temp$outProp <- round(temp$outProp, 2)
-    temp$progProp <- round(temp$progProp, 2)
+
+    
+    print(temp)
     
     temp})
 
@@ -473,7 +477,7 @@ shinyServer(function(input, output, session) {
       }
       
       # Set axis based on comparison
-      if (input$compareS == 'None' | input$demoS == 'None') {
+      if (input$compareDem == 'No' | input$demoS == 'None') {
         n1$chart(forceY = c(0,100))
         n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
         n1$chart(tooltipContent = "#! function(key, x, y, e){ 
@@ -488,7 +492,7 @@ shinyServer(function(input, output, session) {
         } !#")
       }
       
-      if (input$compareS == 'None' & input$demoS != 'None') {
+      if (input$compareDem == 'No' & input$demoS != 'None') {
         n1$chart(forceY = c(0,100))
         n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
         n1$chart(tooltipContent = "#! function(key, x, y, e){ 
@@ -506,7 +510,7 @@ shinyServer(function(input, output, session) {
       } !#")
     }
 
-      if (input$compareS == 'Evaluate Equity' & input$demoS != 'None') {
+      if (input$compareDem == 'Yes' & input$demoS != 'None') {
         n1$chart(forceY = c(0, max(success()$Success) + 10))
         n1$yAxis(axisLabel='Proportionality Index', width=50)
         n1$chart(tooltipContent = "#! 
@@ -525,7 +529,7 @@ shinyServer(function(input, output, session) {
                } !#")
       }
       
-      if (input$compareS == 'Compare to Collegewide') {
+      if (input$compareCol == 'Yes' & input$demoS == 'None') {
         n1$chart(forceY = c(-20,20))
         n1$yAxis(axisLabel =
                    'Program Success Rate (%) - Collegewide Success Rate (%)', 

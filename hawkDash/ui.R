@@ -149,8 +149,15 @@ shinyUI(fluidPage(
 
           selectInput('demoS', 'Would you like to view trends for
                       a particular demographic group?', demo),
-      
-          selectInput('compareS','Perform a Comparison', compare)
+          
+          conditionalPanel(condition = "input.demoS != 'None'",
+            selectInput('compareDem','Would you like to evaluate
+                        equity?', compare)),
+          
+          conditionalPanel(condition = "input.collegeS != 'Collegewide' &
+                             input.demoS == 'None'",
+            selectInput('compareCol','Would you like to compare these
+                        success rates to the college?', compare))
         ),
 
     # Show a plot of the generated distribution
