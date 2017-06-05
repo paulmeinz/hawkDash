@@ -19,6 +19,9 @@ colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999",
 # Define server logic
 shinyServer(function(input, output, session) {
 
+#-----------------------ACCESS DASH---------------------------------------------
+  access <- reactive({'hello world'})
+    output$histA <- renderText({access()})
   
 #-----------------------MATRICULATION DASH--------------------------------------  
   matriculation <- reactive({
@@ -447,10 +450,6 @@ shinyServer(function(input, output, session) {
     if (length(temp[,1]) > 0) {
       temp <- temp[temp$den >= 20, ]
     }
-    
-
-    
-    print(temp)
     
     temp})
 

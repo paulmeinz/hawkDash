@@ -5,7 +5,6 @@ library(tidyr)
 
 # Load standard data
 load('enrollment.rdata')
-load('access.rdata')
 
 ################################################################################
 
@@ -23,11 +22,11 @@ outcome <- c('Applicant Counts', '% of Applicants that Enroll')
 egusd <- c('Yes','No')
 
 # Demographic selections for disaggregation
-demoA <- c('First Generation' = 'firstgen', 'Enrollment Status' = 'status',
-           Ethnicity = 'ethnicity', 'Interested in DSPS' = 'dsps',
-           'Interested in CalWORKS' = 'calworks', 'Interested in EOPS' = 'eops',
-           Gender = 'gender', 'Veteran Status' = 'veteran',
-           'Foster youth' = 'foster')
+demoA <- c(None = 'None', 'Enrollment Status' = 'status', 
+           Ethnicity = 'ethnicity', 'First Generation' = 'firstgen', 
+           'Foster youth' = 'foster', Gender = 'gender', 
+           'Interested in CalWORKS' = 'calworks', 'Interested in DSPS' = 'dsps',
+           'Interested in EOPS' = 'eops', 'Veteran Status' = 'veteran')
 
 
 #--------------ENROLLMENT/SUCCESS/MATRICULATION DASHBOARD OPTIONS---------------
@@ -75,7 +74,32 @@ shinyUI(fluidPage(
 
   navbarPage(title = 'The CRC Hawkdash',
 #---------------------------ACCESS TAB------------------------------------------
-    tabPanel(title = 'Applications (Access)'),
+    tabPanel(title = 'Applications (Access)',
+      sidebarLayout(
+        sidebarPanel(
+          radioButtons('outcome', 'What applicant data would you like to see?',
+                        outcome),
+          
+          radioButtons('egusd', 'Look at EGUSD applicants only?', egusd,
+                       inline = TRUE),
+          
+          checkboxGroupInput('termA','What terms would you like to see?', term),
+          
+          selectInput('demoA', 'Would you like to see data for a particular
+                      demographic group?', demoA),
+          
+          conditionalPanel(condition = "input.demoA != 'None'",       
+                           selectInput('compareA','Evaluate Equity?', compare))
+          
+        ),
+        
+        # Show plot
+        mainPanel(
+          textOutput('histA')
+        )
+       
+      )
+    ),
 
 #---------------------------MATRICULATION TAB-----------------------------------
     tabPanel(title = 'Matriculation (SSSP)',
