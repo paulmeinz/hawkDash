@@ -83,7 +83,7 @@ shinyServer(function(input, output, session) {
   })
 
     
-#----------------------------------OUTPUT---------------------------------------
+#-----------------------------ACCESS-OUTPUT-------------------------------------
 
     
     output$histA <- renderChart({
@@ -267,13 +267,20 @@ shinyServer(function(input, output, session) {
       
       })
   
-#-----------------------MATRICULATION DASH--------------------------------------  
+    
+################################################################################
+    
+#                           Matriculation Dash
+    
+################################################################################ 
+  
+    
   matriculation <- reactive({
   
-    # Determine the group by factors, if "None" is selected only put term
+    # Determine the grouping factors, if "None" is selected only put term
     demo <- input$demoM
     dots <- c("term", demo)
-    dots <- dots[!dots == 'None', drop = F]
+    dots <- dots[dots != 'None', drop = F]
     
     # Determine terms and make a regex pattern for filtering
     terms <- input$termM
@@ -287,15 +294,17 @@ shinyServer(function(input, output, session) {
       matric <- matric[matric$exempt == 'not exempt',]  
     }
     
-    # Determine which sssp elements should be used and calculate appropriately
+    # Determine which sssp elements should be used and calculate
+    # which students have completed all the selected outcomes
     if (length(input$sssp) > 1) {
       x <- matric[,input$sssp]
-      matric$Proportion <- rowSums(x)/length(input$sssp)
+      matric$Proportion <- rowSums(x)/length(input$sssp) # Won't work witn 1 col
       matric$Proportion[matric$Proportion < 100] <- 0
     } else {
       names(matric)[names(matric) == input$sssp] <- 'Proportion'
     }
     
+    # If non selected than prop col with zero so the disag doesnt throw error
     if (is.null(input$sssp)) {
       matric$Proportion <- 0
     }
