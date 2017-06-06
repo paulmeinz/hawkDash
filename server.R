@@ -276,7 +276,7 @@ shinyServer(function(input, output, session) {
                   summarise(colTot = n_distinct(emplid))) %>%
       mutate(Prop = outGrp/hcGrp * 100, outRep = outGrp/outTot,
              colRep = hcGrp/colTot) %>%
-      mutate(Equity = outRep/colRep)
+      mutate(Equity = outRep/colRep * 100)
     
     
     if (input$demoM != 'None') {
