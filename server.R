@@ -239,7 +239,7 @@ shinyServer(function(input, output, session) {
                      forceY = c(floor(1.1 * max(acc()$equity)),
                                 floor(.9 * min(acc()$equity))), 
                      tooltipContent = "#! 
-                   function(key, x, y, e){ 
+                   function(key, x, y, e) { 
                    return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
                    '<p>' + 
                      x + ': ' + '<strong>' + y  + '</strong>' + 
@@ -309,32 +309,42 @@ shinyServer(function(input, output, session) {
       matric$Proportion <- 0
     }
     
-    # Disaggregate
+    # Disaggregate (Must do several left joins to eliminate duplication)
     temp <- matric %>%
       subset(seq_along(term) %in% grep(terms, term) &
              Proportion == 100) %>%
       group_by_(.dots = dots) %>%
-      summarise(outGrp = n_distinct(emplid)) %>%
+      
+      # N Completing outcomes by grp
+      summarise(outGrp = n_distinct(emplid)) %>% 
+      
+      # The headcount by group (the denominator for the rate)
       left_join(x <- matric %>%
                   group_by_(.dots = dots) %>%
                   summarise(hcGrp = n_distinct(emplid))) %>%
+      
+      # Total completing the outcome collegewide (for equity calc)
       left_join(y <- matric %>%
                   subset(seq_along(term) %in% grep(terms, term) &
                          Proportion == 100) %>%
                   group_by(term)%>%
                   summarise(outTot = n_distinct(emplid))) %>%
+      
+      # Total headcount collegewide (for equity calc)
       left_join(z <- matric %>%
                   group_by(term) %>%
                   summarise(colTot = n_distinct(emplid))) %>%
-      mutate(Prop = outGrp/hcGrp * 100, outRep = outGrp/outTot,
-             colRep = hcGrp/colTot) %>%
+      mutate(Prop = outGrp/hcGrp * 100, # Proportion completing
+             outRep = outGrp/outTot * 100, # Outcome representation (equity num)
+             colRep = hcGrp/colTot * 100) %>% # Colleg rep (equity den)
       mutate(Equity = outRep/colRep * 100)
     
     
     if (input$demoM != 'None') {
-      names(temp)[2] <- 'demo_col'
+      names(temp)[2] <- 'demoCol'
     }
     
+    # Round these numbers for equity plot tooltips
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
     
@@ -343,19 +353,26 @@ shinyServer(function(input, output, session) {
   
 # MATRICULATION DASH OUTPUT   
     output$histM <- renderChart({
-      if (input$compareM == 'No' | input$demoM == 'None') {
+      
+      # Render this plot if no demos are selected
+      if (input$demoM == 'None') {
         n1 <- nPlot(Prop ~ term,  
                     data = matriculation(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot3_width"]])
         
+        n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
+                 width=50)
+        n1$xAxis(rotateLabels = -25)
         n1$chart(forceY = c(0,100), 
                  color = colors,
-                 tooltipContent = "#! function(key, x, y, e){ 
-                 return '<p>' + x + '</p>' +
-                   '<p>' + 
-                     'Proportion of students: ' + 
-                     '<strong>' + y + '%' + '</strong>' +
+                  
+                 # Create custom tooltips
+                 tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p>' + x + '</p>' +
+                   '<p>' +
+                     'Proportion of students: <strong>' + y + '% </strong>' +
                    '</p>' + 
                    '<P>' +
                      e.point.outGrp + ' out of ' + 
@@ -363,56 +380,61 @@ shinyServer(function(input, output, session) {
                    '</p>'
                  } !#")
         
-        n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
-                 width=50)
-        n1$xAxis(rotateLabels = -25)
+
       }
       
-      if (input$compareM == 'No' & input$demoM != 'None') {
-        n1 <- nPlot(Prop ~ demo_col, group = "term", 
-                    data = matriculation(), 
-                    type = "multiBarChart",
-                    width = session$clientData[["output_plot3_width"]])
+      # If demo is not None
+      if (input$demoM != 'None') {
         
-        n1$chart(forceY = c(0,100), 
-                 color = colors,
-                 showControls = F, reduceXTicks = F, 
-                 tooltipContent = "#! function(key, x, y, e){ 
-                 return '<p>' + key + '</p>' +
-                 '<p>' + 
-                   x + ': ' + '<strong>' + y + '%' + '</strong>' +
-                 '</p>' + 
-                 '<P>' +
-                   e.point.outGrp + ' out of ' + 
-                   e.point.hcGrp + ' students.' +
-                 '</p>'
-                 } !#")
-      }
+        # Make this plot with no comparisons
+        if (input$compareE == 'No') {
+          n1 <- nPlot(Prop ~ demoCol, group = "term", 
+                      data = matriculation(), 
+                      type = "multiBarChart",
+                      width = session$clientData[["output_plot3_width"]])
+        
+          n1$chart(forceY = c(0,100), 
+                   color = colors,
+                   showControls = F, reduceXTicks = F, 
+                   tooltipContent = "#! 
+                   function(key, x, y, e) { 
+                     return '<p>' + key + '</p>' +
+                     '<p>' + 
+                       x + ': <strong>' + y + '% </strong>' +
+                     '</p>' + 
+                     '<P>' +
+                       e.point.outGrp + ' out of ' + 
+                       e.point.hcGrp + ' students.' +
+                     '</p>'
+                   } !#")
+        }
       
-      if (input$compareM == 'Yes' & input$demoM != 'None') {
-        n1 <- nPlot(Equity ~ demo_col, group = "term", 
-                    data = matriculation(), 
-                    type = "multiBarChart",
-                    width = session$clientData[["output_plot3_width"]])
+        # Make this plot with comparisons
+        if (input$compareM == 'Yes') {
+          n1 <- nPlot(Equity ~ demoCol, group = "term", 
+                      data = matriculation(), 
+                      type = "multiBarChart",
+                      width = session$clientData[["output_plot3_width"]])
         
-        n1$chart(showControls = F, reduceXTicks = F,
-                 color = colors,
-                 forceY = c(0,max(matriculation()$Equity) + 10),
-                 tooltipContent = "#! 
-                 function(key, x, y, e){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                   '<p>' + x + ': ' + '<strong>' + y + '</strong>' + '</p>' + 
-                   '<p>' +
-                     'This group constituted ' + e.point.outRep + '%' + 
-                     '<br/>' + 
-                     'of students completing the' +
-                     '<br/>' +
-                     'selected outcome(s) and' + 
-                     '<br/>' +
-                     e.point.colRep + '% of students collegewide.' + 
-                     '<br/>'
-                   '</p>'
-                 } !#")
+          n1$chart(showControls = F, reduceXTicks = F,
+                   color = colors,
+                   forceY = c(0,max(matriculation()$Equity) + 10),
+                   tooltipContent = "#! 
+                   function(key, x, y, e) { 
+                   return '<p> <strong>' + key + '</strong> </p>' + 
+                     '<p>' + x + ': <strong>' + y + '</strong> </p>' + 
+                     '<p>' +
+                       'This group constituted ' + e.point.outRep + '%' + 
+                       '<br/>' + 
+                       'of students completing the' +
+                       '<br/>' +
+                       'selected outcome(s) and' + 
+                       '<br/>' +
+                       e.point.colRep + '% of students collegewide.' + 
+                       '<br/>'
+                     '</p>'
+                   } !#")
+        }
       }
       
       n1$addParams(dom = 'histM')
