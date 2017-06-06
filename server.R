@@ -21,7 +21,7 @@ shinyServer(function(input, output, session) {
   
 ################################################################################
   
-#                              ACCESS DASH
+#                              Access Dash
   
 ################################################################################
   
@@ -445,6 +445,7 @@ shinyServer(function(input, output, session) {
         }
       }
       
+      # Make the plot render
       n1$addParams(dom = 'histM')
       return(n1)
     })
@@ -483,7 +484,7 @@ shinyServer(function(input, output, session) {
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
+      summarise(duplicated = n(), unduplicated = n_distinct(emplid)) %>%
       
       # Left join collegwide unduplicated to use as the denom for rep
       # calculations. Otherwise sum(unduplicated) will be duplicated
@@ -491,7 +492,7 @@ shinyServer(function(input, output, session) {
                   subset(seq_along(term) %in% grep(terms, term)) %>%
                   group_by(term) %>%
                   summarise(undup = n_distinct(emplid))) %>%
-      mutate(Proportion = Unduplicated/undup * 100)
+      mutate(proportion = unduplicated/undup * 100)
       
     
     # Save the collegewide
@@ -503,7 +504,7 @@ shinyServer(function(input, output, session) {
         subset(seq_along(term) %in% grep(terms, term) &
                  (filt %in% input$acadE  | input$specialE == filt)) %>%
         group_by_(.dots = dots) %>%
-        summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
+        summarise(duplicated = n(), unduplicated = n_distinct(emplid)) %>%
         
         # Left join again (see previous)
         left_join(undup <- enroll %>%
@@ -512,14 +513,18 @@ shinyServer(function(input, output, session) {
                                 input$specialE == filt)) %>%
                     group_by(term) %>%
                     summarise(undup = n_distinct(emplid))) %>%
-        mutate(Proportion = Unduplicated/undup * 100)
+        mutate(proportion = unduplicated/undup * 100)
     }
     
     # If no demo is selected restructure the data to plot dup/undup
     if (input$demoE =='None') {
-      temp <- gather(temp, 'Type', 'Enrollment', 2:3) %>%
-        select(-Proportion)
+      temp <- gather(temp, 'type', 'enrollment', 2:3) %>%
+        select(-proportion)
       temp$termCont <- as.numeric(temp$term)
+      
+      # Rename levels for the purpos of tooltips
+      temp[temp$type == 'unduplicated', 'type'] <- 'Unduplicated'
+      temp[temp$type == 'duplicated', 'type'] <- 'Duplicated'
     }
     
     # If a demo is selected label the appropriate column (for general plot)
@@ -527,43 +532,39 @@ shinyServer(function(input, output, session) {
       names(temp)[2] <- 'demoCol'
       names(college)[2] <- 'demoCol'
       
-      # If compare is selected and demo is not none calculated a prop index
+      # If compare is selected and demo calculated a prop index (equity)
       if (input$compareE == 'Yes') {
         temp <- temp %>%
           left_join(college, 
-                    by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
-          mutate(Proportion = Proportion.x/Proportion.y * 100) %>%
-          select(-c(Duplicated.x, Duplicated.y, Unduplicated.y,
+                    by = c('term' = 'term', 'demoCol' = 'demoCol')) %>%
+          mutate(proportion = proportion.x/proportion.y * 100) %>%
+          select(-c(duplicated.x, duplicated.y, unduplicated.y,
                     undup.x, undup.y)) %>%
-          rename(Unduplicated = Unduplicated.x, progProp = Proportion.x,
-                 colProp = Proportion.y)
+          rename(Unduplicated = unduplicated.x, progProp = proportion.x,
+                 colProp = proportion.y)
         temp$progProp <- round(temp$progProp, 2)
         temp$colProp <- round(temp$colProp, 2)
       }
       
       # Suppress small Ns so that prop indexes arent outliers.
       if (length(temp[,1]) > 0) {
-        temp <- temp[temp$Unduplicated >= 10, ]
+        temp <- temp[temp$unduplicated >= 10, ]
       }
       
     }
-    
 
-    
-
-    
     temp
   })
   
   
-  
-  # ENROLLMENT DASH OUTPUT
-  
+#----------------------------ENROLLMENT OUTPUT----------------------------------
+ 
+   
   output$histE <- renderChart({
     
     # General plot if no demo selected
     if(input$demoE == 'None') {
-      n1 <- nPlot(Enrollment ~ termCont, group = "Type", 
+      n1 <- nPlot(enrollment ~ termCont, group = "type", 
                   data = enrollment(), 
                   type = "lineChart",
                   width = session$clientData[["output_plot2_width"]])
@@ -597,61 +598,68 @@ shinyServer(function(input, output, session) {
                     return tickvalues}!#", sep = '')
       
       # Execute code and set other features
-      n1$chart(forceY = c(floor(.9 * min(enrollment()$Enrollment)),
-                          floor(1.1 * max(enrollment()$Enrollment))),
-               margin = list(left = 63, bottom = 63, right = 63),
-               color = colors, size = 5, 
-               tooltipContent = "#! 
-                 function(key, x, y, e){ 
-                   return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                   x + ': ' + '<strong>' + y + '</strong>'
-                 } !#")
-      
-      n1$yAxis(axisLabel='Enrollment', width=50)
       n1$xAxis(axisLabel = 'Term', tickFormat = codeForm, tickValues = codeVal, 
                width = 50, rotateLabels = -25)
+      n1$yAxis(axisLabel='Enrollment', width=50)
+      n1$chart(forceY = c(floor(.9 * min(enrollment()$enrollment)),
+                          floor(1.1 * max(enrollment()$enrollment))),
+               margin = list(left = 63, bottom = 63, right = 63),
+               color = colors, size = 5, 
+               
+               # Custom tooltip
+               tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + key + '</strong> </p>' + 
+                     '<p>' + x + ': <strong>' + y + '</strong> </p>'
+                 } !#")
     }
     
     # General plot if demo is selected
     if (input$demoE != 'None') {
-      n1 <- nPlot(Proportion ~ demoCol, group = "term", 
-                  data = enrollment(), 
-                  type = "multiBarChart",
-                  width = session$clientData[["output_plot2_width"]])
       
-      n1$chart(showControls = F, reduceXTicks = F, 
-               color = colors,
-               forceY = c(0,100), 
-               tooltipContent = "#! 
-               function(key, x, y, e){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                   '<p>' + 
-                   x + ': ' + '<strong>' + y + '%' + '</strong>' + 
-                   '</p>' +
-                   '<p>' + e.point.Unduplicated + ' out of ' + 
-                   e.point.undup + ' unduplicated students' + '<br/>' +
-                   'in the selected program(s).'
-                   '</p>'
-               } !#")
+      # If no comparison....
+      if (input$compareE == 'No') {
+        n1 <- nPlot(proportion ~ demoCol, group = "term", 
+                    data = enrollment(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot2_width"]])
       
-      n1$yAxis(axisLabel = 'Proportion of UNDUPLICATED Students (%)', 
-               width = 50)
-    }
-    
-    # General plot if compare is 'Yes'
-    if (input$demoE != 'None' & input$compareE == 'Yes') {
-      n1 <- nPlot(Proportion ~ demoCol, group = "term", 
-                  data = enrollment(), 
-                  type = "multiBarChart",
-                  width = session$clientData[["output_plot2_width"]])
+        n1$yAxis(axisLabel = 'Proportion of UNDUPLICATED Students (%)', 
+                 width = 50)
+        n1$chart(showControls = F, reduceXTicks = F, 
+                 color = colors,
+                 forceY = c(0,100), 
+                 tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + key + '</strong> </p>' + 
+                     '<p>' + 
+                     x + ': <strong>' + y + '% </strong>' + 
+                     '</p>' +
+                     '<p>' + e.point.Unduplicated + ' out of ' + 
+                       e.point.undup + ' unduplicated students' + 
+                       '<br/>' +
+                       'in the selected program(s).'
+                     '</p>'
+                 } !#")
       
-      n1$chart(showControls = F, reduceXTicks = F,
-               color = colors,
-               forceY = c(0,max(enrollment()$Proportion) + 10),
-               tooltipContent = "#! 
-               function(key, x, y, e){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                   '<p>' + x + ': ' + '<strong>' + y + '</strong>' + '</p>' + 
+
+      }
+      
+      # General plot if compare is 'Yes'
+      if (input$compareE == 'Yes') {
+        n1 <- nPlot(proportion ~ demoCol, group = "term", 
+                    data = enrollment(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot2_width"]])
+        
+        n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
+        n1$chart(showControls = F, reduceXTicks = F,
+                 color = colors,
+                 forceY = c(0,max(enrollment()$Proportion) + 10),
+                 tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + key + '</strong> </p>' + 
+                   '<p>' + x + ': <strong>' + y + '</strong> </p>' + 
                    '<p>' +
                      'This group constituted ' + e.point.progProp + '%' + 
                      '<br/>' + 
@@ -662,17 +670,22 @@ shinyServer(function(input, output, session) {
                      'collegewide.' +
                    '</p>'
                } !#")
-      
-      n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
+      }
     }
     
+    # Make the plot render
     n1$addParams(dom = 'histE')
-    
     return(n1)
   })
 
     
-#-----------------------SUCCESS DASH--------------------------------------------  
+################################################################################
+  
+#                             Success Dash
+  
+################################################################################  
+  
+  
   success <- reactive({
 
     # Determine filter columns, subject by default.
@@ -698,7 +711,7 @@ shinyServer(function(input, output, session) {
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      summarise(Success = mean(success), num = sum(success), den = n()) %>%
+      summarise(suc = mean(success), num = sum(success), den = n()) %>%
       mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
              progProp = den/sum(den) * 100)
 
@@ -711,21 +724,20 @@ shinyServer(function(input, output, session) {
         subset(seq_along(term) %in% grep(terms, term) & 
                (filt %in% input$acadS  | input$specialS == filt)) %>%
         group_by_(.dots = dots) %>%
-        summarise(Success = mean(success), num = sum(success), den = n()) %>%
+        summarise(suc = mean(success), num = sum(success), den = n()) %>%
         mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
                progProp = den/sum(den) * 100)
     }
     
-    
     # Final manipulations based on input
     if (input$demoS != 'None') {
-      names(temp)[2] <- 'demo_col'
-      names(college)[2] <- 'demo_col'
+      names(temp)[2] <- 'demoCol'
+      names(college)[2] <- 'demoCol'
     }
     
     # If equity comparison is slected divide by overall success
     if (input$compareDem == 'Yes' & input$demoS != 'None') {
-      temp$Success <- temp$Success/temp$overallSuc * 100
+      temp$suc <- temp$suc/temp$overallSuc * 100
       temp$outProp <- round(temp$outProp, 2)
       temp$progProp <- round(temp$progProp, 2)
       
@@ -735,20 +747,22 @@ shinyServer(function(input, output, session) {
     if (input$compareCol == 'Yes' & input$demoS == 'None') {
       temp <- temp %>% 
         left_join(college, by = c('term' = 'term')) %>%
-        rename(Program = Success.x, Collegewide = Success.y, den = den.x) %>%
+        rename(Program = suc.x, Collegewide = suc.y, den = den.x) %>%
         select(-c(num.x, overallSuc.x, outProp.x, progProp.x,
                   num.y, den.y, overallSuc.y, outProp.y, progProp.y))
-      temp <- gather(temp, 'Type', 'Success', c(2,4))
+      
+      temp <- gather(temp, 'type', 'success', c(2,4))
       temp$termCont <- as.numeric(temp$term)
-      temp$Success <- round(temp$Success, 2)
+      temp$suc <- round(temp$suc, 2)
     }
     
     # Suppress small Ns
     if (length(temp[,1]) > 0) {
       temp <- temp[temp$den >= 20, ]
     }
-    
-    temp})
+
+    temp
+  })
 
   
   
@@ -758,7 +772,7 @@ shinyServer(function(input, output, session) {
       
       # General plot for when demos are selected
       if (input$demoS != 'None') {
-        n1 <- nPlot(Success ~ demo_col, group = "term", 
+        n1 <- nPlot(suc ~ demoCol, group = "term", 
                     data = success(), 
                     type = "multiBarChart",
                     width = session$clientData[["output_plot1_width"]])
@@ -768,7 +782,7 @@ shinyServer(function(input, output, session) {
       
       # General plot for when no demos selected
       if (input$demoS == 'None' & input$compareCol == 'No') {
-        n1 <- nPlot(Success ~ term, 
+        n1 <- nPlot(suc ~ term, 
                     data = success(), 
                     type = "discreteBarChart",
                     width = session$clientData[["output_plot1_width"]])
@@ -776,7 +790,7 @@ shinyServer(function(input, output, session) {
       
       # When compare to college is selected
       if (input$demoS == 'None' & input$compareCol == 'Yes') {
-      n1 <- nPlot(Success ~ termCont, group = "Type", 
+      n1 <- nPlot(suc ~ termCont, group = "Type", 
                   data = success(), 
                   type = "lineChart",
                   width = session$clientData[["output_plot1_width"]])
