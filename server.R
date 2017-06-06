@@ -211,6 +211,8 @@ shinyServer(function(input, output, session) {
                    '<br/>' +
                    'of the students that enrolled' +
                    '<br/>' +
+                   'after applying' +
+                   '<br/>' +
                    'and ' + e.point.repAll + '% of all applicants.' 
                  '</p>'
                  } !#")
@@ -286,8 +288,6 @@ shinyServer(function(input, output, session) {
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
     
-    print(temp)
-    
     temp
   })
   
@@ -302,12 +302,15 @@ shinyServer(function(input, output, session) {
         n1$chart(forceY = c(0,100), 
                  color = colors,
                  tooltipContent = "#! function(key, x, y, e){ 
-                 return x + ': ' + '<strong>' + y + '%' + '</strong>' 
-                   + '<br/>' +
-                   '<strong>' + e.point.outGrp + '</strong>' + 
-                   ' out of ' + 
-                   '<strong>' + e.point.hcGrp + '</strong>' +
-                   ' students'
+                 return '<p>' + x + '</p>' +
+                   '<p>' + 
+                     'Proportion of students: ' + 
+                     '<strong>' + y + '%' + '</strong>' +
+                   '</p>' + 
+                   '<P>' +
+                     e.point.outGrp + ' out of ' + 
+                     e.point.hcGrp + ' students.' +
+                   '</p>'
                  } !#")
         
         n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
@@ -325,12 +328,14 @@ shinyServer(function(input, output, session) {
                  color = colors,
                  showControls = F, reduceXTicks = F, 
                  tooltipContent = "#! function(key, x, y, e){ 
-                 return x + ': ' + '<strong>' + y + '%' + '</strong>' 
-                   + '<br/>' +
-                   '<strong>' + e.point.outGrp + '</strong>' + 
-                   ' out of ' + 
-                   '<strong>' + e.point.hcGrp + '</strong>' +
-                   ' students'
+                 return '<p>' + key + '</p>' +
+                 '<p>' + 
+                   x + ': ' + '<strong>' + y + '%' + '</strong>' +
+                 '</p>' + 
+                 '<P>' +
+                   e.point.outGrp + ' out of ' + 
+                   e.point.hcGrp + ' students.' +
+                 '</p>'
                  } !#")
       }
       
