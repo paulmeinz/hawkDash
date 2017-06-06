@@ -63,13 +63,18 @@ shinyServer(function(input, output, session) {
       select(-c(tot))
     
     # Remove small sample sizes (less than 10) if temp is populated
-    if (length(temp[,1]) > 0 & input$demoA != 'None') {
+    if (length(temp[,1]) > 0) {
       temp <- temp[temp$headcount >= 10, ]
     }
     
     # Rename the demographic column for general plot function
     if (input$demoA != 'None') {
       names(temp)[2] <- 'demoCol'
+    }
+    
+    # Remove small sample sizes (less than 10) if temp is populated
+    if (length(temp[,1]) > 0) {
+      temp <- temp[temp$headcount >= 10, ]
     }
     
     # Make term numeric for line plot
@@ -351,7 +356,10 @@ shinyServer(function(input, output, session) {
     temp
   })
   
-# MATRICULATION DASH OUTPUT   
+
+#----------------------------Matric-Output--------------------------------------
+  
+    
     output$histM <- renderChart({
       
       # Render this plot if no demos are selected
@@ -440,7 +448,15 @@ shinyServer(function(input, output, session) {
       n1$addParams(dom = 'histM')
       return(n1)
     })
-#-----------------------ENROLLMENT DASH-----------------------------------------
+    
+    
+################################################################################
+    
+#                           Enrollment Dash
+  
+################################################################################ 
+    
+    
   enrollment <- reactive({
     
     # Determine filter columns, subject by default.
@@ -464,12 +480,13 @@ shinyServer(function(input, output, session) {
     }
     
     # Calculate collegewide enrollment by default
-    # Have to do some voodoo magic in the left join because numbers will be
-    # duplicated otherwise
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
+      
+      # Left join collegwide unduplicated to use as the denom for rep
+      # calculations. Otherwise sum(unduplicated) will be duplicated
       left_join(undup <- enroll %>%
                   subset(seq_along(term) %in% grep(terms, term)) %>%
                   group_by(term) %>%
@@ -487,6 +504,8 @@ shinyServer(function(input, output, session) {
                  (filt %in% input$acadE  | input$specialE == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(Duplicated = n(), Unduplicated = n_distinct(emplid)) %>%
+        
+        # Left join again (see previous)
         left_join(undup <- enroll %>%
                     subset(seq_along(term) %in% grep(terms, term) &
                              (filt %in% input$acadE  | 
@@ -496,26 +515,6 @@ shinyServer(function(input, output, session) {
         mutate(Proportion = Unduplicated/undup * 100)
     }
     
-    # If a demo is selected label the appropriate column (for general plot)
-    if (input$demoE != 'None') {
-      names(temp)[2] <- 'demo_col'
-      names(college)[2] <- 'demo_col'
-    }
-    
-    # If compare is selected and demo is not none calculated a prop index
-    if (input$compareE == 'Yes' & input$demoE != 'None') {
-      temp <- temp %>%
-        left_join(college, 
-                  by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
-        mutate(Proportion = Proportion.x/Proportion.y * 100) %>%
-        select(-c(Duplicated.x, Duplicated.y, Unduplicated.y,
-                  undup.x, undup.y)) %>%
-        rename(Unduplicated = Unduplicated.x, progProp = Proportion.x,
-               colProp = Proportion.y)
-      temp$progProp <- round(temp$progProp, 2)
-      temp$colProp <- round(temp$colProp, 2)
-    }
-    
     # If no demo is selected restructure the data to plot dup/undup
     if (input$demoE =='None') {
       temp <- gather(temp, 'Type', 'Enrollment', 2:3) %>%
@@ -523,10 +522,35 @@ shinyServer(function(input, output, session) {
       temp$termCont <- as.numeric(temp$term)
     }
     
-    # Suppress small Ns so that prop indexes arent outliers.
-    if (length(temp[,1]) > 0 & input$demoE != 'None') {
-      temp <- temp[temp$Unduplicated >= 10, ]
+    # If a demo is selected label the appropriate column (for general plot)
+    if (input$demoE != 'None') {
+      names(temp)[2] <- 'demoCol'
+      names(college)[2] <- 'demoCol'
+      
+      # If compare is selected and demo is not none calculated a prop index
+      if (input$compareE == 'Yes') {
+        temp <- temp %>%
+          left_join(college, 
+                    by = c('term' = 'term', 'demo_col' = 'demo_col')) %>%
+          mutate(Proportion = Proportion.x/Proportion.y * 100) %>%
+          select(-c(Duplicated.x, Duplicated.y, Unduplicated.y,
+                    undup.x, undup.y)) %>%
+          rename(Unduplicated = Unduplicated.x, progProp = Proportion.x,
+                 colProp = Proportion.y)
+        temp$progProp <- round(temp$progProp, 2)
+        temp$colProp <- round(temp$colProp, 2)
+      }
+      
+      # Suppress small Ns so that prop indexes arent outliers.
+      if (length(temp[,1]) > 0) {
+        temp <- temp[temp$Unduplicated >= 10, ]
+      }
+      
     }
+    
+
+    
+
     
     temp
   })
@@ -590,7 +614,7 @@ shinyServer(function(input, output, session) {
     
     # General plot if demo is selected
     if (input$demoE != 'None') {
-      n1 <- nPlot(Proportion ~ demo_col, group = "term", 
+      n1 <- nPlot(Proportion ~ demoCol, group = "term", 
                   data = enrollment(), 
                   type = "multiBarChart",
                   width = session$clientData[["output_plot2_width"]])
@@ -616,7 +640,7 @@ shinyServer(function(input, output, session) {
     
     # General plot if compare is 'Yes'
     if (input$demoE != 'None' & input$compareE == 'Yes') {
-      n1 <- nPlot(Proportion ~ demo_col, group = "term", 
+      n1 <- nPlot(Proportion ~ demoCol, group = "term", 
                   data = enrollment(), 
                   type = "multiBarChart",
                   width = session$clientData[["output_plot2_width"]])
