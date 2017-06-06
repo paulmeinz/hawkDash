@@ -5,13 +5,8 @@ load('enrollment.rdata')
 load('access.rdata')
 
 # Create matriculation data
-# Remove columns of the data that cause duplication IN terms
 matric <- enroll %>%
-  select(-class_rec_key, -subject, -success) %>%
   filter(strm > 1143) # we dont have data in spring 14 or before
-
-# Deduplify so students dont get double counted in a term
-matric <- unique(matric)
 
 # Set Colors
 colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999", 
@@ -249,21 +244,6 @@ shinyServer(function(input, output, session) {
       matric <- matric[matric$exempt == 'not exempt',]  
     }
     
-    # The basic skills/online flag creats duplication in the outcome variable
-    if (input$demoM != 'basicskills') {
-      matric <- matric %>%
-        select(-basicskills)
-      
-      matric <- unique(matric)
-    }
-    
-    if (input$demoM != 'online') {
-      matric <- matric %>%
-        select(-online)
-      
-      matric <- unique(matric)
-    }
-    
     # Determine which sssp elements should be used and calculate appropriately
     if (length(input$sssp) > 1) {
       x <- matric[,input$sssp]
@@ -279,18 +259,25 @@ shinyServer(function(input, output, session) {
     
     # Disaggregate
     temp <- matric %>%
-      subset(seq_along(term) %in% grep(terms, term)) %>%
+      subset(seq_along(term) %in% grep(terms, term) &
+             Proportion == 100) %>%
       group_by_(.dots = dots) %>%
-      summarise(Prop = mean(Proportion),
-                EarnedProg = sum(Proportion)/100,
-                HCProg = n_distinct(emplid)) %>%
-      left_join(overall <- matric %>%
+      summarise(outGrp = n_distinct(emplid)) %>%
+      left_join(x <- matric %>%
+                  group_by_(.dots = dots) %>%
+                  summarise(hcGrp = n_distinct(emplid))) %>%
+      left_join(y <- matric %>%
+                  subset(seq_along(term) %in% grep(terms, term) &
+                         Proportion == 100) %>%
+                  group_by(term)%>%
+                  summarise(outTot = n_distinct(emplid))) %>%
+      left_join(z <- matric %>%
                   group_by(term) %>%
-                  summarise(EarnedCol = sum(Proportion)/100,
-                            HCCol = n_distinct(emplid))) %>%
-      mutate(outRep = EarnedProg/EarnedCol * 100, 
-             colRep = HCProg/HCCol * 100) %>%
-      mutate(Equity = outRep/colRep * 100)
+                  summarise(colTot = n_distinct(emplid))) %>%
+      mutate(Prop = outGrp/hcGrp * 100, outRep = outGrp/outTot,
+             colRep = hcGrp/colTot) %>%
+      mutate(Equity = outRep/colRep)
+    
     
     if (input$demoM != 'None') {
       names(temp)[2] <- 'demo_col'
@@ -298,6 +285,8 @@ shinyServer(function(input, output, session) {
     
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
+    
+    print(temp)
     
     temp
   })
@@ -315,9 +304,9 @@ shinyServer(function(input, output, session) {
                  tooltipContent = "#! function(key, x, y, e){ 
                  return x + ': ' + '<strong>' + y + '%' + '</strong>' 
                    + '<br/>' +
-                   '<strong>' + e.point.EarnedCol + '</strong>' + 
+                   '<strong>' + e.point.outGrp + '</strong>' + 
                    ' out of ' + 
-                   '<strong>' + e.point.HCCol + '</strong>' +
+                   '<strong>' + e.point.hcGrp + '</strong>' +
                    ' students'
                  } !#")
         
@@ -338,9 +327,9 @@ shinyServer(function(input, output, session) {
                  tooltipContent = "#! function(key, x, y, e){ 
                  return x + ': ' + '<strong>' + y + '%' + '</strong>' 
                    + '<br/>' +
-                   '<strong>' + e.point.EarnedProg + '</strong>' + 
+                   '<strong>' + e.point.outGrp + '</strong>' + 
                    ' out of ' + 
-                   '<strong>' + e.point.HCProg + '</strong>' +
+                   '<strong>' + e.point.hcGrp + '</strong>' +
                    ' students'
                  } !#")
       }
