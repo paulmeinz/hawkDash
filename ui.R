@@ -90,7 +90,7 @@ shinyUI(fluidPage(
                       demographic group?', demoA),
           
           conditionalPanel(condition = "input.demoA != 'None' &
-                           input$outcome = '% of Applicants that Enroll'",       
+                           input.outcome == '% of Applicants that Enroll'",       
                            selectInput('compareA','Evaluate Equity?', compare))
           
         ),

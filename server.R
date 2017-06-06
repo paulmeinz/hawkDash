@@ -47,8 +47,9 @@ shinyServer(function(input, output, session) {
                 tot = sum(enroll)) %>%
       mutate(repAll = headcount/sum(headcount) * 100, 
              avgEnrolled = sum(tot)/sum(headcount),
-             repOut = tot/sum(tot) * 100, outTot = tot/100) %>%
-      mutate(equity = enrolled/avgEnrolled) %>%
+             repOut = tot/sum(tot) * 100, outTot = tot/100,
+             headcountAll = sum(headcount)) %>%
+      mutate(equity = enrolled/avgEnrolled * 100) %>%
       select(-c(avgEnrolled, tot))
     
     if (length(temp[,1]) > 0 & input$demoA != 'None') {
@@ -60,6 +61,8 @@ shinyServer(function(input, output, session) {
     }
     
     temp$termCont <- as.numeric(temp$term)
+    temp$repAll <- round(temp$repAll, 2)
+    temp$repOut <- round(temp$repOut, 2)
     
     temp
   })
@@ -141,6 +144,32 @@ shinyServer(function(input, output, session) {
       }
       
       if (input$demoA != 'None' & 
+          input$outcome == 'Applicant Counts') {
+        n1 <- nPlot(repAll ~ demo_col, group = "term", 
+                    data = acc(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot4_width"]])
+        
+        n1$chart(showControls = F, reduceXTicks = F, 
+                 color = colors,
+                 forceY = c(0,100), 
+                 tooltipContent = "#! 
+                 function(key, x, y, e){ 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 '<p>' + 
+                   x + ': ' + '<strong>' + y + '%' + '</strong>' + 
+                 '</p>' +
+                 '<p>' + e.point.headcount + ' out of ' + 
+                   e.point.headcountAll + ' applicants' + '</br>' +
+                   'in this group.'
+                 '</p>'
+                 } !#")
+        
+        n1$yAxis(axisLabel = 'Proportion (%) of all applicants', 
+                 width = 50)  
+      }
+      
+      if (input$demoA != 'None' & 
           input$outcome == '% of Applicants that Enroll') {
         n1 <- nPlot(enrolled ~ demo_col, group = "term", 
                     data = acc(), 
@@ -154,16 +183,45 @@ shinyServer(function(input, output, session) {
                  function(key, x, y, e){ 
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
                  '<p>' + 
-                 x + ': ' + '<strong>' + y + '%' + '</strong>' + 
+                   x + ': ' + '<strong>' + y + '%' + '</strong>' + 
                  '</p>' +
                  '<p>' + e.point.outTot + ' out of ' + 
-                 e.point.headcount + ' applicants' + '<br/>' +
-                 'in this group enrolled after applying.'
+                   e.point.headcount + ' applicants' + '<br/>' +
+                   'in this group enrolled after applying.'
                  '</p>'
                  } !#")
         
         n1$yAxis(axisLabel = '% of Applicants Who Enrolled (%)', 
                  width = 50)  
+      }
+      
+      if (input$demoA != 'None' & input$compareA == 'Yes') {
+        n1 <- nPlot(equity ~ demo_col, group = "term", 
+                    data = acc(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot4_width"]])
+        
+        n1$chart(showControls = F, reduceXTicks = F, 
+                 color = colors,
+                 forceY = c(floor(1.1 * max(acc()$equity)),
+                            floor(.9 * min(acc()$equity))), 
+                 tooltipContent = "#! 
+                 function(key, x, y, e){ 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 '<p>' + 
+                   x + ': ' + '<strong>' + y  + '</strong>' + 
+                 '</p>' +
+                 '<p>' + 
+                   'This group constituted ' + e.point.repOut + '%' + 
+                   '<br/>' +
+                   'of the students that enrolled' +
+                   '<br/>' +
+                   'and ' + e.point.repAll + '% of all applicants.' 
+                 '</p>'
+                 } !#")
+        
+        n1$yAxis(axisLabel = 'Proportionality Index', 
+                 width = 50) 
       }
       
       n1$addParams(dom = 'histA')
