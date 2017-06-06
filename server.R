@@ -48,16 +48,14 @@ shinyServer(function(input, output, session) {
     # Disaggregate the access data  
     temp <- access %>%
       
-      # Filter terms and group by selected factors
+      # Filter terms and group by selected factors and summarize
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      
-      # Summarise
       summarise(headcount = n_distinct(emplid), # Headcount by grouping
                 enrolled = mean(enroll), # Percent that enrolled by grouping
                 tot = sum(enroll)) %>% # Overall number that enrolled
       
-      # Create additional variables for Equity calc
+      # Create additional variables for Equity and custom tooltips
       mutate(repOut = tot/sum(tot) * 100, outTot = tot/100, # Rep in enrolled
              repAll = headcount/sum(headcount) * 100, # Rep at college
              headcountAll = sum(headcount)) %>% # Collegewide headcount
@@ -92,6 +90,8 @@ shinyServer(function(input, output, session) {
       
       # FOr non demo plots..
       if (input$demoA == 'None') {
+        
+        # When applicant counts is selected
         if (input$outcome == 'Applicant Counts') {
           n1 <- nPlot(headcount ~ termCont,
                       data = acc(), 
@@ -128,35 +128,40 @@ shinyServer(function(input, output, session) {
                          return tickvalues}!#", sep = '')
           
           # Execute code and set other features
+          n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
+                   width = 50, rotateLabels = -25)
+          n1$yAxis(axisLabel='Number of Applicants', width=50)
           n1$chart(forceY = c(floor(.9 * min(acc()$headcount)),
                               floor(1.1 * max(acc()$headcount))),
                    margin = list(left = 63, bottom = 63, right = 63),
                    color = colors, size = 5,
                    showLegend = FALSE,
+                   
+                   # Tooltip function
                    tooltipContent = "#! 
-                   function(key, x, y, e){ 
-                     return  x + ': ' + '<strong>' + y + 
-                     '</strong>' + ' applicants'
+                   function(key, x, y, e) { 
+                     return  x + ': <strong>' + y + '</strong>' + ' applicants'
                    } !#")
           
-          n1$yAxis(axisLabel='Number of Applicants', width=50)
-          n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-                   width = 50, rotateLabels = -25)
+
+
         }
         
+        # If percent applicants is selected
         if (input$outcome == '% of Applicants that Enroll') {
           n1 <- nPlot(enrolled ~ term,
                       data = acc(), 
                       type = "discreteBarChart",
                       width = session$clientData[["output_plot4_width"]])
+          
+          # Set plot features
           n1$yAxis(axisLabel='% of Applicants Who Enrolled', width=50)
           n1$xAxis(rotateLabels = -25)
-          n1$chart(forceY = c(0,100), tooltipContent = "#! 
-          function(key, x, y, e){ 
-            return '<p>' + '<strong>' + x + '</strong>' + '</p>' + 
-              '<p>' + 
-                'Enrollment Rate: ' + '<strong>' + y + '%' + '</strong>' + 
-              '</p>' +
+          n1$chart(forceY = c(0,100), tooltipContent = 
+          "#! 
+          function(key, x, y, e) { 
+            return '<p> <strong>' + x + '</strong> </p>' + 
+              '<p> Enrollment Rate: <strong>' + y + '% </strong> </p>' +
               '<p>' +
                 e.point.outTot + ' out of ' + e.point.headcount + '</br>' +
                 'applicants enrolled after applying' +
@@ -165,89 +170,98 @@ shinyServer(function(input, output, session) {
         }
       }
       
-      if (input$demoA != 'None' & 
-          input$outcome == 'Applicant Counts') {
-        n1 <- nPlot(repAll ~ demo_col, group = "term", 
-                    data = acc(), 
-                    type = "multiBarChart",
-                    width = session$clientData[["output_plot4_width"]])
+      # If demos are selected
+      if (input$demoA != 'None') {
         
-        n1$chart(showControls = F, reduceXTicks = F, 
-                 color = colors,
-                 forceY = c(0,100), 
-                 tooltipContent = "#! 
-                 function(key, x, y, e){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 '<p>' + 
-                   x + ': ' + '<strong>' + y + '%' + '</strong>' + 
-                 '</p>' +
-                 '<p>' + e.point.headcount + ' out of ' + 
-                   e.point.headcountAll + ' applicants' + '</br>' +
-                   'in this group.'
-                 '</p>'
-                 } !#")
+        # If applicant counts are selected
+        if(input$outcome == 'Applicant Counts') {
+          n1 <- nPlot(repAll ~ demoCol, group = "term", 
+                      data = acc(), 
+                      type = "multiBarChart",
+                      width = session$clientData[["output_plot4_width"]])
         
-        n1$yAxis(axisLabel = 'Proportion (%) of all applicants', 
-                 width = 50)  
-      }
+          
+          n1$yAxis(axisLabel = 'Proportion (%) of all applicants', 
+                   width = 50)  
+          n1$chart(showControls = F, reduceXTicks = F, 
+                   color = colors,
+                   forceY = c(0,100), 
+                   tooltipContent = 
+                   "#! 
+                   function(key, x, y, e) { 
+                     return '<p> <strong>' + key + '</strong> </p>' + 
+                       '<p>' + x + ': <strong>' + y + '% </strong> </p>' +
+                       '<p>' + 
+                         e.point.headcount + ' out of ' + 
+                         e.point.headcountAll + ' applicants </br>' +
+                         'in this group.'
+                       '</p>'
+                   } !#")
+        }
       
-      if (input$demoA != 'None' & 
-          input$outcome == '% of Applicants that Enroll') {
-        n1 <- nPlot(enrolled ~ demo_col, group = "term", 
-                    data = acc(), 
-                    type = "multiBarChart",
-                    width = session$clientData[["output_plot4_width"]])
+        # if outcome is percent of applicants then..
+        if (input$outcome == '% of Applicants that Enroll') {
+          
+          # Dont calculate equity
+          if (input$compareA == 'No') {
+            n1 <- nPlot(enrolled ~ demoCol, group = "term", 
+                        data = acc(), 
+                        type = "multiBarChart",
+                        width = session$clientData[["output_plot4_width"]])
         
-        n1$chart(showControls = F, reduceXTicks = F, 
-                 color = colors,
-                 forceY = c(0,100), 
-                 tooltipContent = "#! 
-                 function(key, x, y, e){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 '<p>' + 
-                   x + ': ' + '<strong>' + y + '%' + '</strong>' + 
-                 '</p>' +
-                 '<p>' + e.point.outTot + ' out of ' + 
-                   e.point.headcount + ' applicants' + '<br/>' +
-                   'in this group enrolled after applying.'
-                 '</p>'
-                 } !#")
+            n1$yAxis(axisLabel = '% of Applicants Who Enrolled (%)', 
+                     width = 50) 
+            n1$chart(showControls = F, reduceXTicks = F, 
+                     color = colors,
+                     forceY = c(0,100), 
+                     tooltipContent = 
+                     "#! 
+                     function(key, x, y, e) { 
+                       return '<p> <strong>' + key + '</strong> </p>' + 
+                         '<p>' + x + ': <strong>' + y + '% </strong> </p>' +
+                         '<p>' + 
+                            e.point.outTot + ' enrolled out of ' + 
+                            e.point.headcount + '<br/>' +
+                            'applicants in this group.'
+                         '</p>'
+                     } !#")
+          }
         
-        n1$yAxis(axisLabel = '% of Applicants Who Enrolled (%)', 
-                 width = 50)  
-      }
+          # Calculate equity
+          if (input$compareA == 'Yes') {
+            n1 <- nPlot(equity ~ demoCol, group = "term", 
+                        data = acc(), 
+                        type = "multiBarChart",
+                        width = session$clientData[["output_plot4_width"]])
+          
+            n1$chart(showControls = F, reduceXTicks = F, 
+                     color = colors,
+                     forceY = c(floor(1.1 * max(acc()$equity)),
+                                floor(.9 * min(acc()$equity))), 
+                     tooltipContent = "#! 
+                   function(key, x, y, e){ 
+                   return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                   '<p>' + 
+                     x + ': ' + '<strong>' + y  + '</strong>' + 
+                   '</p>' +
+                   '<p>' + 
+                     'This group constituted ' + e.point.repOut + '%' + 
+                     '<br/>' +
+                     'of the students that enrolled' +
+                     '<br/>' +
+                     'after applying' +
+                     '<br/>' +
+                     'and ' + e.point.repAll + '% of all applicants.' 
+                   '</p>'
+                   } !#")
+          
+            n1$yAxis(axisLabel = 'Proportionality Index', 
+                     width = 50)  
+          }
+        }
+      }  
       
-      if (input$demoA != 'None' & input$compareA == 'Yes') {
-        n1 <- nPlot(equity ~ demo_col, group = "term", 
-                    data = acc(), 
-                    type = "multiBarChart",
-                    width = session$clientData[["output_plot4_width"]])
-        
-        n1$chart(showControls = F, reduceXTicks = F, 
-                 color = colors,
-                 forceY = c(floor(1.1 * max(acc()$equity)),
-                            floor(.9 * min(acc()$equity))), 
-                 tooltipContent = "#! 
-                 function(key, x, y, e){ 
-                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                 '<p>' + 
-                   x + ': ' + '<strong>' + y  + '</strong>' + 
-                 '</p>' +
-                 '<p>' + 
-                   'This group constituted ' + e.point.repOut + '%' + 
-                   '<br/>' +
-                   'of the students that enrolled' +
-                   '<br/>' +
-                   'after applying' +
-                   '<br/>' +
-                   'and ' + e.point.repAll + '% of all applicants.' 
-                 '</p>'
-                 } !#")
-        
-        n1$yAxis(axisLabel = 'Proportionality Index', 
-                 width = 50) 
-      }
-      
+      # Make sure the plot displays
       n1$addParams(dom = 'histA')
       return(n1)
       
