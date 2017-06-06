@@ -4,67 +4,93 @@ library(shiny)
 load('enrollment.rdata')
 load('access.rdata')
 
+# INITIALIZE SOME THINGS--------------------------------------------------------
+
+
 # Create matriculation data
 matric <- enroll %>%
   filter(strm > 1143) # we dont have data in spring 14 or before
 
 # Set Colors
 colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999", 
-            "#F0E442", "#000000", "#56B4E9", "#CC79A7", "#999900" )
+            "#F0E442", "#000000", "#56B4E9", "#CC79A7", "#999900")
 
 # Define server logic
 shinyServer(function(input, output, session) {
 
-#-----------------------ACCESS DASH---------------------------------------------
+  
+################################################################################
+  
+#                              ACCESS DASH
+  
+################################################################################
+  
+  
   acc <- reactive({
     
-    # Determine the group by factors, if "None" is selected only put term
+    # Determine the group by factors, if "None" is selected only use term
     demo <- input$demoA
     dots <- c("term", demo)
-    dots <- dots[!dots == 'None', drop = F]
+    dots <- dots[dots != 'None', drop = F]
     
     # Determine terms and make a regex pattern for filtering
     terms <- input$termA
-    terms[is.null(terms)] <- 'None'
+    terms[is.null(terms)] <- 'None' # If non selected make terms 'None'
     if (length(terms) > 1) {
       terms <- paste(terms[1], "|", terms[2], sep = '')
     }
     
-    # Filter Elk Grove only
+    # Filter Elk Grove only if yes selected to input
     if (input$egusd == 'Yes') {
       access <- access[access$egusd == 'egusd',]
     }
-      
+    
+    # Disaggregate the access data  
     temp <- access %>%
+      
+      # Filter terms and group by selected factors
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
-      summarise(headcount = n_distinct(emplid), enrolled = mean(enroll),
-                tot = sum(enroll)) %>%
-      mutate(repAll = headcount/sum(headcount) * 100, 
-             avgEnrolled = sum(tot)/sum(headcount),
-             repOut = tot/sum(tot) * 100, outTot = tot/100,
-             headcountAll = sum(headcount)) %>%
-      mutate(equity = enrolled/avgEnrolled * 100) %>%
-      select(-c(avgEnrolled, tot))
+      
+      # Summarise
+      summarise(headcount = n_distinct(emplid), # Headcount by grouping
+                enrolled = mean(enroll), # Percent that enrolled by grouping
+                tot = sum(enroll)) %>% # Overall number that enrolled
+      
+      # Create additional variables for Equity calc
+      mutate(repOut = tot/sum(tot) * 100, outTot = tot/100, # Rep in enrolled
+             repAll = headcount/sum(headcount) * 100, # Rep at college
+             headcountAll = sum(headcount)) %>% # Collegewide headcount
+      mutate(equity = repOut/repAll * 100) %>% # Calc equity index
+      select(-c(tot))
     
+    # Remove small sample sizes (less than 10) if temp is populated
     if (length(temp[,1]) > 0 & input$demoA != 'None') {
       temp <- temp[temp$headcount >= 10, ]
     }
     
+    # Rename the demographic column for general plot function
     if (input$demoA != 'None') {
-      names(temp)[2] <- 'demo_col'
+      names(temp)[2] <- 'demoCol'
     }
     
-    temp$termCont <- as.numeric(temp$term)
+    # Make term numeric for line plot
+    temp$termCont <- as.numeric(temp$term) 
+    
+    # Round for custom tooltips
     temp$repAll <- round(temp$repAll, 2)
     temp$repOut <- round(temp$repOut, 2)
     
     temp
   })
-  
-# ACCESS DASH OUTPUT  
+
+    
+#----------------------------------OUTPUT---------------------------------------
+
+    
     output$histA <- renderChart({
       
+      # FOr non demo plots..
       if (input$demoA == 'None') {
         if (input$outcome == 'Applicant Counts') {
           n1 <- nPlot(headcount ~ termCont,
@@ -72,7 +98,8 @@ shinyServer(function(input, output, session) {
                       type = "lineChart",
                       width = session$clientData[["output_plot4_width"]])
           
-          # Create javascript code to modify x ticks (Wacky)
+          # Create javascript code to modify x ticks (Ugly)
+          # Could turn this into a helper function
           x <- unique(access$term)
           x <- x[order(x)]
           y <- ''
