@@ -689,10 +689,9 @@ shinyServer(function(input, output, session) {
   
 ################################################################################  
   
+
   
   success <- reactive({
-    
-    print(is.null(input$compareDem))
     
     # Determine filter columns, subject by default.
     prog <- input$collegeS
@@ -767,7 +766,7 @@ shinyServer(function(input, output, session) {
     if (length(temp[,1]) > 0) {
       temp <- temp[temp$den >= 20, ]
     }
-
+    
     temp
   })
 
@@ -777,19 +776,17 @@ shinyServer(function(input, output, session) {
   
     output$histS <- renderChart({
       
-      
-      
       # General plot for when no demos selected
       if (input$demoS == 'None') {
         
         # If no comparison to College
-        if (input$compareCol == 'No' | is.null(input$compareCol)) {
+        if (is.null(input$compareCol) | sum(input$compareCol == 'No') == 1) {
+
           n1 <- nPlot(suc ~ term, 
                       data = success(), 
                       type = "discreteBarChart",
                       width = session$clientData[["output_plot1_width"]])
           
-          print('here2')
           n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
           n1$xAxis(rotateLabels = -25)
           n1$chart(forceY = c(0,100), tooltipContent = "#! 
@@ -916,7 +913,8 @@ shinyServer(function(input, output, session) {
       
       if (input$collegeS == 'Academic Programs' & !is.null(input$acadS) | 
           input$collegeS == 'Special Programs') {
-        selectInput('compareCol','Compare to collegewide?', compare)
+        selectInput('compareCol','Compare to collegewide?', compare,
+                    selected = 'No')
       }
     })
 
