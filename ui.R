@@ -33,7 +33,7 @@ demoA <- c(None = 'None', 'Enrollment Status' = 'status',
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
-trends <- c('Collegewide','Academic Programs', 'Special Programs')
+trends <- c('Collegewide', 'Academic Programs', 'Special Programs')
 
 # Academic programs
 acad <- unique(enroll$subject)

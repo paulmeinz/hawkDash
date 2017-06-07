@@ -520,11 +520,14 @@ shinyServer(function(input, output, session) {
     if (input$demoE =='None') {
       temp <- gather(temp, 'type', 'enrollment', 2:3) %>%
         select(-proportion)
-      temp$termCont <- as.numeric(temp$term)
-      
+
       # Rename levels for the purpos of tooltips
-      temp[temp$type == 'unduplicated', 'type'] <- 'Unduplicated'
-      temp[temp$type == 'duplicated', 'type'] <- 'Duplicated'
+      if (length(temp[,1]) > 1) {
+        temp[temp$type == 'unduplicated', 'type'] <- 'Unduplicated'
+        temp[temp$type == 'duplicated', 'type'] <- 'Duplicated'
+      }
+      
+      temp$termCont <- as.numeric(temp$term)
     }
     
     # If a demo is selected label the appropriate column (for general plot)
@@ -547,12 +550,11 @@ shinyServer(function(input, output, session) {
       }
       
       # Suppress small Ns so that prop indexes arent outliers.
-      if (length(temp[,1]) > 0) {
-        temp <- temp[temp$unduplicated >= 10, ]
-      }
+      temp <- temp[temp$unduplicated >= 10, ]
       
     }
 
+    print(temp)
     temp
   })
   
@@ -635,7 +637,7 @@ shinyServer(function(input, output, session) {
                      '<p>' + 
                      x + ': <strong>' + y + '% </strong>' + 
                      '</p>' +
-                     '<p>' + e.point.Unduplicated + ' out of ' + 
+                     '<p>' + e.point.unduplicated + ' out of ' + 
                        e.point.undup + ' unduplicated students' + 
                        '<br/>' +
                        'in the selected program(s).'
