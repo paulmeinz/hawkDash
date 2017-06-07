@@ -89,7 +89,7 @@ shinyUI(fluidPage(
                        inline = TRUE),
           
           checkboxGroupInput('termA','What terms would you like to see?', term,
-                             selected = 'Fall'),
+                             selected = 'Fall', inline = TRUE),
           
           selectInput('demoA', 'Would you like to see data for a particular
                       demographic group?', demoA),
