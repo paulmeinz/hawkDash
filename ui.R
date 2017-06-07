@@ -33,7 +33,7 @@ demoA <- c(None = 'None', 'Enrollment Status' = 'status',
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
-trends <- c('Collegewide','Program')
+trends <- c('Collegewide','Academic Programs', 'Special Programs')
 
 # Academic programs
 acad <- unique(enroll$subject)
@@ -70,10 +70,15 @@ sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan',
 
 ################################################################################
 
+
 shinyUI(fluidPage(
 
   navbarPage(title = 'The CRC Hawkdash',
+             
+             
 #---------------------------ACCESS TAB------------------------------------------
+
+
     tabPanel(title = 'Applications (Access)',
       sidebarLayout(
         sidebarPanel(
@@ -104,7 +109,10 @@ shinyUI(fluidPage(
       )
     ),
 
+
 #---------------------------MATRICULATION TAB-----------------------------------
+    
+
     tabPanel(title = 'Matriculation (SSSP)',
       sidebarLayout(
         sidebarPanel(
@@ -133,7 +141,10 @@ shinyUI(fluidPage(
       )           
     ),
 
+
 #---------------------------ENROLLMENT TAB--------------------------------------
+    
+
     tabPanel(title = 'Enrollment',
       sidebarLayout(
         sidebarPanel(
@@ -170,23 +181,23 @@ shinyUI(fluidPage(
       )           
     ),
 
+
 #---------------------------COURSE SUCCESS TAB----------------------------------
+
+
     tabPanel(title = 'Course Success', 
       sidebarLayout(
         sidebarPanel(
           selectInput('collegeS', 'Would you like to see Collegewide data
                   or data in a program?', trends),
 
-          conditionalPanel(condition = "input.collegeS == 'Program'",
-            selectInput('progTypeS', 'Select a program type', programType),
-
-          conditionalPanel(condition = "input.progTypeS == 'Academic Programs'",
+          conditionalPanel(condition = "input.collegeS == 'Academic Programs'",
             selectInput('acadS', 
                         'Select program(s) by clicking in the box below.',
                          acad, multiple = TRUE)),
 
-          conditionalPanel(condition = "input.progTypeS == 'Special Programs'",
-            selectInput('specialS', 'Select a program', special))),
+          conditionalPanel(condition = "input.collegeS == 'Special Programs'",
+            selectInput('specialS', 'Select a program', special)),
 
           checkboxGroupInput('termS', 'What terms would you like to see?', 
                       term, inline = TRUE, selected = 'Fall'),

@@ -689,7 +689,7 @@ shinyServer(function(input, output, session) {
   success <- reactive({
 
     # Determine filter columns, subject by default.
-    prog <- input$progTypeS
+    prog <- input$collegeS
     filtCol <- 'subject'
     filtCol[prog == 'Special Programs'] <- input$specialS
     names(enroll)[names(enroll) == filtCol] <- 'filt'
