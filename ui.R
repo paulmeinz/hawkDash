@@ -150,17 +150,14 @@ shinyUI(fluidPage(
         sidebarPanel(
           selectInput('collegeE', 'Would you like to see Collegewide data
                       or data in a program?', trends),
-                 
-          conditionalPanel(condition = "input.collegeE == 'Program'",
-            selectInput('progTypeE', 'Select a program type', programType),
                                   
-          conditionalPanel(condition = "input.progTypeE == 'Academic Programs'",
+          conditionalPanel(condition = "input.collegeE == 'Academic Programs'",
             selectInput('acadE', 
                         'Select program(s) by clicking in the box below.',
                         acad, multiple = TRUE)),
                                   
-          conditionalPanel(condition = "input.progTypeE == 'Special Programs'",
-            selectInput('specialE', 'Select a program', special))),
+          conditionalPanel(condition = "input.collegeE == 'Special Programs'",
+            selectInput('specialE', 'Select a program', special)),
                  
           checkboxGroupInput('termE', 'What terms would you like to see?', 
                       term, inline = TRUE, selected = 'Fall'),
@@ -169,7 +166,7 @@ shinyUI(fluidPage(
                       a particular demographic group?', demo),
           
           conditionalPanel(condition = "input.demoE != 'None'
-                           & input.collegeE == 'Program'",       
+                           & input.collegeE != 'Collegewide'",       
             selectInput('compareE','Evaluate Equity?', compare))
         ),
                
@@ -189,7 +186,7 @@ shinyUI(fluidPage(
       sidebarLayout(
         sidebarPanel(
           selectInput('collegeS', 'Would you like to see Collegewide data
-                  or data in a program?', trends),
+                      or data in a program?', trends),
 
           conditionalPanel(condition = "input.collegeS == 'Academic Programs'",
             selectInput('acadS', 
@@ -207,19 +204,18 @@ shinyUI(fluidPage(
           
           conditionalPanel(condition = "input.demoS != 'None'",
             selectInput('compareDem','Would you like to evaluate
-                        equity?', compare)),
+                         equity?', compare)),
           
           conditionalPanel(condition = "input.collegeS != 'Collegewide' &
                              input.demoS == 'None'",
-            selectInput('compareCol','Would you like to compare these
-                        success rates to the college?', compare))
+            selectInput('compareCol','Compare to collegewide?', compare))
         ),
 
     # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histS', lib = 'nvd3'),
-          plotOutput("plot1")
-        )
+          plotOutput("plot1"))
+        
       )
     )
   )

@@ -461,7 +461,7 @@ shinyServer(function(input, output, session) {
   enrollment <- reactive({
     
     # Determine filter columns, subject by default.
-    prog <- input$progTypeE
+    prog <- input$collegeE
     filtCol <- 'subject'
     filtCol[prog == 'Special Programs'] <- input$specialE
     oldNames <- names(enroll)
@@ -540,7 +540,7 @@ shinyServer(function(input, output, session) {
           mutate(proportion = proportion.x/proportion.y * 100) %>%
           select(-c(duplicated.x, duplicated.y, unduplicated.y,
                     undup.x, undup.y)) %>%
-          rename(Unduplicated = unduplicated.x, progProp = proportion.x,
+          rename(unduplicated = unduplicated.x, progProp = proportion.x,
                  colProp = proportion.y)
         temp$progProp <- round(temp$progProp, 2)
         temp$colProp <- round(temp$colProp, 2)
@@ -655,7 +655,7 @@ shinyServer(function(input, output, session) {
         n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(0,max(enrollment()$Proportion) + 10),
+                 forceY = c(0,max(enrollment()$proportion) + 10),
                  tooltipContent = "#! 
                  function(key, x, y, e) { 
                    return '<p> <strong>' + key + '</strong> </p>' + 
@@ -835,7 +835,7 @@ shinyServer(function(input, output, session) {
           # Execute code and set other features
           n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
                    rotateLabels = -25)
-          n1$yAxis(axisLabel = 'Program Success Rate (%)', 
+          n1$yAxis(axisLabel = 'Course Success Rate (%)', 
                    width=50)
           n1$chart(forceY = c(0, 100),
                    margin = list(left = 63, bottom = 63, right = 63),
