@@ -918,6 +918,7 @@ shinyServer(function(input, output, session) {
           input$collegeS == 'Special Programs') {
         selectInput('compareCol','Compare to collegewide?', compare)
       }
+      
     })
 
 })
