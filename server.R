@@ -15,6 +15,9 @@ matric <- enroll %>%
 colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999", 
             "#F0E442", "#000000", "#56B4E9", "#CC79A7", "#999900")
 
+# Compare options
+compare <- c('No', 'Yes')
+
 # Define server logic
 shinyServer(function(input, output, session) {
 
@@ -553,8 +556,7 @@ shinyServer(function(input, output, session) {
       temp <- temp[temp$unduplicated >= 10, ]
       
     }
-
-    print(temp)
+    
     temp
   })
   
@@ -689,7 +691,9 @@ shinyServer(function(input, output, session) {
   
   
   success <- reactive({
-
+    
+    print(is.null(input$compareDem))
+    
     # Determine filter columns, subject by default.
     prog <- input$collegeS
     filtCol <- 'subject'
@@ -773,15 +777,19 @@ shinyServer(function(input, output, session) {
   
     output$histS <- renderChart({
       
+      
+      
       # General plot for when no demos selected
       if (input$demoS == 'None') {
         
         # If no comparison to College
-        if (input$compareCol == 'No') {
+        if (input$compareCol == 'No' | is.null(input$compareCol)) {
           n1 <- nPlot(suc ~ term, 
                       data = success(), 
                       type = "discreteBarChart",
                       width = session$clientData[["output_plot1_width"]])
+          
+          print('here2')
           n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
           n1$xAxis(rotateLabels = -25)
           n1$chart(forceY = c(0,100), tooltipContent = "#! 
@@ -861,7 +869,7 @@ shinyServer(function(input, output, session) {
         
         n1$chart(showControls = F, reduceXTicks = F)
         
-        if(input$compareDem == 'No') {
+        if(input$compareDem == 'No' | is.null(input$compareDem)) {
           n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
           n1$chart(forceY = c(0,100), tooltipContent = "#! 
                    function(key, x, y, e) { 
@@ -903,5 +911,13 @@ shinyServer(function(input, output, session) {
       n1$chart(color = colors)
       return(n1)
       })
+    
+    output$uiSuccess <- renderUI({
+      
+      if (input$collegeS == 'Academic Programs' & !is.null(input$acadS) | 
+          input$collegeS == 'Special Programs') {
+        selectInput('compareCol','Compare to collegewide?', compare)
+      }
+    })
 
 })

@@ -130,8 +130,8 @@ shinyUI(fluidPage(
                       a particular demographic group?', demo),
                  
           conditionalPanel(condition = "input.demoM != 'None'",       
-          selectInput('compareM','Evaluate Equity?', compare))
-                 ),
+                           selectInput('compareM','Evaluate Equity?', compare))
+        ),
                
                # Show a plot of the generated distribution
         mainPanel(
@@ -152,22 +152,23 @@ shinyUI(fluidPage(
                       or data in a program?', trends),
                                   
           conditionalPanel(condition = "input.collegeE == 'Academic Programs'",
-            selectInput('acadE', 
-                        'Select program(s) by clicking in the box below.',
-                        acad, multiple = TRUE)),
+                           selectInput('acadE', 'Select program(s) by clicking 
+                                       in the box below.',acad, 
+                                       multiple = TRUE)),
                                   
           conditionalPanel(condition = "input.collegeE == 'Special Programs'",
-            selectInput('specialE', 'Select a program', special)),
+                           selectInput('specialE', 'Select a program', 
+                                       special)),
                  
           checkboxGroupInput('termE', 'What terms would you like to see?', 
-                      term, inline = TRUE, selected = 'Fall'),
+                             term, inline = TRUE, selected = 'Fall'),
                  
           selectInput('demoE', 'Would you like to view trends for
                       a particular demographic group?', demo),
           
           conditionalPanel(condition = "input.demoE != 'None'
                            & input.collegeE != 'Collegewide'",       
-            selectInput('compareE','Evaluate Equity?', compare))
+                           selectInput('compareE','Evaluate Equity?', compare))
         ),
                
                # Show a plot of the generated distribution
@@ -189,26 +190,22 @@ shinyUI(fluidPage(
                       or data in a program?', trends),
 
           conditionalPanel(condition = "input.collegeS == 'Academic Programs'",
-            selectInput('acadS', 
-                        'Select program(s) by clicking in the box below.',
-                         acad, multiple = TRUE)),
+                           selectInput('acadS', 
+                                       'Select program(s) by clicking in the box 
+                                       below.',
+                                       acad, multiple = TRUE)),
 
           conditionalPanel(condition = "input.collegeS == 'Special Programs'",
-            selectInput('specialS', 'Select a program', special)),
+                           selectInput('specialS', 'Select a program', 
+                                       special)),
 
           checkboxGroupInput('termS', 'What terms would you like to see?', 
-                      term, inline = TRUE, selected = 'Fall'),
+                             term, inline = TRUE, selected = 'Fall'),
 
           selectInput('demoS', 'Would you like to view trends for
                       a particular demographic group?', demo),
           
-          conditionalPanel(condition = "input.demoS != 'None'",
-            selectInput('compareDem','Would you like to evaluate
-                         equity?', compare)),
-          
-          conditionalPanel(condition = "input.collegeS != 'Collegewide' &
-                             input.demoS == 'None'",
-            selectInput('compareCol','Compare to collegewide?', compare))
+          uiOutput('uiSuccess')
         ),
 
     # Show a plot of the generated distribution
