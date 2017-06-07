@@ -783,7 +783,7 @@ shinyServer(function(input, output, session) {
       if (input$demoS == 'None') {
         
         # If no comparison to College
-        if (input$compareCol == 'No' | is.null(input$compareCol)) {
+        if (input$compareCol == 'No') {
           n1 <- nPlot(suc ~ term, 
                       data = success(), 
                       type = "discreteBarChart",
@@ -869,7 +869,7 @@ shinyServer(function(input, output, session) {
         
         n1$chart(showControls = F, reduceXTicks = F)
         
-        if(input$compareDem == 'No' | is.null(input$compareDem)) {
+        if(input$compareDem == 'No') {
           n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
           n1$chart(forceY = c(0,100), tooltipContent = "#! 
                    function(key, x, y, e) { 
@@ -911,13 +911,6 @@ shinyServer(function(input, output, session) {
       n1$chart(color = colors)
       return(n1)
       })
-    
-    output$uiSuccess <- renderUI({
-      
-      if (input$collegeS == 'Academic Programs' & !is.null(input$acadS) | 
-          input$collegeS == 'Special Programs') {
-        selectInput('compareCol','Compare to collegewide?', compare)
-      }
       
     })
 
