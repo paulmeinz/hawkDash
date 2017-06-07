@@ -557,7 +557,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-#----------------------------ENROLLMENT OUTPUT----------------------------------
+#----------------------------Enrollment Output----------------------------------
  
    
   output$histE <- renderChart({
@@ -598,7 +598,7 @@ shinyServer(function(input, output, session) {
                     return tickvalues}!#", sep = '')
       
       # Execute code and set other features
-      n1$xAxis(axisLabel = 'Term', tickFormat = codeForm, tickValues = codeVal, 
+      n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
                width = 50, rotateLabels = -25)
       n1$yAxis(axisLabel='Enrollment', width=50)
       n1$chart(forceY = c(floor(.9 * min(enrollment()$enrollment)),
@@ -766,7 +766,7 @@ shinyServer(function(input, output, session) {
   })
 
   
-#-----------------------------SUCCESS-OUTPUT------------------------------------  
+#-----------------------------Success-Output------------------------------------  
 
   
     output$histS <- renderChart({
