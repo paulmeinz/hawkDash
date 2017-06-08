@@ -218,14 +218,14 @@ shinyUI(fluidPage(
                            ",
                            selectInput('compareCol','Compare to collegewide?', 
                                        compare))
-          
         ),
 
     # Show a plot of the generated distribution
         mainPanel(
+          htmlOutput('textS'),
           chartOutput('histS', lib = 'nvd3'),
-          plotOutput("plot1"))
-        
+          plotOutput("plot1")
+        )
       )
     )
   )
