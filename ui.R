@@ -200,6 +200,7 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.collegeS == 'Special Programs'",
                            selectInput('specialS', 'Select a program', 
                                        special)),
+          htmlOutput('helpS'),
 
           checkboxGroupInput('termS', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
@@ -222,7 +223,7 @@ shinyUI(fluidPage(
 
     # Show a plot of the generated distribution
         mainPanel(
-          htmlOutput('helpS'),
+          
           chartOutput('histS', lib = 'nvd3'),
           plotOutput("plot1")
         )

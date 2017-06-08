@@ -714,7 +714,7 @@ shinyServer(function(input, output, session) {
   # UX Help text generator
   helpMessages <- reactive({
     'empty for now'
-  })
+  }) 
   
   # Reset comparisons if they are hidden
   observe({
