@@ -712,7 +712,7 @@ shinyServer(function(input, output, session) {
 ################################################################################  
   
   # UX Help text generator
-  textMessages <- reactive({
+  helpMessages <- reactive({
     'empty for now'
   })
   
@@ -810,8 +810,8 @@ shinyServer(function(input, output, session) {
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
 
-    output$textS <- renderUI({
-      HTML(paste(textMessages()))
+    output$helpS <- renderUI({
+      HTML(paste(helpMessages()))
     })
   
   

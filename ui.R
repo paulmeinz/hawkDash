@@ -222,7 +222,7 @@ shinyUI(fluidPage(
 
     # Show a plot of the generated distribution
         mainPanel(
-          htmlOutput('textS'),
+          htmlOutput('helpS'),
           chartOutput('histS', lib = 'nvd3'),
           plotOutput("plot1")
         )
