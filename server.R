@@ -97,6 +97,13 @@ shinyServer(function(input, output, session) {
     
     output$histA <- renderChart({
       
+      # Reset comparisons if they are hidden
+      observe({
+        if (input$demoA == 'None') {
+          reset('compareA')
+        }
+      })
+      
       # FOr non demo plots..
       if (input$demoA == 'None') {
         
@@ -285,6 +292,13 @@ shinyServer(function(input, output, session) {
   
     
   matriculation <- reactive({
+    
+    # Reset comparisons if they are hidden
+    observe({
+      if (input$demoM == 'None') {
+        reset('compareM')
+      }
+    })
   
     # Determine the grouping factors, if "None" is selected only put term
     demo <- input$demoM
@@ -463,6 +477,13 @@ shinyServer(function(input, output, session) {
     
     
   enrollment <- reactive({
+    
+    # Reset comparisons if they are hidden
+    observe({
+      if (input$demoE == 'None') {
+        reset('compareE')
+      }
+    })
     
     # Determine filter columns, subject by default.
     prog <- input$collegeE
@@ -689,6 +710,8 @@ shinyServer(function(input, output, session) {
 #                             Success Dash
   
 ################################################################################  
+  
+  # Reset comparisons if they are hidden
   observe({
     if (input$collegeS == 'Collegewide') {
       reset('compareCol')

@@ -30,6 +30,7 @@ demoA <- c(None = 'None', 'Enrollment Status' = 'status',
 
 
 #--------------ENROLLMENT/SUCCESS/MATRICULATION DASHBOARD OPTIONS---------------
+
 programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
@@ -168,7 +169,7 @@ shinyUI(fluidPage(
                       a particular demographic group?', demo),
           
           conditionalPanel(condition = "input.demoE != 'None'
-                           & input.collegeE != 'Collegewide'",       
+                           && input.collegeE != 'Collegewide'",       
                            selectInput('compareE','Evaluate Equity?', compare))
         ),
                
@@ -208,13 +209,15 @@ shinyUI(fluidPage(
           
           conditionalPanel(condition = "input.demoS != 'None'",
                            selectInput('compareDem','Would you like to evaluate
-                                       equity?', compare, selected = 'No')),
+                                       equity?', compare)),
           
-          conditionalPanel(condition = "input.collegeS != 'Collegewide' &
-                           input.demoS == 'None'",
+          conditionalPanel(condition = "
+                           input.collegeS == 'Academic Programs' &&
+                           input.acadS != null ||
+                           input.collegeS == 'Special Programs'
+                           ",
                            selectInput('compareCol','Compare to collegewide?', 
-                                       compare, selected = 'No')),
-          actionButton('reset','Reset')
+                                       compare))
           
         ),
 
