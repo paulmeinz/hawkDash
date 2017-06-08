@@ -28,8 +28,15 @@ shinyServer(function(input, output, session) {
 #                              Access Dash
   
 ################################################################################
+
+  # Reset comparisons if they are hidden
+  observe({
+    if (input$demoA == 'None') {
+      reset('compareA')
+    }
+  })  
   
-  
+  # Create access dataset for plotting
   acc <- reactive({
     
     # Determine the group by factors, if "None" is selected only use term
@@ -97,13 +104,6 @@ shinyServer(function(input, output, session) {
     
     output$histA <- renderChart({
       
-      # Reset comparisons if they are hidden
-      observe({
-        if (input$demoA == 'None') {
-          reset('compareA')
-        }
-      })
-      
       # FOr non demo plots..
       if (input$demoA == 'None') {
         
@@ -158,9 +158,6 @@ shinyServer(function(input, output, session) {
                    function(key, x, y, e) { 
                      return  x + ': <strong>' + y + '</strong>' + ' applicants'
                    } !#")
-          
-
-
         }
         
         # If percent applicants is selected
@@ -280,7 +277,6 @@ shinyServer(function(input, output, session) {
       # Make sure the plot displays
       n1$addParams(dom = 'histA')
       return(n1)
-      
       })
   
     
@@ -290,16 +286,16 @@ shinyServer(function(input, output, session) {
     
 ################################################################################ 
   
-    
+  # Reset comparisons if they are hidden
+  observe({
+    if (input$demoM == 'None') {
+      reset('compareM')
+    }
+  })
+  
+  # Create matriculation dataset for plotting    
   matriculation <- reactive({
     
-    # Reset comparisons if they are hidden
-    observe({
-      if (input$demoM == 'None') {
-        reset('compareM')
-      }
-    })
-  
     # Determine the grouping factors, if "None" is selected only put term
     demo <- input$demoM
     dots <- c("term", demo)
@@ -405,8 +401,6 @@ shinyServer(function(input, output, session) {
                      e.point.hcGrp + ' students.' +
                    '</p>'
                  } !#")
-        
-
       }
       
       # If demo is not None
@@ -474,16 +468,16 @@ shinyServer(function(input, output, session) {
 #                           Enrollment Dash
   
 ################################################################################ 
-    
-    
+  
+  # Reset comparisons if they are hidden
+  observe({
+    if (input$demoE == 'None') {
+      reset('compareE')
+    }
+  })  
+  
+  # Create enrollment dataset for plotting  
   enrollment <- reactive({
-    
-    # Reset comparisons if they are hidden
-    observe({
-      if (input$demoE == 'None') {
-        reset('compareE')
-      }
-    })
     
     # Determine filter columns, subject by default.
     prog <- input$collegeE
@@ -667,8 +661,6 @@ shinyServer(function(input, output, session) {
                        'in the selected program(s).'
                      '</p>'
                  } !#")
-      
-
       }
       
       # General plot if compare is 'Yes'
@@ -722,8 +714,8 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # Create success dataset
   success <- reactive({
-    
     
     # Determine filter columns, subject by default.
     prog <- input$collegeS
