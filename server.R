@@ -809,7 +809,8 @@ shinyServer(function(input, output, session) {
 
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
-
+    
+    # Help text display..
     output$helpS <- renderUI({
       HTML(paste(helpMessages()))
     })
