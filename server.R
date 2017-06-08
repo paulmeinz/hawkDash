@@ -66,7 +66,7 @@ shinyServer(function(input, output, session) {
       select(-c(tot))
     
     # Remove small sample sizes (less than 10) if temp is populated
-    if (length(temp[,1]) > 0) {
+    if (length(temp[, 1]) > 0) {
       temp <- temp[temp$headcount >= 10, ]
     }
     
@@ -76,7 +76,7 @@ shinyServer(function(input, output, session) {
     }
     
     # Remove small sample sizes (less than 10) if temp is populated
-    if (length(temp[,1]) > 0) {
+    if (length(temp[, 1]) > 0) {
       temp <- temp[temp$headcount >= 10, ]
     }
     
@@ -138,7 +138,7 @@ shinyServer(function(input, output, session) {
           # Execute code and set other features
           n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
                    width = 50, rotateLabels = -25)
-          n1$yAxis(axisLabel='Number of Applicants', width=50)
+          n1$yAxis(axisLabel='Number of Applicants', width = 50)
           n1$chart(forceY = c(floor(.9 * min(acc()$headcount)),
                               floor(1.1 * max(acc()$headcount))),
                    margin = list(left = 63, bottom = 63, right = 63),
@@ -163,9 +163,9 @@ shinyServer(function(input, output, session) {
                       width = session$clientData[["output_plot4_width"]])
           
           # Set plot features
-          n1$yAxis(axisLabel='% of Applicants Who Enrolled', width=50)
+          n1$yAxis(axisLabel='% of Applicants Who Enrolled', width = 50)
           n1$xAxis(rotateLabels = -25)
-          n1$chart(forceY = c(0,100), tooltipContent = 
+          n1$chart(forceY = c(0, 100), tooltipContent = 
           "#! 
           function(key, x, y, e) { 
             return '<p> <strong>' + x + '</strong> </p>' + 
@@ -193,7 +193,7 @@ shinyServer(function(input, output, session) {
                    width = 50)  
           n1$chart(showControls = F, reduceXTicks = F, 
                    color = colors,
-                   forceY = c(0,100), 
+                   forceY = c(0, 100), 
                    tooltipContent = 
                    "#! 
                    function(key, x, y, e) { 
@@ -221,7 +221,7 @@ shinyServer(function(input, output, session) {
                      width = 50) 
             n1$chart(showControls = F, reduceXTicks = F, 
                      color = colors,
-                     forceY = c(0,100), 
+                     forceY = c(0, 100), 
                      tooltipContent = 
                      "#! 
                      function(key, x, y, e) { 
@@ -373,9 +373,9 @@ shinyServer(function(input, output, session) {
                     width = session$clientData[["output_plot3_width"]])
         
         n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
-                 width=50)
+                 width = 50)
         n1$xAxis(rotateLabels = -25)
-        n1$chart(forceY = c(0,100), 
+        n1$chart(forceY = c(0, 100), 
                  color = colors,
                   
                  # Create custom tooltips
@@ -404,7 +404,7 @@ shinyServer(function(input, output, session) {
                       type = "multiBarChart",
                       width = session$clientData[["output_plot3_width"]])
         
-          n1$chart(forceY = c(0,100), 
+          n1$chart(forceY = c(0, 100), 
                    color = colors,
                    showControls = F, reduceXTicks = F, 
                    tooltipContent = "#! 
@@ -429,7 +429,7 @@ shinyServer(function(input, output, session) {
         
           n1$chart(showControls = F, reduceXTicks = F,
                    color = colors,
-                   forceY = c(0,max(matriculation()$Equity) + 10),
+                   forceY = c(0, max(matriculation()$Equity) + 10),
                    tooltipContent = "#! 
                    function(key, x, y, e) { 
                    return '<p> <strong>' + key + '</strong> </p>' + 
@@ -525,7 +525,7 @@ shinyServer(function(input, output, session) {
         select(-proportion)
 
       # Rename levels for the purpos of tooltips
-      if (length(temp[,1]) > 1) {
+      if (length(temp[, 1]) > 1) {
         temp[temp$type == 'unduplicated', 'type'] <- 'Unduplicated'
         temp[temp$type == 'duplicated', 'type'] <- 'Duplicated'
       }
@@ -604,7 +604,7 @@ shinyServer(function(input, output, session) {
       # Execute code and set other features
       n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
                width = 50, rotateLabels = -25)
-      n1$yAxis(axisLabel='Enrollment', width=50)
+      n1$yAxis(axisLabel='Enrollment', width = 50)
       n1$chart(forceY = c(floor(.9 * min(enrollment()$enrollment)),
                           floor(1.1 * max(enrollment()$enrollment))),
                margin = list(left = 63, bottom = 63, right = 63),
@@ -632,7 +632,7 @@ shinyServer(function(input, output, session) {
                  width = 50)
         n1$chart(showControls = F, reduceXTicks = F, 
                  color = colors,
-                 forceY = c(0,100), 
+                 forceY = c(0, 100), 
                  tooltipContent = "#! 
                  function(key, x, y, e) { 
                    return '<p> <strong>' + key + '</strong> </p>' + 
@@ -659,7 +659,7 @@ shinyServer(function(input, output, session) {
         n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(0,max(enrollment()$proportion) + 10),
+                 forceY = c(0, max(enrollment()$proportion) + 10),
                  tooltipContent = "#! 
                  function(key, x, y, e) { 
                    return '<p> <strong>' + key + '</strong> </p>' + 
@@ -691,8 +691,6 @@ shinyServer(function(input, output, session) {
   
   
   success <- reactive({
-    
-    print(is.null(input$compareDem))
     
     # Determine filter columns, subject by default.
     prog <- input$collegeS
@@ -757,14 +755,14 @@ shinyServer(function(input, output, session) {
         select(-c(num.x, overallSuc.x, outProp.x, progProp.x,
                   num.y, den.y, overallSuc.y, outProp.y, progProp.y))
       
-      temp <- gather(temp, 'type', 'suc', c(2,4))
+      temp <- gather(temp, 'type', 'suc', c(2, 4))
       temp$termCont <- as.numeric(temp$term)
       temp$suc <- round(temp$suc, 2)
       temp[temp$type == 'Program', 'type'] <- 'Selected Program'
     }
     
     # Suppress small Ns
-    if (length(temp[,1]) > 0) {
+    if (length(temp[, 1]) > 0) {
       temp <- temp[temp$den >= 20, ]
     }
 
@@ -774,7 +772,6 @@ shinyServer(function(input, output, session) {
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
 
-  
     output$histS <- renderChart({
       
       
@@ -783,16 +780,15 @@ shinyServer(function(input, output, session) {
       if (input$demoS == 'None') {
         
         # If no comparison to College
-        if (input$compareCol == 'No') {
+        if (input$compareCol == 'No' | input$collegeS == 'Collegewide') {
           n1 <- nPlot(suc ~ term, 
                       data = success(), 
                       type = "discreteBarChart",
                       width = session$clientData[["output_plot1_width"]])
           
-          print('here2')
-          n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
+          n1$yAxis(axisLabel='Course Success Rate (%)', width = 50)
           n1$xAxis(rotateLabels = -25)
-          n1$chart(forceY = c(0,100), tooltipContent = "#! 
+          n1$chart(forceY = c(0, 100), tooltipContent = "#! 
                    function(key, x, y, e) { 
                      return '<p> <strong>' + x + '</strong> </p>' + 
                      '<p>' + 
@@ -808,7 +804,7 @@ shinyServer(function(input, output, session) {
         }
         
         # If comparison to college
-        if (input$compareCol == 'Yes') {
+        if (input$compareCol == 'Yes' & input$collegeS != 'Collegewide') {
           n1 <- nPlot(suc ~ termCont, group = "type", 
                       data = success(), 
                       type = "lineChart",
@@ -846,7 +842,7 @@ shinyServer(function(input, output, session) {
           n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
                    rotateLabels = -25)
           n1$yAxis(axisLabel = 'Course Success Rate (%)', 
-                   width=50)
+                   width = 50)
           n1$chart(forceY = c(0, 100),
                    margin = list(left = 63, bottom = 63, right = 63),
                    color = colors, size = 5, 
@@ -870,8 +866,8 @@ shinyServer(function(input, output, session) {
         n1$chart(showControls = F, reduceXTicks = F)
         
         if(input$compareDem == 'No') {
-          n1$yAxis(axisLabel='Course Success Rate (%)', width=50)
-          n1$chart(forceY = c(0,100), tooltipContent = "#! 
+          n1$yAxis(axisLabel='Course Success Rate (%)', width = 50)
+          n1$chart(forceY = c(0, 100), tooltipContent = "#! 
                    function(key, x, y, e) { 
                      return '<p> <strong>' + key + ': </strong>' + x + '</p>' + 
                      '<p>' + 
@@ -887,7 +883,7 @@ shinyServer(function(input, output, session) {
         
         if(input$compareDem == 'Yes') {
           
-          n1$yAxis(axisLabel='Proportionality Index', width=50)
+          n1$yAxis(axisLabel='Proportionality Index', width = 50)
           n1$chart(forceY = c(0, max(success()$suc) + 10),
                    tooltipContent = "#! 
                    function(key, x, y, e){ 

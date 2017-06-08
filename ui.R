@@ -212,7 +212,10 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.collegeS != 'Collegewide' &
                            input.demoS == 'None'",
                            selectInput('compareCol','Compare to collegewide?', 
-                                       compare))
+                                       compare)),
+          
+          uiOutput('uiSuccess')
+          
         ),
 
     # Show a plot of the generated distribution
