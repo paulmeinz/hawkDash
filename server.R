@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyjs)
 
 # Load enrollment and application data
 load('enrollment.rdata')
@@ -688,9 +689,18 @@ shinyServer(function(input, output, session) {
 #                             Success Dash
   
 ################################################################################  
-  
+  observe({
+    if (input$collegeS == 'Collegewide') {
+      reset('compareCol')
+    }
+    
+    if (input$demoS == 'None') {
+      reset('compareDem')
+    }
+  })
   
   success <- reactive({
+    
     
     # Determine filter columns, subject by default.
     prog <- input$collegeS
@@ -773,8 +783,6 @@ shinyServer(function(input, output, session) {
 #-----------------------------Success-Output------------------------------------  
 
     output$histS <- renderChart({
-      
-      
       
       # General plot for when no demos selected
       if (input$demoS == 'None') {

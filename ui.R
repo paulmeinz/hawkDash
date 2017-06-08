@@ -72,6 +72,7 @@ sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan',
 
 
 shinyUI(fluidPage(
+  useShinyjs(),
 
   navbarPage(title = 'The CRC Hawkdash',
              
@@ -207,14 +208,13 @@ shinyUI(fluidPage(
           
           conditionalPanel(condition = "input.demoS != 'None'",
                            selectInput('compareDem','Would you like to evaluate
-                                       equity?', compare)),
+                                       equity?', compare, selected = 'No')),
           
           conditionalPanel(condition = "input.collegeS != 'Collegewide' &
                            input.demoS == 'None'",
                            selectInput('compareCol','Compare to collegewide?', 
-                                       compare)),
-          
-          uiOutput('uiSuccess')
+                                       compare, selected = 'No')),
+          actionButton('reset','Reset')
           
         ),
 
