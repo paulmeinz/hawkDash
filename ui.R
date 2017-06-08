@@ -2,9 +2,12 @@ library(shiny)
 library(dplyr)
 library(rCharts)
 library(tidyr)
+library(shinyjs)
+
 
 # Load standard data
 load('enrollment.rdata')
+
 
 ################################################################################
 
@@ -72,7 +75,8 @@ sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan',
 
 
 shinyUI(fluidPage(
-
+  
+  useShinyjs(),
   navbarPage(title = 'The CRC Hawkdash',
              
              
