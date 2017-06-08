@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(rCharts)
 library(tidyr)
+library(shinyjs)
 
 # Load standard data
 load('enrollment.rdata')
@@ -200,7 +201,6 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.collegeS == 'Special Programs'",
                            selectInput('specialS', 'Select a program', 
                                        special)),
-          htmlOutput('helpS'),
 
           checkboxGroupInput('termS', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
@@ -223,7 +223,6 @@ shinyUI(fluidPage(
 
     # Show a plot of the generated distribution
         mainPanel(
-          
           chartOutput('histS', lib = 'nvd3'),
           plotOutput("plot1")
         )

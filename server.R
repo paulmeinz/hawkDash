@@ -711,11 +711,6 @@ shinyServer(function(input, output, session) {
   
 ################################################################################  
   
-  # UX Help text generator
-  helpMessages <- reactive({
-    'empty for now'
-  }) 
-  
   # Reset comparisons if they are hidden
   observe({
     if (input$collegeS == 'Collegewide') {
@@ -809,13 +804,7 @@ shinyServer(function(input, output, session) {
 
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
-    
-    # Help text display..
-    output$helpS <- renderUI({
-      HTML(paste(helpMessages()))
-    })
-  
-  
+
     output$histS <- renderChart({
       
       # General plot for when no demos selected
