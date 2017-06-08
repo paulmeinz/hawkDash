@@ -102,100 +102,128 @@ shinyServer(function(input, output, session) {
 #-----------------------------ACCESS-OUTPUT-------------------------------------
 
     
-    output$histA <- renderChart({
+  output$histA <- renderChart({
       
-      # FOr non demo plots..
-      if (input$demoA == 'None') {
+    # FOr non demo plots..
+    if (input$demoA == 'None') {
+      
+      # When applicant counts is selected
+      if (input$outcome == 'Applicant Counts') {
+        n1 <- nPlot(headcount ~ termCont,
+                    data = acc(), 
+                    type = "lineChart",
+                    width = session$clientData[["output_plot4_width"]])
         
-        # When applicant counts is selected
-        if (input$outcome == 'Applicant Counts') {
-          n1 <- nPlot(headcount ~ termCont,
-                      data = acc(), 
-                      type = "lineChart",
-                      width = session$clientData[["output_plot4_width"]])
-          
-          # Create javascript code to modify x ticks (Ugly)
-          # Could turn this into a helper function
-          x <- unique(access$term)
-          x <- x[order(x)]
-          y <- ''
-          for (i in x) {
-            if (y == '') {
-              y <- paste("'", i, "'")
-            } else {
-              y <- paste(y, ",'", i, "'")
-            }
+        # Create javascript code to modify x ticks (Ugly)
+        # Could turn this into a helper function
+        x <- unique(access$term)
+        x <- x[order(x)]
+        y <- ''
+        for (i in x) {
+          if (y == '') {
+            y <- paste("'", i, "'")
+          } else {
+            y <- paste(y, ",'", i, "'")
           }
-          
-          codeForm <- paste("#!function(x) {keys = [", y, "]","
-                            return keys[x-1]}!#", sep = '')
-          
-          x <- unique(as.numeric(acc()$term))
-          y <- ''
-          for (i in x) {
-            if (y == '') {
-              y <- paste("'", i, "'")
-            } else {
-              y <- paste(y, ",'", i, "'")
-            }
+        }
+        
+        codeForm <- paste("#!function(x) {keys = [", y, "]","
+                          return keys[x-1]}!#", sep = '')
+        
+        x <- unique(as.numeric(acc()$term))
+        y <- ''
+        for (i in x) {
+          if (y == '') {
+            y <- paste("'", i, "'")
+          } else {
+            y <- paste(y, ",'", i, "'")
           }
+        }
           
-          codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
+        codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
                          return tickvalues}!#", sep = '')
           
-          # Execute code and set other features
-          n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-                   width = 50, rotateLabels = -25)
-          n1$yAxis(axisLabel='Number of Applicants', width = 50)
-          n1$chart(forceY = c(floor(.9 * min(acc()$headcount)),
-                              floor(1.1 * max(acc()$headcount))),
-                   margin = list(left = 63, bottom = 63, right = 63),
-                   color = colors, size = 5,
-                   showLegend = FALSE,
-                   
-                   # Tooltip function
-                   tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                     return  x + ': <strong>' + y + '</strong>' + ' applicants'
-                   } !#")
-        }
+        # Execute code and set other features
+        n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
+                 width = 50, rotateLabels = -25)
+        n1$yAxis(axisLabel='Number of Applicants', width = 50)
+        n1$chart(forceY = c(floor(.9 * min(acc()$headcount)),
+                            floor(1.1 * max(acc()$headcount))),
+                 margin = list(left = 63, bottom = 63, right = 63),
+                 color = colors, size = 5,
+                 showLegend = FALSE,
+                 
+                 # Tooltip function
+                 tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return  x + ': <strong>' + y + '</strong>' + ' applicants'
+                 } !#")
+      }
         
-        # If percent applicants is selected
-        if (input$outcome == '% of Applicants that Enroll') {
-          n1 <- nPlot(enrolled ~ term,
-                      data = acc(), 
-                      type = "discreteBarChart",
-                      width = session$clientData[["output_plot4_width"]])
+      # If percent applicants is selected
+      if (input$outcome == '% of Applicants that Enroll') {
+        n1 <- nPlot(enrolled ~ term,
+                    data = acc(), 
+                    type = "discreteBarChart",
+                    width = session$clientData[["output_plot4_width"]])
+        
+        # Set plot features
+        n1$yAxis(axisLabel='% of Applicants Who Enrolled', width = 50)
+        n1$xAxis(rotateLabels = -25)
+        n1$chart(forceY = c(0, 100), tooltipContent = 
+        "#! 
+        function(key, x, y, e) { 
+          return '<p> <strong>' + x + '</strong> </p>' + 
+            '<p> Enrollment Rate: <strong>' + y + '% </strong> </p>' +
+            '<p>' +
+              e.point.outTot + ' out of ' + e.point.headcount + '</br>' +
+              'applicants enrolled after applying' +
+            '</p>'
+        } !#")
+      }
+    }
+      
+    # If demos are selected
+    if (input$demoA != 'None') {
+      
+      # If applicant counts are selected
+      if(input$outcome == 'Applicant Counts') {
+        n1 <- nPlot(repAll ~ demoCol, group = "term", 
+                    data = acc(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot4_width"]])
+      
           
-          # Set plot features
-          n1$yAxis(axisLabel='% of Applicants Who Enrolled', width = 50)
-          n1$xAxis(rotateLabels = -25)
-          n1$chart(forceY = c(0, 100), tooltipContent = 
-          "#! 
-          function(key, x, y, e) { 
-            return '<p> <strong>' + x + '</strong> </p>' + 
-              '<p> Enrollment Rate: <strong>' + y + '% </strong> </p>' +
-              '<p>' +
-                e.point.outTot + ' out of ' + e.point.headcount + '</br>' +
-                'applicants enrolled after applying' +
-              '</p>'
-          } !#")
-        }
+        n1$yAxis(axisLabel = 'Proportion (%) of all applicants', 
+                 width = 50)  
+        n1$chart(showControls = F, reduceXTicks = F, 
+                 color = colors,
+                 forceY = c(0, 100), 
+                 tooltipContent = 
+                 "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + key + '</strong> </p>' + 
+                     '<p>' + x + ': <strong>' + y + '% </strong> </p>' +
+                     '<p>' + 
+                       e.point.headcount + ' out of ' + 
+                       e.point.headcountAll + ' applicants </br>' +
+                       'in this group.'
+                     '</p>'
+                 } !#")
       }
       
-      # If demos are selected
-      if (input$demoA != 'None') {
+      # if outcome is percent of applicants then..
+      if (input$outcome == '% of Applicants that Enroll') {
         
-        # If applicant counts are selected
-        if(input$outcome == 'Applicant Counts') {
-          n1 <- nPlot(repAll ~ demoCol, group = "term", 
+        # Dont calculate equity
+        if (input$compareA == 'No') {
+          n1 <- nPlot(enrolled ~ demoCol, group = "term", 
                       data = acc(), 
                       type = "multiBarChart",
                       width = session$clientData[["output_plot4_width"]])
-        
-          
-          n1$yAxis(axisLabel = 'Proportion (%) of all applicants', 
-                   width = 50)  
+      
+          n1$yAxis(axisLabel = '% of Applicants Who Enrolled (%)', 
+                   width = 50) 
           n1$chart(showControls = F, reduceXTicks = F, 
                    color = colors,
                    forceY = c(0, 100), 
@@ -205,79 +233,51 @@ shinyServer(function(input, output, session) {
                      return '<p> <strong>' + key + '</strong> </p>' + 
                        '<p>' + x + ': <strong>' + y + '% </strong> </p>' +
                        '<p>' + 
-                         e.point.headcount + ' out of ' + 
-                         e.point.headcountAll + ' applicants </br>' +
-                         'in this group.'
+                          e.point.outTot + ' enrolled out of ' + 
+                          e.point.headcount + '<br/>' +
+                          'applicants in this group.'
                        '</p>'
                    } !#")
-        }
-      
-        # if outcome is percent of applicants then..
-        if (input$outcome == '% of Applicants that Enroll') {
-          
-          # Dont calculate equity
-          if (input$compareA == 'No') {
-            n1 <- nPlot(enrolled ~ demoCol, group = "term", 
-                        data = acc(), 
-                        type = "multiBarChart",
-                        width = session$clientData[["output_plot4_width"]])
+      }
         
-            n1$yAxis(axisLabel = '% of Applicants Who Enrolled (%)', 
-                     width = 50) 
-            n1$chart(showControls = F, reduceXTicks = F, 
-                     color = colors,
-                     forceY = c(0, 100), 
-                     tooltipContent = 
-                     "#! 
-                     function(key, x, y, e) { 
-                       return '<p> <strong>' + key + '</strong> </p>' + 
-                         '<p>' + x + ': <strong>' + y + '% </strong> </p>' +
-                         '<p>' + 
-                            e.point.outTot + ' enrolled out of ' + 
-                            e.point.headcount + '<br/>' +
-                            'applicants in this group.'
-                         '</p>'
-                     } !#")
-          }
-        
-          # Calculate equity
-          if (input$compareA == 'Yes') {
-            n1 <- nPlot(equity ~ demoCol, group = "term", 
-                        data = acc(), 
-                        type = "multiBarChart",
-                        width = session$clientData[["output_plot4_width"]])
-          
-            n1$chart(showControls = F, reduceXTicks = F, 
-                     color = colors,
-                     forceY = c(floor(1.1 * max(acc()$equity)),
-                                floor(.9 * min(acc()$equity))), 
-                     tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                   return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
-                   '<p>' + 
-                     x + ': ' + '<strong>' + y  + '</strong>' + 
-                   '</p>' +
-                   '<p>' + 
-                     'This group constituted ' + e.point.repOut + '%' + 
-                     '<br/>' +
-                     'of the students that enrolled' +
-                     '<br/>' +
-                     'after applying' +
-                     '<br/>' +
-                     'and ' + e.point.repAll + '% of all applicants.' 
-                   '</p>'
-                   } !#")
-          
-            n1$yAxis(axisLabel = 'Proportionality Index', 
-                     width = 50)  
-          }
-        }
-      }  
+      # Calculate equity
+      if (input$compareA == 'Yes') {
+        n1 <- nPlot(equity ~ demoCol, group = "term", 
+                    data = acc(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot4_width"]])
       
-      # Make sure the plot displays
-      n1$addParams(dom = 'histA')
-      return(n1)
-      })
+        n1$chart(showControls = F, reduceXTicks = F, 
+                 color = colors,
+                   forceY = c(floor(1.1 * max(acc()$equity)),
+                              floor(.9 * min(acc()$equity))), 
+                   tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                 return '<p>' + '<strong>' + key + '</strong>' + '</p>' + 
+                 '<p>' + 
+                   x + ': ' + '<strong>' + y  + '</strong>' + 
+                 '</p>' +
+                 '<p>' + 
+                   'This group constituted ' + e.point.repOut + '%' + 
+                   '<br/>' +
+                   'of the students that enrolled' +
+                   '<br/>' +
+                   'after applying' +
+                   '<br/>' +
+                   'and ' + e.point.repAll + '% of all applicants.' 
+                 '</p>'
+                 } !#")
+          
+          n1$yAxis(axisLabel = 'Proportionality Index', 
+                   width = 50)  
+        }
+      }
+    }  
+      
+    # Make sure the plot displays
+    n1$addParams(dom = 'histA')
+    return(n1)
+  })
   
     
 ################################################################################
@@ -374,27 +374,53 @@ shinyServer(function(input, output, session) {
 #----------------------------Matric-Output--------------------------------------
   
     
-    output$histM <- renderChart({
+  output$histM <- renderChart({
+    
+    # Render this plot if no demos are selected
+    if (input$demoM == 'None') {
+      n1 <- nPlot(Prop ~ term,  
+                  data = matriculation(), 
+                  type = "discreteBarChart",
+                  width = session$clientData[["output_plot3_width"]])
       
-      # Render this plot if no demos are selected
-      if (input$demoM == 'None') {
-        n1 <- nPlot(Prop ~ term,  
+      n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
+               width = 50)
+      n1$xAxis(rotateLabels = -25)
+      n1$chart(forceY = c(0, 100), 
+               color = colors,
+                
+               # Create custom tooltips
+               tooltipContent = "#! 
+               function(key, x, y, e) { 
+                 return '<p>' + x + '</p>' +
+                 '<p>' +
+                   'Proportion of students: <strong>' + y + '% </strong>' +
+                 '</p>' + 
+                 '<P>' +
+                   e.point.outGrp + ' out of ' + 
+                   e.point.hcGrp + ' students.' +
+                 '</p>'
+               } !#")
+    }
+    
+    # If demo is not None
+    if (input$demoM != 'None') {
+      
+      # Make this plot with no comparisons
+      if (input$compareE == 'No') {
+        n1 <- nPlot(Prop ~ demoCol, group = "term", 
                     data = matriculation(), 
-                    type = "discreteBarChart",
+                    type = "multiBarChart",
                     width = session$clientData[["output_plot3_width"]])
-        
-        n1$yAxis(axisLabel='% of Students Completing the Selected Outcomes',
-                 width = 50)
-        n1$xAxis(rotateLabels = -25)
+      
         n1$chart(forceY = c(0, 100), 
                  color = colors,
-                  
-                 # Create custom tooltips
+                 showControls = F, reduceXTicks = F, 
                  tooltipContent = "#! 
                  function(key, x, y, e) { 
-                   return '<p>' + x + '</p>' +
-                   '<p>' +
-                     'Proportion of students: <strong>' + y + '% </strong>' +
+                   return '<p>' + key + '</p>' +
+                   '<p>' + 
+                     x + ': <strong>' + y + '% </strong>' +
                    '</p>' + 
                    '<P>' +
                      e.point.outGrp + ' out of ' + 
@@ -402,66 +428,40 @@ shinyServer(function(input, output, session) {
                    '</p>'
                  } !#")
       }
-      
-      # If demo is not None
-      if (input$demoM != 'None') {
-        
-        # Make this plot with no comparisons
-        if (input$compareE == 'No') {
-          n1 <- nPlot(Prop ~ demoCol, group = "term", 
-                      data = matriculation(), 
-                      type = "multiBarChart",
-                      width = session$clientData[["output_plot3_width"]])
-        
-          n1$chart(forceY = c(0, 100), 
-                   color = colors,
-                   showControls = F, reduceXTicks = F, 
-                   tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                     return '<p>' + key + '</p>' +
-                     '<p>' + 
-                       x + ': <strong>' + y + '% </strong>' +
-                     '</p>' + 
-                     '<P>' +
-                       e.point.outGrp + ' out of ' + 
-                       e.point.hcGrp + ' students.' +
-                     '</p>'
-                   } !#")
-        }
-      
-        # Make this plot with comparisons
-        if (input$compareM == 'Yes') {
-          n1 <- nPlot(Equity ~ demoCol, group = "term", 
-                      data = matriculation(), 
-                      type = "multiBarChart",
-                      width = session$clientData[["output_plot3_width"]])
-        
-          n1$chart(showControls = F, reduceXTicks = F,
-                   color = colors,
-                   forceY = c(0, max(matriculation()$Equity) + 10),
-                   tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                   return '<p> <strong>' + key + '</strong> </p>' + 
-                     '<p>' + x + ': <strong>' + y + '</strong> </p>' + 
-                     '<p>' +
-                       'This group constituted ' + e.point.outRep + '%' + 
-                       '<br/>' + 
-                       'of students completing the' +
-                       '<br/>' +
-                       'selected outcome(s) and' + 
-                       '<br/>' +
-                       e.point.colRep + '% of students collegewide.' + 
-                       '<br/>'
-                     '</p>'
-                   } !#")
-        }
-      }
-      
-      # Make the plot render
-      n1$addParams(dom = 'histM')
-      return(n1)
-    })
     
+      # Make this plot with comparisons
+      if (input$compareM == 'Yes') {
+        n1 <- nPlot(Equity ~ demoCol, group = "term", 
+                    data = matriculation(), 
+                    type = "multiBarChart",
+                    width = session$clientData[["output_plot3_width"]])
+      
+        n1$chart(showControls = F, reduceXTicks = F,
+                 color = colors,
+                 forceY = c(0, max(matriculation()$Equity) + 10),
+                 tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                 return '<p> <strong>' + key + '</strong> </p>' + 
+                   '<p>' + x + ': <strong>' + y + '</strong> </p>' + 
+                   '<p>' +
+                     'This group constituted ' + e.point.outRep + '%' + 
+                     '<br/>' + 
+                     'of students completing the' +
+                     '<br/>' +
+                     'selected outcome(s) and' + 
+                     '<br/>' +
+                     e.point.colRep + '% of students collegewide.' + 
+                     '<br/>'
+                   '</p>'
+                 } !#")
+      }
+    }
+    
+    # Make the plot render
+    n1$addParams(dom = 'histM')
+    return(n1)
+  })
+  
     
 ################################################################################
     
@@ -797,139 +797,136 @@ shinyServer(function(input, output, session) {
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
 
-    output$histS <- renderChart({
+  output$histS <- renderChart({
+    
+    # General plot for when no demos selected
+    if (input$demoS == 'None') {
       
-      # General plot for when no demos selected
-      if (input$demoS == 'None') {
-        
-        # If no comparison to College
-        if (input$compareCol == 'No' | input$collegeS == 'Collegewide') {
-          n1 <- nPlot(suc ~ term, 
-                      data = success(), 
-                      type = "discreteBarChart",
-                      width = session$clientData[["output_plot1_width"]])
-          
-          n1$yAxis(axisLabel='Course Success Rate (%)', width = 50)
-          n1$xAxis(rotateLabels = -25)
-          n1$chart(forceY = c(0, 100), tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                     return '<p> <strong>' + x + '</strong> </p>' + 
-                     '<p>' + 
-                       'Success Rate: <strong>' + y + '% </strong>' + 
-                     '</p>' +
-                     '<p>' +
-                       e.point.num/100 + ' successful enrollments out of' +
-                       '</br>' +
-                       e.point.den + ' total enrollments.' +
-                     '</p>'
-                   } !#")
-
-        }
-        
-        # If comparison to college
-        if (input$compareCol == 'Yes' & input$collegeS != 'Collegewide') {
-          n1 <- nPlot(suc ~ termCont, group = "type", 
-                      data = success(), 
-                      type = "lineChart",
-                      width = session$clientData[["output_plot1_width"]])
-
-          # Create javascript code to modify x ticks (Wacky)
-          x <- unique(enroll$term)
-          x <- x[order(x)]
-          y <- ''
-          for (i in x) {
-            if (y == '') {
-              y <- paste("'", i, "'")
-            } else {
-              y <- paste(y, ",'", i, "'")
-            }
-          }
-          
-          codeForm <- paste("#!function(x) {keys = [", y, "]","
-                            return keys[x-1]}!#", sep = '')
-          
-          x <- unique(as.numeric(success()$term))
-          y <- ''
-          for (i in x) {
-            if (y == '') {
-              y <- paste("'", i, "'")
-            } else {
-              y <- paste(y, ",'", i, "'")
-            }
-          }
-          
-          codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
-                    return tickvalues}!#", sep = '')
-          
-          # Execute code and set other features
-          n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-                   rotateLabels = -25)
-          n1$yAxis(axisLabel = 'Course Success Rate (%)', 
-                   width = 50)
-          n1$chart(forceY = c(0, 100),
-                   margin = list(left = 63, bottom = 63, right = 63),
-                   color = colors, size = 5, 
-                   tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                     return '<p> <strong>' + key + '</strong> </p>' + 
-                       '<p>' + x + ': <strong>' + y + '% </strong>' + '</p>'
-                   } !#")
-        }
-      }
-      
-
-      
-      # General plot for when demos are selected
-      if (input$demoS != 'None') {
-        n1 <- nPlot(suc ~ demoCol, group = "term", 
+      # If no comparison to College
+      if (input$compareCol == 'No' | input$collegeS == 'Collegewide') {
+        n1 <- nPlot(suc ~ term, 
                     data = success(), 
-                    type = "multiBarChart",
+                    type = "discreteBarChart",
                     width = session$clientData[["output_plot1_width"]])
         
-        n1$chart(showControls = F, reduceXTicks = F)
-        
-        if(input$compareDem == 'No') {
-          n1$yAxis(axisLabel='Course Success Rate (%)', width = 50)
-          n1$chart(forceY = c(0, 100), tooltipContent = "#! 
-                   function(key, x, y, e) { 
-                     return '<p> <strong>' + key + ': </strong>' + x + '</p>' + 
-                     '<p>' + 
-                       'Success Rate: <strong>' + y + '% </strong>' + 
-                     '</p>' +
-                     '<p>' +
-                       e.point.num/100 + ' successful enrollments out of' + 
-                       '</br>' +
-                       e.point.den + ' total enrollments.' +
-                     '</p>'
-                  } !#")
-        }
-        
-        if(input$compareDem == 'Yes') {
-          
-          n1$yAxis(axisLabel='Proportionality Index', width = 50)
-          n1$chart(forceY = c(0, max(success()$suc) + 10),
-                   tooltipContent = "#! 
-                   function(key, x, y, e){ 
-                   return '<p> <strong>' + key + '</strong> </p>' + 
-                   '<p>' + x + ': <strong>' + y + '</strong> </p>' + 
+        n1$yAxis(axisLabel='Course Success Rate (%)', width = 50)
+        n1$xAxis(rotateLabels = -25)
+        n1$chart(forceY = c(0, 100), tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + x + '</strong> </p>' + 
+                   '<p>' + 
+                     'Success Rate: <strong>' + y + '% </strong>' + 
+                   '</p>' +
                    '<p>' +
-                     'This group constituted ' + e.point.outProp + '%' + 
-                     '<br/>' + 
-                     ' of successful enrollments and ' + 
-                     '<br/>' +
-                     e.point.progProp + '% of enrollments ' + 
-                     '<br/>' +
-                     'in the selected program(s).' +
+                     e.point.num/100 + ' successful enrollments out of' +
+                     '</br>' +
+                     e.point.den + ' total enrollments.' +
                    '</p>'
-                   } !#")  
+                 } !#")
         }
+      
+      # If comparison to college
+      if (input$compareCol == 'Yes' & input$collegeS != 'Collegewide') {
+        n1 <- nPlot(suc ~ termCont, group = "type", 
+                    data = success(), 
+                    type = "lineChart",
+                    width = session$clientData[["output_plot1_width"]])
+          # Create javascript code to modify x ticks (Wacky)
+        x <- unique(enroll$term)
+        x <- x[order(x)]
+        y <- ''
+        for (i in x) {
+          if (y == '') {
+            y <- paste("'", i, "'")
+          } else {
+            y <- paste(y, ",'", i, "'")
+          }
+        }
+        
+        codeForm <- paste("#!function(x) {keys = [", y, "]","
+                          return keys[x-1]}!#", sep = '')
+        
+        x <- unique(as.numeric(success()$term))
+        y <- ''
+        for (i in x) {
+          if (y == '') {
+            y <- paste("'", i, "'")
+          } else {
+            y <- paste(y, ",'", i, "'")
+          }
+        }
+        
+        codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
+                  return tickvalues}!#", sep = '')
+        
+        # Execute code and set other features
+        n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
+                 rotateLabels = -25)
+        n1$yAxis(axisLabel = 'Course Success Rate (%)', 
+                 width = 50)
+        n1$chart(forceY = c(0, 100),
+                 margin = list(left = 63, bottom = 63, right = 63),
+                 color = colors, size = 5, 
+                 tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + key + '</strong> </p>' + 
+                     '<p>' + x + ': <strong>' + y + '% </strong>' + '</p>'
+                 } !#")
+      }
+    }
+    
+
+    # General plot for when demos are selected
+    if (input$demoS != 'None') {
+      n1 <- nPlot(suc ~ demoCol, group = "term", 
+                  data = success(), 
+                  type = "multiBarChart",
+                  width = session$clientData[["output_plot1_width"]])
+      
+      n1$chart(showControls = F, reduceXTicks = F)
+      
+      if(input$compareDem == 'No') {
+        n1$yAxis(axisLabel='Course Success Rate (%)', width = 50)
+        n1$chart(forceY = c(0, 100), tooltipContent = "#! 
+                 function(key, x, y, e) { 
+                   return '<p> <strong>' + key + ': </strong>' + x + '</p>' + 
+                   '<p>' + 
+                     'Success Rate: <strong>' + y + '% </strong>' + 
+                   '</p>' +
+                   '<p>' +
+                     e.point.num/100 + ' successful enrollments out of' + 
+                     '</br>' +
+                     e.point.den + ' total enrollments.' +
+                   '</p>'
+                } !#")
       }
       
-      # Make sure the plot displays
-      n1$addParams(dom = 'histS')
-      n1$chart(color = colors)
-      return(n1)
-      })
+      if(input$compareDem == 'Yes') {
+        
+        n1$yAxis(axisLabel='Proportionality Index', width = 50)
+        n1$chart(forceY = c(0, max(success()$suc) + 10),
+                 tooltipContent = "#! 
+                 function(key, x, y, e){ 
+                 return '<p> <strong>' + key + '</strong> </p>' + 
+                 '<p>' + x + ': <strong>' + y + '</strong> </p>' + 
+                 '<p>' +
+                   'This group constituted ' + e.point.outProp + '%' + 
+                   '<br/>' + 
+                   ' of successful enrollments and ' + 
+                   '<br/>' +
+                   e.point.progProp + '% of enrollments ' + 
+                   '<br/>' +
+                   'in the selected program(s).' +
+                 '</p>'
+                 } !#")  
+      }
+    }
+    
+    # Make sure the plot displays
+    n1$addParams(dom = 'histS')
+    n1$chart(color = colors)
+    return(n1)
+    })
   
 
       

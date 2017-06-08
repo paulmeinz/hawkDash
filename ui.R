@@ -218,7 +218,8 @@ shinyUI(fluidPage(
                            input.collegeS == 'Special Programs'
                            ",
                            selectInput('compareCol','Compare to collegewide?', 
-                                       compare))
+                                       compare)),
+          textOutput('help1')
         ),
 
     # Show a plot of the generated distribution
