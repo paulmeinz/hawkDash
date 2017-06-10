@@ -809,6 +809,8 @@ shinyServer(function(input, output, session) {
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
 
+  
+  
   output$histS <- renderChart({
     
     # General plot for when no demos selected

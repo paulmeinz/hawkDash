@@ -213,9 +213,10 @@ shinyUI(fluidPage(
                                        equity?', compare)),
           
           conditionalPanel(condition = "
-                           input.collegeS == 'Academic Programs' &&
+                           (input.collegeS == 'Academic Programs' &&
                            input.acadS != null ||
-                           input.collegeS == 'Special Programs'
+                           input.collegeS == 'Special Programs') &&
+                           input.demoS == 'None'
                            ",
                            selectInput('compareCol','Compare to collegewide?', 
                                        compare)),
