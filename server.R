@@ -35,8 +35,10 @@ shinyServer(function(input, output, session) {
       reset('compareA')
     }
   })  
-  
-  # Create access dataset for plotting
+    
+  # Create access dataset for plotting. I could do this inside a render* func
+  # But this opens the door for other plots and/or an event reactive button
+  # In the event of changes...
   acc <- reactive({
     
     # Determine the group by factors, if "None" is selected only use term
@@ -68,7 +70,7 @@ shinyServer(function(input, output, session) {
       
       # Create additional variables for Equity and custom tooltips
       mutate(repOut = tot/sum(tot) * 100, outTot = tot/100, # Rep in enrolled
-             repAll = headcount/sum(headcount) * 100, # Rep at college
+             repAll = headcount/sum(headcount) * 100, # Rep in all applicants
              headcountAll = sum(headcount)) %>% # Collegewide headcount
       mutate(equity = repOut/repAll * 100) %>% # Calc equity index
       select(-c(tot))
@@ -94,6 +96,10 @@ shinyServer(function(input, output, session) {
     # Round for custom tooltips
     temp$repAll <- round(temp$repAll, 2)
     temp$repOut <- round(temp$repOut, 2)
+    
+    if (nrow(temp) > 0) {
+      temp <- temp[temp$headcount >= 10,]
+    }
     
     temp
   })
@@ -363,6 +369,11 @@ shinyServer(function(input, output, session) {
       names(temp)[2] <- 'demoCol'
     }
     
+    # Remove N less than ten
+    if (nrow(temp) > 0) {
+      temp <- temp[temp$hcGrp >= 10,]
+    }
+        
     # Round these numbers for equity plot tooltips
     temp$outRep <- round(temp$outRep, 2)
     temp$colRep <- round(temp$colRep, 2)
@@ -540,8 +551,9 @@ shinyServer(function(input, output, session) {
       temp <- gather(temp, 'type', 'enrollment', 2:3) %>%
         select(-proportion)
 
-      # Rename levels for the purpos of tooltips
-      if (length(temp[, 1]) > 1) {
+      # Rename levels for the purpose of tooltips
+      if (nrow(temp) > 0) {
+        print('here')
         temp[temp$type == 'unduplicated', 'type'] <- 'Unduplicated'
         temp[temp$type == 'duplicated', 'type'] <- 'Duplicated'
       }
@@ -787,7 +799,7 @@ shinyServer(function(input, output, session) {
     }
     
     # Suppress small Ns
-    if (length(temp[, 1]) > 0) {
+    if (nrow(temp) > 0) {
       temp <- temp[temp$den >= 20, ]
     }
 
