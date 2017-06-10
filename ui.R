@@ -197,6 +197,11 @@ shinyUI(fluidPage(
                                        'Select program(s) by clicking in the box 
                                        below.',
                                        acad, multiple = TRUE)),
+          
+          conditionalPanel(condition = "
+                           input.collegeS == 'Academic Programs' &&
+                           input.acadS == null",
+                           htmlOutput('helpS1')),
 
           conditionalPanel(condition = "input.collegeS == 'Special Programs'",
                            selectInput('specialS', 'Select a program', 
@@ -204,7 +209,10 @@ shinyUI(fluidPage(
 
           checkboxGroupInput('termS', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
-
+          
+          conditionalPanel(condition = "input.termS == ''",
+                           htmlOutput('helpS2')),
+          
           selectInput('demoS', 'Would you like to view trends for
                       a particular demographic group?', demo),
           
@@ -219,8 +227,7 @@ shinyUI(fluidPage(
                            input.demoS == 'None'
                            ",
                            selectInput('compareCol','Compare to collegewide?', 
-                                       compare)),
-          textOutput('help1')
+                                       compare))
         ),
 
     # Show a plot of the generated distribution

@@ -808,7 +808,37 @@ shinyServer(function(input, output, session) {
 
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
-
+  
+  output$helpS1 <- renderUI({
+    prog <- input$acadS
+    col <- input$collegeS
+    txt <- ''
+    
+    if (is.null(prog) & col == 'Academic Programs') {
+      txt <- "<p class = 'help'> Select a program by clicking in the box above.
+        You can type a subject prefix (e.g., MATH) or pick out of
+        the menu. Picking multiple will combine results across programs.
+        Delete selections with backspace. </p>"
+    }
+    
+    HTML(txt)
+  })
+  
+  
+  output$helpS2 <- renderUI({
+    term <- input$termS
+    txt <- ''
+    print(term)
+    
+    if (is.null(term)) {
+      print('here')
+      txt <- "<p class = 'help'> Select a term by checking the boxes
+        above. Selecting both Fall and Spring will display data for
+        fall and spring over five years.</p>"
+    }
+    
+    HTML(txt)
+    })
   
   
   output$histS <- renderChart({
