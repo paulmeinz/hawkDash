@@ -223,9 +223,8 @@ shinyServer(function(input, output, session) {
                    return '<p> <strong>' + key + '</strong> </p>' + 
                      '<p>' + x + ': <strong>' + y + '% </strong> </p>' +
                      '<p>' + 
-                       e.point.headcount + ' out of ' + 
-                       e.point.headcountAll + ' applicants </br>' +
-                       'in this group.'
+                       e.point.headcount + ' out of </br>' + 
+                       e.point.headcountAll + ' total applicants'
                      '</p>'
                  } !#")
       }

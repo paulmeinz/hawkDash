@@ -67,7 +67,8 @@ exempt <- c('No','Yes')
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
           Orientation = 'orientation')
 
-#---------------------------Popover Messages------------------------------------
+#---------------------------POPOVER MESSAGES------------------------------------
+
 toolValues <- 'Mouse over points/bars to view specific values and raw numbers'
 toolValues <- subNew(toolValues)
 
