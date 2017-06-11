@@ -158,6 +158,11 @@ shinyUI(fluidPage(
                            selectInput('acadE', 'Select program(s) by clicking 
                                        in the box below.',acad, 
                                        multiple = TRUE)),
+          
+          conditionalPanel(condition = "
+                           input.collegeE == 'Academic Programs' &&
+                           input.acadE == null",
+                           htmlOutput('helpE1')),
                                   
           conditionalPanel(condition = "input.collegeE == 'Special Programs'",
                            selectInput('specialE', 'Select a program', 
@@ -165,6 +170,9 @@ shinyUI(fluidPage(
                  
           checkboxGroupInput('termE', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
+          
+          conditionalPanel(condition = "input.termE == ''",
+                           htmlOutput('helpE2')),
                  
           selectInput('demoE', 'Would you like to view trends for
                       a particular demographic group?', demo),

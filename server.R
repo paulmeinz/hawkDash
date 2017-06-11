@@ -591,6 +591,35 @@ shinyServer(function(input, output, session) {
 ################################################################################  
 #----------------------------Enrollment Output----------------------------------
  
+  output$helpE1 <- renderUI({
+    prog <- input$acadE
+    col <- input$collegeE
+    txt <- ''
+    
+    if (is.null(prog) & col == 'Academic Programs') {
+      txt <- "<p class = 'help'> Select a program by clicking in the box above.
+      You can type a subject prefix (e.g., MATH) or pick out of
+      the menu. Picking multiple will combine results across programs.
+      Delete selections with backspace. </p>"
+    }
+    
+    HTML(txt)
+  })
+  
+  
+  output$helpE2 <- renderUI({
+    term <- input$termE
+    txt <- ''
+    
+    if (is.null(term)) {
+      print('here')
+      txt <- "<p class = 'help'> Select a term by checking the boxes
+      above. Selecting both Fall and Spring will display data for
+      fall and spring over five years.</p>"
+    }
+    
+    HTML(txt)
+  })
    
   output$histE <- renderChart({
     
@@ -828,7 +857,6 @@ shinyServer(function(input, output, session) {
   output$helpS2 <- renderUI({
     term <- input$termS
     txt <- ''
-    print(term)
     
     if (is.null(term)) {
       print('here')
@@ -971,7 +999,4 @@ shinyServer(function(input, output, session) {
     n1$chart(color = colors)
     return(n1)
     })
-  
-
-      
 })
