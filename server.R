@@ -107,6 +107,18 @@ shinyServer(function(input, output, session) {
 ################################################################################    
 #-----------------------------ACCESS-OUTPUT-------------------------------------
 
+  output$helpA2 <- renderUI({
+    term <- input$termA
+    txt <- ''
+    
+    if (is.null(term)) {
+      txt <- "<p class = 'help'> Select a term by checking the boxes
+      above. Selecting both Fall and Spring will display data for
+      fall and spring over five years.</p>"
+    }
+    
+    HTML(txt)
+  })
     
   output$histA <- renderChart({
       
@@ -383,7 +395,19 @@ shinyServer(function(input, output, session) {
   
 ################################################################################
 #----------------------------Matric-Output--------------------------------------
-  
+
+  output$helpM2 <- renderUI({
+    term <- input$termM
+    txt <- ''
+    
+    if (is.null(term)) {
+      txt <- "<p class = 'help'> Select a term by checking the boxes
+      above. Selecting both Fall and Spring will display data for
+      fall and spring over five years.</p>"
+    }
+    
+    HTML(txt)
+  })  
     
   output$histM <- renderChart({
     
@@ -553,7 +577,6 @@ shinyServer(function(input, output, session) {
 
       # Rename levels for the purpose of tooltips
       if (nrow(temp) > 0) {
-        print('here')
         temp[temp$type == 'unduplicated', 'type'] <- 'Unduplicated'
         temp[temp$type == 'duplicated', 'type'] <- 'Duplicated'
       }
@@ -612,7 +635,6 @@ shinyServer(function(input, output, session) {
     txt <- ''
     
     if (is.null(term)) {
-      print('here')
       txt <- "<p class = 'help'> Select a term by checking the boxes
       above. Selecting both Fall and Spring will display data for
       fall and spring over five years.</p>"
@@ -859,7 +881,6 @@ shinyServer(function(input, output, session) {
     txt <- ''
     
     if (is.null(term)) {
-      print('here')
       txt <- "<p class = 'help'> Select a term by checking the boxes
         above. Selecting both Fall and Spring will display data for
         fall and spring over five years.</p>"

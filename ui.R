@@ -94,6 +94,9 @@ shinyUI(fluidPage(
           checkboxGroupInput('termA','What terms would you like to see?', term,
                              selected = 'Fall', inline = TRUE),
           
+          conditionalPanel(condition = "input.termA == ''",
+                           htmlOutput('helpA2')),
+          
           selectInput('demoA', 'Would you like to see data for a particular
                       demographic group?', demoA),
           
@@ -128,6 +131,9 @@ shinyUI(fluidPage(
                  
           checkboxGroupInput('termM', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
+          
+          conditionalPanel(condition = "input.termM == ''",
+                           htmlOutput('helpM2')),
                  
           selectInput('demoM', 'Would you like to view trends for
                       a particular demographic group?', demo),
