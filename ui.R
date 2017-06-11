@@ -3,6 +3,8 @@ library(dplyr)
 library(rCharts)
 library(tidyr)
 library(shinyjs)
+library(shinyBS)
+source('utilFuncs.R')
 
 # Load standard data
 load('enrollment.rdata')
@@ -65,6 +67,31 @@ exempt <- c('No','Yes')
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
           Orientation = 'orientation')
 
+#---------------------------Popover Messages------------------------------------
+toolValues <- 'Mouse over points/bars to view specific values and raw numbers'
+toolValues <- subNew(toolValues)
+
+popTerm <- 'Select the terms you would like to see. Picking both <strong> Fall
+        </strong> and <strong> Spring </strong> will show fall and spring data 
+        for five years.'
+popTerm <- subNew(popTerm)
+
+popA1 <- 'Selecting <strong> Applicant Counts </strong> will provide a breakdown 
+         of the raw number of applicants, and selecting <strong> % of Applicants 
+         that Enroll </strong> will provide data on the applicants that enroll 
+         after applying.'
+popA1 <- subNew(popA1)
+
+popA2 <- 'Selecting <strong> Yes </strong> will display data only for applicants
+         from....[fill in]'
+popA2 <- subNew(popA2)
+
+popA3 <- "Selecting <strong> Yes </strong> will calculate a proportionality
+         index by taking the percent representation of a group in the
+         enrollees and dividing by the representation of that group in all 
+         applicants. A ratio below 1 may indicate disproportionate impact."
+popA3 <- subNew(popA3)
+
 
 ################################################################################
 
@@ -88,27 +115,44 @@ shinyUI(fluidPage(
           radioButtons('outcome', 'What applicant data would you like to see?',
                         outcome),
           
+          bsPopover('outcome', 
+                    "<strong> What data would you like to see? </strong>",
+                     popA1, 'right', options = list(container = 'body')),
+          
           radioButtons('egusd', 'Look at EGUSD applicants only?', egusd,
                        inline = TRUE),
+          
+          bsPopover('egusd', 
+                    '<strong> Look at EGUSD applicants only? </strong>',
+                    popA2, 'right', options = list(container = 'body')),
           
           checkboxGroupInput('termA','What terms would you like to see?', term,
                              selected = 'Fall', inline = TRUE),
           
+          bsPopover('termA', 
+                    '<strong> What terms would you like to see? </strong>',
+                    popTerm, 'right', options = list(container = 'body')),
+          
           conditionalPanel(condition = "input.termA == ''",
                            htmlOutput('helpA2')),
           
-          selectInput('demoA', 'Would you like to see data for a particular
-                      demographic group?', demoA),
+          selectInput('demoA', 'Look at a particular demographic group?', 
+                      demoA),
           
           conditionalPanel(condition = "input.demoA != 'None' &
                            input.outcome == '% of Applicants that Enroll'",       
-                           selectInput('compareA','Evaluate Equity?', compare))
-          
+                           radioButtons('compareA','Evaluate Equity?', 
+                                         compare, inline = TRUE)),
+          bsPopover('compareA', 
+                    '<strong> Evaluate Equity? </strong>',
+                    popA3, 'right', 
+                    options = list(container = 'body'))
         ),
         
         # Show plot
         mainPanel(
           chartOutput('histA', lib = 'nvd3'),
+          bsTooltip('histA', toolValues, 'top'),
           plotOutput("plot4")
         )
        
