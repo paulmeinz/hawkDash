@@ -112,13 +112,14 @@ shinyServer(function(input, output, session) {
     txt <- ''
     if (input$outcome == 'Applicant Counts') {
       if (input$demoA == 'None') {
-        txt <- '<strong> Displaying data for applicant counts. MOUSE OVER LINE
-          TO VIEW EXACT COUNTS. </strong>'
+        txt <- '<strong> Displaying data for applicant counts. MOUSE OVER 
+          LINE TO VIEW EXACT COUNTS. </strong>'
       }
       if(input$demoA != 'None') {
         txt <- '<strong> Displaying the % representation of a demographic 
-          among all applicants. MOUSE OVER BARS TO VIEW EXACT NUMBERS AND
-          HEADCOUNTS. </strong>'
+          among all applicants. Groups with headcounts less than 10 will not be 
+          displayed. MOUSE OVER BARS TO VIEW EXACT NUMBERS AND HEADCOUNTS. 
+          </strong>'
       }
     }
     if (input$outcome == '% of Applicants that Enroll') {
@@ -126,7 +127,8 @@ shinyServer(function(input, output, session) {
         term. Note that headcounts of enrollees will be highly correlated with
         but may not exactly match end of term enrollment counts (like those 
         displayed in the enrollment tab of this dashboard). This is because 
-        additional data validation and cleaning happens after enrollment. 
+        additional data validation and cleaning happens after enrollment.
+        Groups with headcounts less than 10 will not be displayed.
         MOUSE OVER BARS TO VIEW EXACT NUMBERS AND COUNTS. </strong>'
 
       if (input$compareA == 'Yes') {
@@ -438,8 +440,9 @@ shinyServer(function(input, output, session) {
     txt <- '<strong>
       Displaying the percentage of enrolled students that completed ALL the 
       matriculation elements you selected (Assessment, Ed Plan, 
-      and/or Orientation) during or before a given term. MOUSE OVER BARS TO VIEW 
-      SPECIFIC NUMBERS AND COUNTS.
+      and/or Orientation) during or before a given term. 
+      Groups with headcounts less than 10 will not be displayed.  MOUSE OVER 
+      BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
       </strong>'
     
     if(input$compareM == 'Yes') {
@@ -676,13 +679,13 @@ shinyServer(function(input, output, session) {
 #----------------------------Enrollment Output----------------------------------
  
   output$defE <- renderUI({
-    txt <- '<strong> Displaying collegewide duplicated and unduplicated 
+    txt <- '<strong> Displaying duplicated and unduplicated 
         headcounts. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
  
     if(input$demoE != 'None') {
       txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
-        the selected demographic collegwide. MOUSE OVER BARS TO VIEW RAW 
-        NUMBERS. </strong>'
+        the selected demographic collegwide. Groups with headcounts less than 10 
+        will not be displayed. MOUSE OVER BARS TO VIEW RAW NUMBERS. </strong>'
     }
 
     if(input$compareE == 'Yes') {
@@ -949,8 +952,10 @@ shinyServer(function(input, output, session) {
   output$defS <- renderUI ({
   txt <- '<strong> Displaying success rates. A success rate is
     calculated by counting the total number of A, B, C, and P grades and 
-    dividing by the total number of enrollments (including w&#39;s). MOUSE
-    OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
+    dividing by the total number of enrollments (including w&#39;s). 
+    Note that groups with enrollment counts less than 20 will not be displayed. 
+    MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
+  
   if (input$compareDem == 'Yes') {
     txt <- '<strong> Displaying proportionality indexes. 
       For course success, the proportionality index is calculated by taking 
