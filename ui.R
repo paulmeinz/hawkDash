@@ -75,8 +75,7 @@ toolValues <- 'Mouse over points/bars to view specific values and raw numbers'
 toolValues <- subNew(toolValues)
 
 popTerm <- 'Select the terms you would like to see. Picking both <strong> Fall
-        </strong> and <strong> Spring </strong> will show fall and spring data 
-        for five years.'
+        </strong> and <strong> Spring </strong> will show fall and spring data.'
 popTerm <- subNew(popTerm)
 
 popA1 <- 'Selecting <strong> Applicant Counts </strong> will provide a breakdown 
@@ -86,21 +85,23 @@ popA1 <- 'Selecting <strong> Applicant Counts </strong> will provide a breakdown
 popA1 <- subNew(popA1)
 
 popA2 <- 'Selecting <strong> Yes </strong> will display data only for applicants
-         from....[fill in]'
+         from Cosumnes Oaks, Elk Grove High, Elk Grove Charter, Florin, 
+         Franklin, Laguna Creek, Monterey Trail, Pleasant Grove, Sheldon,
+         Valley, Calvine, Rio Cazadero, and Transition High.'
 popA2 <- subNew(popA2)
 
 popA3 <- "Selecting <strong> Yes </strong> will calculate a proportionality
          index by taking the percent representation of a group in student
          enrollees and dividing by the representation of that group in all 
          applicants. The resulting ratio is multiplied by 100. A ratio below 
-         100 may indicate disproportionate impact."
+         100 may indicate an access issue."
 popA3 <- subNew(popA3)
 
 popM1 <- 'Checking multiple boxes will display data for enrolled students who 
-         have completed all the selected outcomes. For example, checking 
-         <strong> Assessment </strong> and <strong> Ed Plan </strong> will 
-         display data on students who completed assessment AND an educational 
-         plan.'
+         have completed all the selected outcomes during or before a given term. 
+         For example, checking <strong> Assessment </strong> and <strong> 
+         Ed Plan </strong> will display data on students who completed 
+         assessment AND an educational plan.'
 popM1 <- subNew(popM1)
 
 popM2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
@@ -192,7 +193,7 @@ shinyUI(fluidPage(
         # Show plot
         mainPanel(
           chartOutput('histA', lib = 'nvd3'),
-          bsTooltip('histA', toolValues, 'bottom'),
+          #bsTooltip('histA', toolValues, 'bottom'),
           htmlOutput('defA'),
           plotOutput('plot4')
         )
@@ -240,7 +241,7 @@ shinyUI(fluidPage(
                # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histM', lib = 'nvd3'),
-          bsTooltip('histM', toolValues, 'bottom'),
+          #bsTooltip('histM', toolValues, 'bottom'),
           htmlOutput('defM'),
           plotOutput("plot3")
         )
@@ -297,7 +298,7 @@ shinyUI(fluidPage(
                # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histE', lib = 'nvd3'),
-          bsTooltip('histE', toolValues, 'bottom'),
+          #bsTooltip('histE', toolValues, 'bottom'),
           htmlOutput('defE'),
           plotOutput("plot2")
         )
@@ -367,7 +368,7 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histS', lib = 'nvd3'),
-          bsTooltip('histS', toolValues, 'bottom'),
+          #bsTooltip('histS', toolValues, 'bottom'),
           htmlOutput('defS'),
           plotOutput("plot1")
         )
