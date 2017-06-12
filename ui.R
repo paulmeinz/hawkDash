@@ -88,10 +88,26 @@ popA2 <- 'Selecting <strong> Yes </strong> will display data only for applicants
 popA2 <- subNew(popA2)
 
 popA3 <- "Selecting <strong> Yes </strong> will calculate a proportionality
-         index by taking the percent representation of a group in the
+         index by taking the percent representation of a group in student
          enrollees and dividing by the representation of that group in all 
-         applicants. A ratio below 1 may indicate disproportionate impact."
+         applicants. The resulting ratio is multiplied by 100. A ratio below 
+         100 may indicate disproportionate impact."
 popA3 <- subNew(popA3)
+
+popM1 <- 'Checking multiple boxes will display data for enrolled students who 
+         have completed all the selected outcomes. For example, checking 
+         <strong> Assessment </strong> and <strong> Ed Plan </strong> will 
+         display data on students who completed assessment AND an educational 
+         plan.'
+popM1 <- subNew(popM1)
+
+popM2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
+         index by taking the percent representation of a group among students
+         that completed the selected outcomes (Assessment, Ed Plan, and/or 
+         Orientation) and dividing by the representation of that group amongst
+         all enrolled students. The resulting ratio is multiplied by 100.
+         A ratio below 1 may indicate disproportionate impact.'
+popM2 <- subNew(popM2)
 
 
 ################################################################################
@@ -144,8 +160,8 @@ shinyUI(fluidPage(
                            input.outcome == '% of Applicants that Enroll'",       
                            radioButtons('compareA','Evaluate Equity?', 
                                          compare, inline = TRUE)),
-          bsPopover('compareA', 
-                    '<strong> Evaluate Equity? </strong>',
+          
+          bsPopover('compareA', '<strong> Evaluate Equity? </strong>',
                     popA3, 'right', 
                     options = list(container = 'body'))
         ),
@@ -153,7 +169,7 @@ shinyUI(fluidPage(
         # Show plot
         mainPanel(
           chartOutput('histA', lib = 'nvd3'),
-          bsTooltip('histA', toolValues, 'top'),
+          bsTooltip('histA', toolValues, 'bottom'),
           plotOutput("plot4")
         )
        
@@ -171,25 +187,36 @@ shinyUI(fluidPage(
                              that completed (check all that apply):', sssp,
                              selected = c('assess','edPlan', 'orientation')),
           
+          bsPopover('sssp','<strong> Select one or many </strong>', popM1,
+                    'right', options = list(container = 'body')),
+          
           selectInput('exempt', 'Include students who were exempted, 
                       grandfathered, or new transfer matriculated?', exempt),
                  
           checkboxGroupInput('termM', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
           
+          bsPopover('termM', 
+                    '<strong> What terms would you like to see? </strong>',
+                    popTerm, 'right', options = list(container = 'body')),
+          
           conditionalPanel(condition = "input.termM == ''",
                            htmlOutput('helpM2')),
                  
-          selectInput('demoM', 'Would you like to view trends for
-                      a particular demographic group?', demo),
+          selectInput('demoM', 'Look at a particular demographic group?', demo),
                  
           conditionalPanel(condition = "input.demoM != 'None'",       
-                           selectInput('compareM','Evaluate Equity?', compare))
+                           radioButtons('compareM','Evaluate Equity?', compare, 
+                                        inline = TRUE)),
+          
+          bsPopover('compareM', '<strong> Evaluate Equity? </strong>', popM2,
+                    'right', options = list(container = 'body'))
         ),
                
                # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histM', lib = 'nvd3'),
+          bsTooltip('histM', toolValues, 'bottom'),
           plotOutput("plot3")
         )
       )           
