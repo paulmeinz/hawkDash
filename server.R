@@ -466,8 +466,8 @@ shinyServer(function(input, output, session) {
     
     if (is.null(term)) {
       txt <- "<p class = 'help'> Select a term by checking the boxes
-      above. Selecting both Fall and Spring will display data for
-      fall and spring over five years.</p>"
+        above. Selecting both Fall and Spring will display data for
+        fall and spring over five years.</p>"
     }
     
     HTML(txt)
