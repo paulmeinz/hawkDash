@@ -106,8 +106,28 @@ popM2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
          that completed the selected outcomes (Assessment, Ed Plan, and/or 
          Orientation) and dividing by the representation of that group amongst
          all enrolled students. The resulting ratio is multiplied by 100.
-         A ratio below 1 may indicate disproportionate impact.'
+         A ratio below 100 may indicate disproportionate impact.'
 popM2 <- subNew(popM2)
+
+popE2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
+         index by taking the percent representation of a group in the selected
+         program(s) and dividing by the representation of that group 
+         collegewide. The resulting ratio is multiplied by 100. A ratio below
+         100 may indicate an access issue.'
+popE2 <- subNew(popE2)
+
+popS1 <- 'Selecting <strong> Yes </strong> will display a trend graph with
+         a line representing the selected program success rates and a line
+         representing the collegwide success rate.'
+popS1 <- subNew(popS1)
+
+popS2 <- "Selecting <strong> Yes </strong> will calculate a proportionality
+         index. This index is calculated by taking the percent representation 
+         among successful enrollments for a given group and dividing by the
+         representation of that group in collegwide enrollments. The resulting 
+         ratio is multiplied by 100. A value below 100 may indicate 
+         disproportionate impact."
+popS2 <- subNew(popS2)
 
 
 ################################################################################
@@ -153,7 +173,8 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.termA == ''",
                            htmlOutput('helpA2')),
           
-          selectInput('demoA', 'Look at a particular demographic group?', 
+          selectInput('demoA', 
+                      'View trends for a particular demographic group?', 
                       demoA),
           
           conditionalPanel(condition = "input.demoA != 'None' &
@@ -161,7 +182,7 @@ shinyUI(fluidPage(
                            radioButtons('compareA','Evaluate Equity?', 
                                          compare, inline = TRUE)),
           
-          bsPopover('compareA', '<strong> Evaluate Equity? </strong>',
+          bsPopover('compareA', '<strong> Evaluate equity? </strong>',
                     popA3, 'right', 
                     options = list(container = 'body'))
         ),
@@ -203,13 +224,14 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "input.termM == ''",
                            htmlOutput('helpM2')),
                  
-          selectInput('demoM', 'Look at a particular demographic group?', demo),
+          selectInput('demoM', 'View trends for a particular demographic group?'
+                      , demo),
                  
           conditionalPanel(condition = "input.demoM != 'None'",       
                            radioButtons('compareM','Evaluate Equity?', compare, 
                                         inline = TRUE)),
           
-          bsPopover('compareM', '<strong> Evaluate Equity? </strong>', popM2,
+          bsPopover('compareM', '<strong> Evaluate equity? </strong>', popM2,
                     'right', options = list(container = 'body'))
         ),
                
@@ -229,12 +251,11 @@ shinyUI(fluidPage(
     tabPanel(title = 'Enrollment',
       sidebarLayout(
         sidebarPanel(
-          selectInput('collegeE', 'Would you like to see Collegewide data
-                      or data in a program?', trends),
+          selectInput('collegeE', 'View collegewide data or data in a program?', 
+                      trends),
                                   
           conditionalPanel(condition = "input.collegeE == 'Academic Programs'",
-                           selectInput('acadE', 'Select program(s) by clicking 
-                                       in the box below.',acad, 
+                           selectInput('acadE', 'Select program(s)',acad, 
                                        multiple = TRUE)),
           
           conditionalPanel(condition = "
@@ -249,20 +270,28 @@ shinyUI(fluidPage(
           checkboxGroupInput('termE', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
           
+          bsPopover('termE', 
+                    '<strong> What terms would you like to see? </strong>',
+                    popTerm, 'right', options = list(container = 'body')),
+          
           conditionalPanel(condition = "input.termE == ''",
                            htmlOutput('helpE2')),
                  
-          selectInput('demoE', 'Would you like to view trends for
-                      a particular demographic group?', demo),
+          selectInput('demoE', 'View trends for a particular demographic group?'
+                      , demo),
           
           conditionalPanel(condition = "input.demoE != 'None'
                            && input.collegeE != 'Collegewide'",       
-                           selectInput('compareE','Evaluate Equity?', compare))
+                           selectInput('compareE','Evaluate equity?', compare)),
+          
+          bsPopover('compareE', '<strong> Evaluate Equity? </strong>', popE2,
+                    'right', options = list(container = 'body'))
         ),
                
                # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histE', lib = 'nvd3'),
+          bsTooltip('histE', toolValues, 'bottom'),
           plotOutput("plot2")
         )
       )           
@@ -275,14 +304,12 @@ shinyUI(fluidPage(
     tabPanel(title = 'Course Success', 
       sidebarLayout(
         sidebarPanel(
-          selectInput('collegeS', 'Would you like to see Collegewide data
-                      or data in a program?', trends),
+          selectInput('collegeS', 'View collegewide data or data in a program?', 
+                      trends),
 
           conditionalPanel(condition = "input.collegeS == 'Academic Programs'",
-                           selectInput('acadS', 
-                                       'Select program(s) by clicking in the box 
-                                       below.',
-                                       acad, multiple = TRUE)),
+                           selectInput('acadS', 'Select program(s)', acad, 
+                                       multiple = TRUE)),
           
           conditionalPanel(condition = "
                            input.collegeS == 'Academic Programs' &&
@@ -296,6 +323,10 @@ shinyUI(fluidPage(
           checkboxGroupInput('termS', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
           
+          bsPopover('termS', 
+                    '<strong> What terms would you like to see? </strong>',
+                    popTerm, 'right', options = list(container = 'body')),
+          
           conditionalPanel(condition = "input.termS == ''",
                            htmlOutput('helpS2')),
           
@@ -303,8 +334,12 @@ shinyUI(fluidPage(
                       a particular demographic group?', demo),
           
           conditionalPanel(condition = "input.demoS != 'None'",
-                           selectInput('compareDem','Would you like to evaluate
-                                       equity?', compare)),
+                           radioButtons('compareDem','Evaluate equity?', 
+                                       compare, inline = TRUE)),
+          
+          bsPopover('compareDem', 
+                    '<strong> Evaluate equity? </strong>',
+                    popS2, 'right', options = list(container = 'body')),
           
           conditionalPanel(condition = "
                            (input.collegeS == 'Academic Programs' &&
@@ -312,13 +347,17 @@ shinyUI(fluidPage(
                            input.collegeS == 'Special Programs') &&
                            input.demoS == 'None'
                            ",
-                           selectInput('compareCol','Compare to collegewide?', 
-                                       compare))
+                           radioButtons('compareCol','Compare to collegewide?', 
+                                       compare, inline = TRUE)),
+          bsPopover('compareCol', 
+                    '<strong> Compare to collegwide? </strong>',
+                    popS1, 'right', options = list(container = 'body'))
         ),
 
     # Show a plot of the generated distribution
         mainPanel(
           chartOutput('histS', lib = 'nvd3'),
+          bsTooltip('histS', toolValues, 'bottom'),
           plotOutput("plot1")
         )
       )
