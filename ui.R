@@ -148,7 +148,7 @@ shinyUI(fluidPage(
 #---------------------------ACCESS TAB------------------------------------------
 
 
-    tabPanel(title = 'Applications (Access)',
+    tabPanel(title = 'Application Data (Access)',
       sidebarLayout(
         sidebarPanel(
           radioButtons('outcome', 'What applicant data would you like to see?',
@@ -193,7 +193,8 @@ shinyUI(fluidPage(
         mainPanel(
           chartOutput('histA', lib = 'nvd3'),
           bsTooltip('histA', toolValues, 'bottom'),
-          plotOutput("plot4")
+          htmlOutput('defA'),
+          plotOutput('plot4')
         )
       )
     ),
@@ -202,7 +203,7 @@ shinyUI(fluidPage(
 #---------------------------MATRICULATION TAB-----------------------------------
     
 
-    tabPanel(title = 'Matriculation (SSSP)',
+    tabPanel(title = 'Matriculation Data (SSSP)',
       sidebarLayout(
         sidebarPanel(
           checkboxGroupInput('sssp', 'View data on students
@@ -240,6 +241,7 @@ shinyUI(fluidPage(
         mainPanel(
           chartOutput('histM', lib = 'nvd3'),
           bsTooltip('histM', toolValues, 'bottom'),
+          htmlOutput('defM'),
           plotOutput("plot3")
         )
       )           
@@ -249,7 +251,7 @@ shinyUI(fluidPage(
 #---------------------------ENROLLMENT TAB--------------------------------------
     
 
-    tabPanel(title = 'Enrollment',
+    tabPanel(title = 'Enrollment Data',
       sidebarLayout(
         sidebarPanel(
           selectInput('collegeE', 'View collegewide data or data in a program?', 
@@ -285,7 +287,8 @@ shinyUI(fluidPage(
           
           conditionalPanel(condition = "input.demoE != 'None'
                            && input.collegeE != 'Collegewide'",       
-                           selectInput('compareE','Evaluate equity?', compare)),
+                           radioButtons('compareE','Evaluate equity?', 
+                                        compare, inline = TRUE)),
           
           bsPopover('compareE', '<strong> Evaluate Equity? </strong>', popE2,
                     'right', options = list(container = 'body'))
@@ -295,6 +298,7 @@ shinyUI(fluidPage(
         mainPanel(
           chartOutput('histE', lib = 'nvd3'),
           bsTooltip('histE', toolValues, 'bottom'),
+          htmlOutput('defE'),
           plotOutput("plot2")
         )
       )           
@@ -304,7 +308,7 @@ shinyUI(fluidPage(
 #---------------------------COURSE SUCCESS TAB----------------------------------
 
 
-    tabPanel(title = 'Course Success', 
+    tabPanel(title = 'Course Success Data', 
       sidebarLayout(
         sidebarPanel(
           selectInput('collegeS', 'View collegewide data or data in a program?', 
@@ -364,6 +368,7 @@ shinyUI(fluidPage(
         mainPanel(
           chartOutput('histS', lib = 'nvd3'),
           bsTooltip('histS', toolValues, 'bottom'),
+          htmlOutput('defS'),
           plotOutput("plot1")
         )
       )

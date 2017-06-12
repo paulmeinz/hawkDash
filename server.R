@@ -29,6 +29,7 @@ shinyServer(function(input, output, session) {
   
 ################################################################################
 
+  
   # Reset comparisons if they are hidden
   observe({
     if (input$demoA == 'None') {
@@ -106,7 +107,40 @@ shinyServer(function(input, output, session) {
 
 ################################################################################    
 #-----------------------------ACCESS-OUTPUT-------------------------------------
+  
+  output$defA <- renderUI({
+    txt <- ''
+    if (input$outcome == 'Applicant Counts') {
+      if (input$demoA == 'None') {
+        txt <- '<strong> Displaying data for applicant counts. MOUSE OVER LINE
+          TO VIEW EXACT COUNTS. </strong>'
+      }
+      if(input$demoA != 'None') {
+        txt <- '<strong> Displaying the % representation of a demographic 
+          among all applicants. MOUSE OVER BARS TO VIEW EXACT NUMBERS AND
+          HEADCOUNTS. </strong>'
+      }
+    }
+    if (input$outcome == '% of Applicants that Enroll') {
+      txt <- '<strong> Displaying the percentage of applicants for a given term 
+        that enroll in the term they applied for. MOUSE OVER BARS TO VIEW EXACT
+        NUMBERS AND COUNTS. </strong>'
 
+      if (input$compareA == 'Yes') {
+        txt <- '<strong> Displaying proportionality indexes. In this case, the 
+          proportionality index is calculated by taking a group&#39;s percent
+          representation amongst students that enrolled after applying and
+          dividing by the same group&#39;s representation among all applicants.
+          This ratio is multiplied by 100. A value below 100 may indicate an
+          access issue, such that a particular group is enrolling at lower
+          rates than expected. MOUSE OVER BARS TO DISPLAY
+          SPECIFIC VALUES. </strong>'
+      }
+    }
+    
+    HTML(txt)
+  })
+  
   output$helpA2 <- renderUI({
     term <- input$termA
     txt <- ''
@@ -303,6 +337,7 @@ shinyServer(function(input, output, session) {
     
 ################################################################################ 
   
+  
   # Reset comparisons if they are hidden
   observe({
     if (input$demoM == 'None') {
@@ -394,7 +429,29 @@ shinyServer(function(input, output, session) {
   
 ################################################################################
 #----------------------------Matric-Output--------------------------------------
-
+  
+  output$defM <- renderUI({
+    txt <- ''
+    txt <- '<strong>
+      Displaying the percentage of enrolled students that completed ALL the 
+      matriculation elements you selected (Assessment, Ed Plan, 
+      and/or Orientation). MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
+      </strong>'
+    
+    if(input$compareM == 'Yes') {
+      txt <- ' <strong>
+        Displaying proportionality indexes. In this case, the proportionality 
+        index is calculated by taking a group&#39;s representation among the 
+        students that completed all the matriculation elements you selected and 
+        dividing by that group&#39;s representation on campus. This ratio is 
+        multiplied by 100. A value below 100 may indicate disproportionate 
+        impact such that a particular group is less likely to complete
+        matriculation. MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS. </strong>'
+    }
+    
+    HTML(txt)
+  })
+  
   output$helpM2 <- renderUI({
     term <- input$termM
     txt <- ''
@@ -503,6 +560,7 @@ shinyServer(function(input, output, session) {
   
 ################################################################################ 
   
+  
   # Reset comparisons if they are hidden
   observe({
     if (input$demoE == 'None') {
@@ -547,7 +605,6 @@ shinyServer(function(input, output, session) {
                   summarise(undup = n_distinct(emplid))) %>%
       mutate(proportion = unduplicated/undup * 100)
       
-    
     # Save the collegewide
     college <- temp
     
@@ -613,6 +670,42 @@ shinyServer(function(input, output, session) {
 ################################################################################  
 #----------------------------Enrollment Output----------------------------------
  
+  output$defE <- renderUI({
+    txt <- ''
+    if(input$collegeE == 'Collegewide') {
+      txt <- '<strong> Displaying collegewide duplicated and unduplicated 
+        headcounts. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
+      if(input$demoE != 'None') {
+        txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
+          the selected demographic collegwide. MOUSE OVER BARS TO VIEW RAW 
+          NUMBERS. </strong>'
+      }
+    }
+    
+    if(input$collegeE != 'Collegewide') {
+      txt <- '<strong> Displaying duplicated and unduplicated headcounts for
+        the selected program(s). MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS
+        </strong>.'
+      if(input$demoE != 'None') {
+        txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
+          the selected demographic in the selected program(s). MOUSE OVER BARS 
+          TO VIEW RAW NUMBERS. </strong>'
+      }
+      if(input$compareE == 'Yes') {
+        txt <- '<strong> Displaying proportionality indexes for the demographic
+          you selected in the program(s) you selected. The proportionality index
+          is calculated by taking the representation of a demographic group
+          in the selected program and dividing by that group&#39;s 
+          representation collegewide. This ratio is multiplied by 100. A ratio 
+          below 100 may indicate an access issue to the selected program (e.g.,
+          a particular group is accessing the program at a lower rate than 
+          expected). MOUSE OVER BARS TO VIEW SPECIFIC VALUES.'
+      }
+    }
+    
+    HTML(txt)
+  })
+  
   output$helpE1 <- renderUI({
     prog <- input$acadE
     col <- input$collegeE
@@ -765,6 +858,7 @@ shinyServer(function(input, output, session) {
   
 ################################################################################  
   
+  
   # Reset comparisons if they are hidden
   observe({
     if (input$collegeS == 'Collegewide') {
@@ -797,7 +891,6 @@ shinyServer(function(input, output, session) {
       terms <- paste(terms[1], "|", terms[2], sep = '')
     }
     
-
     # Calculate collegewide by default
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
@@ -858,6 +951,47 @@ shinyServer(function(input, output, session) {
 
 ################################################################################  
 #-----------------------------Success-Output------------------------------------  
+  
+  output$defS <- renderUI ({
+    txt <- ''
+    if (input$collegeS == 'Collegewide') {
+      txt <- '<strong> Displaying collegewide success rates. A success rate is
+        calculated by counting the total number of A, B, C, and P grades and 
+        dividing by the total number of enrollments (including w&#39;s). MOUSE
+        OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
+      if (input$compareDem == 'Yes') {
+        txt <- '<strong> Displaying collegewide proportionality indexes. 
+        For course success, the proportionality index is calculated by taking 
+        the representation of a given group among successful enrollments 
+        (A, B, C, or P grades) and dividing by the representation of that same 
+        group among all enrollments. This ratio is multiplied by 100. A value 
+        below 100 may indicate disproportionate impact such that a student
+        group may be succeeding at a lower rate than expected.
+        MOUSE OVER BARS TO VIEW SPECIFIC VALUES. </strong>'
+      }
+    }
+    
+    if (input$collegeS != 'Collegewide') {
+      txt <- '<strong> Displaying success rates for the selected program(s). A
+        success rate is calculated by counting the total number of A, B, C, and
+        P grades and dividing by the total number of enrollments 
+        (including W&#39;s). MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND 
+        COUNTS. </strong>'
+      if (input$compareDem == 'Yes') {
+        txt <- '<strong> Displaying proportionality indexes within the selected
+          programs. For course success, the proportionality index is calculated 
+          by taking the representation of a given group among successful 
+          enrollments (A, B, C, or P grades) and dividing by the representation 
+          of that same group among all enrollments. This ratio is multiplied by 
+          100. A value below 100 may indicate disproportionate impact in student 
+          success such that a student group might be succeeding at a lower
+          rate than expected. MOUSE OVER BARS TO VIEW SPECIFIC VALUES. 
+          </strong>'
+      }
+    }
+    
+    HTML(txt)
+  })
   
   output$helpS1 <- renderUI({
     prog <- input$acadS
