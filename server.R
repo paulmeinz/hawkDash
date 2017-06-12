@@ -516,7 +516,7 @@ shinyServer(function(input, output, session) {
     # Determine filter columns, subject by default.
     prog <- input$collegeE
     filtCol <- 'subject'
-    filtCol[prog == 'Special Programs'] <- input$specialE
+    filtCol[prog == 'Student Support or Cohort Programs'] <- input$specialE
     oldNames <- names(enroll)
     names(enroll)[names(enroll) == filtCol] <- 'filt'
     names(enroll)
@@ -782,7 +782,7 @@ shinyServer(function(input, output, session) {
     # Determine filter columns, subject by default.
     prog <- input$collegeS
     filtCol <- 'subject'
-    filtCol[prog == 'Special Programs'] <- input$specialS
+    filtCol[prog == 'Student Support or Cohort Programs'] <- input$specialS
     names(enroll)[names(enroll) == filtCol] <- 'filt'
     
     # Determine the group by factors, if "None" is selected only put term

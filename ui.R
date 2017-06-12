@@ -34,10 +34,10 @@ demoA <- c(None = 'None', 'Enrollment Status' = 'status',
 
 #--------------ENROLLMENT/SUCCESS/MATRICULATION DASHBOARD OPTIONS---------------
 
-programType <- c('Choose One', 'Academic Programs', 'Special Programs')
 
 # Type of trend evaluation
-trends <- c('Collegewide', 'Academic Programs', 'Special Programs')
+trends <- c('Collegewide', 'Academic Programs', 
+            'Student Support or Cohort Programs')
 
 # Academic programs
 acad <- unique(enroll$subject)
@@ -67,7 +67,9 @@ exempt <- c('No','Yes')
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
           Orientation = 'orientation')
 
+
 #---------------------------POPOVER MESSAGES------------------------------------
+
 
 toolValues <- 'Mouse over points/bars to view specific values and raw numbers'
 toolValues <- subNew(toolValues)
@@ -118,7 +120,7 @@ popE2 <- subNew(popE2)
 
 popS1 <- 'Selecting <strong> Yes </strong> will display a trend graph with
          a line representing the selected program success rates and a line
-         representing the collegwide success rate.'
+         representing the collegwide success rates.'
 popS1 <- subNew(popS1)
 
 popS2 <- "Selecting <strong> Yes </strong> will calculate a proportionality
@@ -193,7 +195,6 @@ shinyUI(fluidPage(
           bsTooltip('histA', toolValues, 'bottom'),
           plotOutput("plot4")
         )
-       
       )
     ),
 
@@ -263,7 +264,9 @@ shinyUI(fluidPage(
                            input.acadE == null",
                            htmlOutput('helpE1')),
                                   
-          conditionalPanel(condition = "input.collegeE == 'Special Programs'",
+          conditionalPanel(condition = 
+                           "input.collegeE == 
+                           'Student Support or Cohort Programs'",
                            selectInput('specialE', 'Select a program', 
                                        special)),
                  
@@ -316,7 +319,9 @@ shinyUI(fluidPage(
                            input.acadS == null",
                            htmlOutput('helpS1')),
 
-          conditionalPanel(condition = "input.collegeS == 'Special Programs'",
+          conditionalPanel(condition = 
+                           "input.collegeS == 
+                           'Student Support or Cohort Programs'",
                            selectInput('specialS', 'Select a program', 
                                        special)),
 
@@ -344,7 +349,8 @@ shinyUI(fluidPage(
           conditionalPanel(condition = "
                            (input.collegeS == 'Academic Programs' &&
                            input.acadS != null ||
-                           input.collegeS == 'Special Programs') &&
+                           input.collegeS == 
+                           'Student Support or Cohort Programs') &&
                            input.demoS == 'None'
                            ",
                            radioButtons('compareCol','Compare to collegewide?', 
