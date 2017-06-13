@@ -9,6 +9,8 @@ source('utilFuncs.R')
 # Load standard data
 load('enrollment.rdata')
 
+crcLink <- "https://researchapps.crc.losrios.edu/CRC_Research_Data_Request_Form"
+
 
 ################################################################################
 
@@ -154,17 +156,30 @@ shinyUI(fluidPage(
       fluidRow(id = 'welcome',
                column(6,
                       p(class = 'welcome-text',
-                        "Welcome to the CRC HawkDash!",
+                        "Welcome to the CRC HawkDash!"),
                       br(),
                       br(),
-                      "Click the tabs above to view data on",
-                      br(),
-                      "applications, matriculation, enrollment,",
-                      br(),
-                      "and course success at Cosumnes River College.")
+                      p(class = 'welcome-text', id = 'specific',
+                        "Click the tabs above to view data on",
+                        "applications, matriculation, enrollment,",
+                        "and course success at Cosumnes River College.")
                       
                ),
-               column(6)
+               column(6,
+                      p(class = 'welcome-text', id = 'specific',
+                        "If you have questions, please contact:",
+                        br(),
+                        a(href = 'CRC-Research@crc.losrios.edu',
+                          style = 'color: #ffffff',
+                          "CRC-Research@crc.losrios.edu")),
+                      br(),
+                      p(class = 'welcome-text', id = 'specific',
+                        "If you have a research question or want",
+                        br(),
+                        "additional data ",
+                        a(href = crcLink, style = 'color:#ffffff',
+                          "click this link"))
+               )
       )
     ),             
 #---------------------------ACCESS TAB------------------------------------------
