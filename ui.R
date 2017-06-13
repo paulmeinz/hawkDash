@@ -9,6 +9,7 @@ source('utilFuncs.R')
 # Load standard data
 load('enrollment.rdata')
 
+
 ################################################################################
 
 #                         DEFINE BUTTON OPTIONS
@@ -141,8 +142,9 @@ popS2 <- subNew(popS2)
 
 
 shinyUI(fluidPage(
+  theme = 'style.css',
   useShinyjs(),
-
+  
   navbarPage(title = 'The CRC Hawkdash',
              
              

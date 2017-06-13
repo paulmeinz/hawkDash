@@ -1,0 +1,13 @@
+.navbar-brand {
+	background-color: blue;
+	font-size: 150%;
+}
+
+.navbar-default .navbar-brand {
+	color: white;
+}
+
+li.active {
+	font-size: 125%;
+	color: orange;
+}
