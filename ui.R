@@ -145,9 +145,28 @@ shinyUI(fluidPage(
   theme = 'style.css',
   useShinyjs(),
   
-  navbarPage(title = 'The CRC Hawkdash',
+  navbarPage(title = 'CRC HawkDash',
              
-             
+#---------------------------INTRO PAGE------------------------------------------             
+
+    
+    tabPanel('Welcome!',
+      fluidRow(id = 'welcome',
+               column(6,
+                      p(class = 'welcome-text',
+                        "Welcome to the CRC HawkDash!",
+                      br(),
+                      br(),
+                      "Click the tabs above to view data on",
+                      br(),
+                      "applications, matriculation, enrollment,",
+                      br(),
+                      "and course success at Cosumnes River College.")
+                      
+               ),
+               column(6)
+      )
+    ),             
 #---------------------------ACCESS TAB------------------------------------------
 
 

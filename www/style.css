@@ -7,9 +7,7 @@
 	color: white;
 }
 
-li.active {
-	font-size: 125%;
-}
+
 
 .active #tab-1356-1 {
 	color: orange;
@@ -25,6 +23,24 @@ p.help {
 
 #defA, #defS, #defM, #defE {
 	background-color: #d9d9d9;
+}
+
+#welcome {
+	background-image: url('LRC-home-banner1.jpg');
+	height: 450px;
+}
+
+.welcome-text {
+	text-align: center;
+    height: 100%;
+	color: white;
+	font-size: 200%;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+#specific {
+	font-size: 120%;
 }
 
 
