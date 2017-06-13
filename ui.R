@@ -75,61 +75,61 @@ toolValues <- 'Mouse over points/bars to view specific values and raw numbers'
 toolValues <- subNew(toolValues)
 
 popTerm <- 'Select the terms you would like to see. Picking both <strong> Fall
-        </strong> and <strong> Spring </strong> will show fall and spring data.'
+  </strong> and <strong> Spring </strong> will show fall and spring data.'
 popTerm <- subNew(popTerm)
 
 popA1 <- 'Selecting <strong> Applicant Counts </strong> will provide a breakdown 
-         of the raw number of applicants, and selecting <strong> % of Applicants 
-         that Enroll </strong> will provide data on the applicants that enroll 
-         after applying.'
+  of the raw number of applicants, and selecting <strong> % of Applicants 
+  that Enroll </strong> will provide data on the applicants that enroll 
+  after applying.'
 popA1 <- subNew(popA1)
 
 popA2 <- 'Selecting <strong> Yes </strong> will display data only for applicants
-         from Cosumnes Oaks, Elk Grove High, Elk Grove Charter, Florin, 
-         Franklin, Laguna Creek, Monterey Trail, Pleasant Grove, Sheldon,
-         Valley, Calvine, Rio Cazadero, and Transition High.'
+  from Cosumnes Oaks, Elk Grove High, Elk Grove Charter, Florin, 
+  Franklin, Laguna Creek, Monterey Trail, Pleasant Grove, Sheldon,
+  Valley, Calvine, Rio Cazadero, and Transition High.'
 popA2 <- subNew(popA2)
 
 popA3 <- "Selecting <strong> Yes </strong> will calculate a proportionality
-         index by taking the percent representation of a group in student
-         enrollees and dividing by the representation of that group in all 
-         applicants. The resulting ratio is multiplied by 100. A ratio below 
-         100 may indicate an access issue."
+  index by taking the percent representation of a group in student
+  enrollees and dividing by the representation of that group in all 
+  applicants. The resulting ratio is multiplied by 100. A ratio below 
+  100 may indicate an access issue."
 popA3 <- subNew(popA3)
 
 popM1 <- 'Checking multiple boxes will display data for enrolled students who 
-         have completed all the selected outcomes during or before a given term. 
-         For example, checking <strong> Assessment </strong> and <strong> 
-         Ed Plan </strong> will display data on students who completed 
-         assessment AND an educational plan.'
+  have completed all the selected outcomes during or before a given term. 
+  For example, checking <strong> Assessment </strong> and <strong> 
+  Ed Plan </strong> will display data on students who completed 
+  assessment AND an educational plan.'
 popM1 <- subNew(popM1)
 
 popM2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
-         index by taking the percent representation of a group among students
-         that completed the selected outcomes (Assessment, Ed Plan, and/or 
-         Orientation) and dividing by the representation of that group amongst
-         all enrolled students. The resulting ratio is multiplied by 100.
-         A ratio below 100 may indicate disproportionate impact.'
+  index by taking the percent representation of a group among students
+  that completed the selected outcomes (Assessment, Ed Plan, and/or 
+  Orientation) and dividing by the representation of that group amongst
+  all enrolled students. The resulting ratio is multiplied by 100.
+  A ratio below 100 may indicate disproportionate impact.'
 popM2 <- subNew(popM2)
 
 popE2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
-         index by taking the percent representation of a group in the selected
-         program(s) and dividing by the representation of that group 
-         collegewide. The resulting ratio is multiplied by 100. A ratio below
-         100 may indicate an access issue.'
+  index by taking the percent representation of a group in the selected
+  program(s) and dividing by the representation of that group 
+  collegewide. The resulting ratio is multiplied by 100. A ratio below
+  100 may indicate an access issue.'
 popE2 <- subNew(popE2)
 
 popS1 <- 'Selecting <strong> Yes </strong> will display a trend graph with
-         a line representing the selected program success rates and a line
-         representing the collegwide success rates.'
+  a line representing the selected program success rates and a line
+  representing the collegwide success rates.'
 popS1 <- subNew(popS1)
 
 popS2 <- "Selecting <strong> Yes </strong> will calculate a proportionality
-         index. This index is calculated by taking the percent representation 
-         among successful enrollments for a given group and dividing by the
-         representation of that group in collegwide enrollments. The resulting 
-         ratio is multiplied by 100. A value below 100 may indicate 
-         disproportionate impact."
+  index. This index is calculated by taking the percent representation 
+  among successful enrollments for a given group and dividing by the
+  representation of that group in collegwide enrollments. The resulting 
+  ratio is multiplied by 100. A value below 100 may indicate 
+  disproportionate impact."
 popS2 <- subNew(popS2)
 
 

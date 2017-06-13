@@ -952,7 +952,7 @@ shinyServer(function(input, output, session) {
   output$defS <- renderUI ({
   txt <- '<strong> Displaying success rates. A success rate is
     calculated by counting the total number of A, B, C, and P grades and 
-    dividing by the total number of enrollments (including w&#39;s). 
+    dividing by the total number of enrollments (including W&#39;s). 
     Note that groups with enrollment counts less than 20 will not be displayed. 
     MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
   
