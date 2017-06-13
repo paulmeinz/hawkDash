@@ -1,6 +1,6 @@
 .navbar-brand {
 	background-color: blue;
-	font-size: 150%;
+	font-size: 175%;
 }
 
 .navbar-default .navbar-brand {
@@ -9,5 +9,23 @@
 
 li.active {
 	font-size: 125%;
+}
+
+.active #tab-1356-1 {
 	color: orange;
 }
+
+p.help {
+	background-color: #ffbf80;
+}
+
+#compareDem, #compareCol, #compareA, #compareM, #compareE {
+	background-color: #d9d9d9;
+}
+
+#defA, #defS, #defM, #defE {
+	background-color: #d9d9d9;
+}
+
+
+
