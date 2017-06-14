@@ -48,7 +48,7 @@ acad <- acad[order(acad)]
 
 # Special (non academic) programs
 special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
-             Diop = 'diop', DSPS = 'dsps', Puente = 'puente')
+             Diop = 'diop', DSPS = 'dsps', Puente = 'puente', MESA = 'mesa')
 
 # Compare options
 compare <- c('No','Yes')
@@ -68,7 +68,7 @@ exempt <- c('No','Yes')
 
 # Output Options
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
-          Orientation = 'orientation')
+          Orientation = 'orientation', 'Counseling' = 'counsel')
 
 
 #---------------------------POPOVER MESSAGES------------------------------------
