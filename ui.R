@@ -39,8 +39,10 @@ demoA <- c(None = 'None', 'Enrollment Status' = 'status',
 
 
 # Type of trend evaluation
-trends <- c('Collegewide', 'Academic Programs', 
-            'Student Support or Cohort Programs')
+trends <- c('The entire college' = 'Collegewide', 
+            'An academic program' = 'Academic Programs', 
+            'A student support or cohort program' = 
+              'Student Support or Cohort Programs')
 
 # Academic programs
 acad <- unique(enroll$subject)
@@ -107,13 +109,17 @@ popM1 <- 'Checking multiple boxes will display data for enrolled students who
   assessment AND an educational plan.'
 popM1 <- subNew(popM1)
 
-popM2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
+popM2 <- 'Checking <strong> Yes </strong> will include students who have been
+  exempted, new transfer matriculated, or grandfathered.'
+popM2 <- subNew(popM2)
+
+popM3 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
   index by taking the percent representation of a group among students
   that completed the selected outcomes (Assessment, Ed Plan, and/or 
   Orientation) and dividing by the representation of that group amongst
   all enrolled students. The resulting ratio is multiplied by 100.
   A ratio below 100 may indicate disproportionate impact.'
-popM2 <- subNew(popM2)
+popM3 <- subNew(popM3)
 
 popE2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
   index by taking the percent representation of a group in the selected
@@ -187,7 +193,7 @@ shinyUI(fluidPage(
       fluidRow(id = 'copyright',
                column(12,
                       p(id = 'info',
-                        'Product of CRC Office of',
+                        'Product of the CRC Office of',
                         'Institutional Effectiveness')
                )
       )
@@ -260,8 +266,13 @@ shinyUI(fluidPage(
           bsPopover('sssp','<strong> Select one or many </strong>', popM1,
                     'right', options = list(container = 'body')),
           
-          selectInput('exempt', 'Include students who were exempted, 
-                      grandfathered, or new transfer matriculated?', exempt),
+          radioButtons('exempt', 'Include students who are not required
+                       to complete the Steps to Success?', exempt,
+                       inline = TRUE),
+          
+          bsPopover('exempt','<strong> Include exempted students? </strong>', 
+                    popM2,
+                    'right', options = list(container = 'body')),
                  
           checkboxGroupInput('termM', 'What terms would you like to see?', 
                              term, inline = TRUE, selected = 'Fall'),
@@ -280,7 +291,7 @@ shinyUI(fluidPage(
                            radioButtons('compareM','Evaluate Equity?', compare, 
                                         inline = TRUE)),
           
-          bsPopover('compareM', '<strong> Evaluate equity? </strong>', popM2,
+          bsPopover('compareM', '<strong> Evaluate equity? </strong>', popM3,
                     'right', options = list(container = 'body'))
         ),
                
@@ -301,8 +312,9 @@ shinyUI(fluidPage(
     tabPanel(title = 'Enrollment Data',
       sidebarLayout(
         sidebarPanel(
-          selectInput('collegeE', 'View collegewide data or data in a program?', 
-                      trends),
+          radioButtons('collegeE', 
+                       'Would you like to view enrollment data for:', 
+                        trends),
                                   
           conditionalPanel(condition = "input.collegeE == 'Academic Programs'",
                            selectInput('acadE', 'Select program(s)',acad, 
@@ -358,8 +370,9 @@ shinyUI(fluidPage(
     tabPanel(title = 'Course Success Data', 
       sidebarLayout(
         sidebarPanel(
-          selectInput('collegeS', 'View collegewide data or data in a program?', 
-                      trends),
+          radioButtons('collegeS', 'Would you like to view course success data
+                       for:', 
+                       trends),
 
           conditionalPanel(condition = "input.collegeS == 'Academic Programs'",
                            selectInput('acadS', 'Select program(s)', acad, 
