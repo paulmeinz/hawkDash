@@ -153,32 +153,42 @@ shinyUI(fluidPage(
 
     
     tabPanel('Welcome!',
-      fluidRow(id = 'welcome',
-               column(6,
-                      p(class = 'welcome-text',
-                        "Welcome to the CRC HawkDash!"),
-                      br(),
-                      br(),
+      fluidRow(id = 'welcome-top',
+               column(12,
+                      h1(id = 'welcome-header',
+                         "Welcome to the CRC HawkDash!"),
                       p(class = 'welcome-text', id = 'specific',
                         "Click the tabs above to view data on",
                         "applications, matriculation, enrollment,",
                         "and course success at Cosumnes River College.")
                       
-               ),
+               )
+      ),
+      fluidRow(id = 'welcome-mid',
                column(6,
                       p(class = 'welcome-text', id = 'specific',
                         "If you have questions, please contact:",
                         br(),
                         a(href = 'CRC-Research@crc.losrios.edu',
                           style = 'color: #ffffff',
-                          "CRC-Research@crc.losrios.edu")),
-                      br(),
+                          "CRC-Research@crc.losrios.edu"))
+
+               ),
+               column(6,
                       p(class = 'welcome-text', id = 'specific',
                         "If you have a research question or want",
                         br(),
                         "additional data ",
                         a(href = crcLink, style = 'color:#ffffff',
-                          "click this link"))
+                          target= '_blank',
+                          "CLICK HERE")) 
+                      )
+      ),
+      fluidRow(id = 'copyright',
+               column(12,
+                      p(id = 'info',
+                        'Product of CRC Office of',
+                        'Institutional Effectiveness')
                )
       )
     ),             
@@ -231,7 +241,7 @@ shinyUI(fluidPage(
           chartOutput('histA', lib = 'nvd3'),
           #bsTooltip('histA', toolValues, 'bottom'),
           htmlOutput('defA'),
-          plotOutput('plot4')
+          plotOutput('plot4', height = '0px')
         )
       )
     ),
@@ -279,7 +289,7 @@ shinyUI(fluidPage(
           chartOutput('histM', lib = 'nvd3'),
           #bsTooltip('histM', toolValues, 'bottom'),
           htmlOutput('defM'),
-          plotOutput("plot3")
+          plotOutput("plot3", height = '0px')
         )
       )           
     ),
@@ -336,7 +346,7 @@ shinyUI(fluidPage(
           chartOutput('histE', lib = 'nvd3'),
           #bsTooltip('histE', toolValues, 'bottom'),
           htmlOutput('defE'),
-          plotOutput("plot2")
+          plotOutput("plot2", height = '0px')
         )
       )           
     ),
@@ -406,7 +416,7 @@ shinyUI(fluidPage(
           chartOutput('histS', lib = 'nvd3'),
           #bsTooltip('histS', toolValues, 'bottom'),
           htmlOutput('defS'),
-          plotOutput("plot1")
+          plotOutput("plot1", height = '0px')
         )
       )
     )

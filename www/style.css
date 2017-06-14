@@ -7,14 +7,10 @@
 	color: white;
 }
 
-
-
-.active #tab-1356-1 {
-	color: orange;
-}
-
 p.help {
 	background-color: #ffbf80;
+	border-radius:10px;
+	text-align: center;
 }
 
 #compareDem, #compareCol, #compareA, #compareM, #compareE {
@@ -22,12 +18,26 @@ p.help {
 }
 
 #defA, #defS, #defM, #defE {
-	background-color: #d9d9d9;
+	
+	padding: 1% 1% 1% 1%;
+	color: white;
+	text-shadow: -1.5px 0 #000000,0 1.5px #000000,1.5px 0 #000000,0 -1.5px #000000;
+	font-size: 115%;
 }
 
-#welcome {
-	background-image: url('LRC-home-banner1.jpg');
-	height: 450px;
+#welcome-top {
+	height: 200px;
+	text-shadow: -2px 0 #000000,0 2px #000000,2px 0 #000000,0 -2px #000000;
+	font-weight: bold;
+}
+
+#welcome-mid {
+	height: 195px;
+}
+
+#welcome-header {
+	text-align: center;
+	color: white;
 }
 
 .welcome-text {
@@ -36,11 +46,28 @@ p.help {
 	color: white;
 	font-size: 200%;
 	font-weight: bold;
-	vertical-align: middle;
+	text-shadow: -2px 0 #000000,0 2px #000000,2px 0 #000000,0 -2px #000000;
 }
 
 #specific {
 	font-size: 150%;
+}
+
+#histS, #histA, #histM, #histE {
+	background-color: white;
+	border-color: black;
+}
+
+.tab-pane {
+	background-image: url('LRC-home-banner1.jpg');
+
+}
+
+#info {
+	color: white;
+	text-align: right;
+	padding-right: 5px;
+	padding-top: 20px;
 }
 
 
