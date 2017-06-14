@@ -169,7 +169,7 @@ shinyUI(fluidPage(
                       p(class = 'welcome-text', id = 'specific',
                         "If you have questions, please contact:",
                         br(),
-                        a(href = 'CRC-Research@crc.losrios.edu',
+                        a(href = 'mailto:CRC-Research@crc.losrios.edu',
                           style = 'color: #ffffff',
                           "CRC-Research@crc.losrios.edu"))
 
