@@ -769,12 +769,19 @@ shinyServer(function(input, output, session) {
       codeVal <- paste("#!function(x) {tickvalues = [", y, "]","
                     return tickvalues}!#", sep = '')
       
+      # Set min/max enrollment
+      mn <- 0
+      mx <- 0
+      if (nrow(enrollment()) > 0) {
+        mn <- floor(.9 * min(enrollment()$enrollment))
+        mx <- floor(1.1 * max(enrollment()$enrollment))
+      }
+      
       # Execute code and set other features
       n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
                width = 50, rotateLabels = -25)
       n1$yAxis(axisLabel='Enrollment', width = 50)
-      n1$chart(forceY = c(floor(.9 * min(enrollment()$enrollment)),
-                          floor(1.1 * max(enrollment()$enrollment))),
+      n1$chart(forceY = c(mn, mx),
                margin = list(left = 63, bottom = 63, right = 63),
                color = colors, size = 5, 
                
