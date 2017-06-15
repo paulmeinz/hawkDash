@@ -91,7 +91,8 @@ popA1 <- 'Selecting <strong> Applicant Counts </strong> will provide a breakdown
 popA1 <- subNew(popA1)
 
 popA2 <- 'Selecting <strong> Yes </strong> will display data only for applicants
-  from Cosumnes Oaks, Elk Grove High, Elk Grove Charter, Florin, 
+  who attended (at any time) Cosumnes Oaks, Elk Grove High, Elk Grove Charter, 
+  Florin, 
   Franklin, Laguna Creek, Monterey Trail, Pleasant Grove, Sheldon,
   Valley, Calvine, Rio Cazadero, and Transition High.'
 popA2 <- subNew(popA2)
