@@ -63,7 +63,7 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
           'Disability Status' = 'disability', Ethnicity = 'ethnicity',
           'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
           'Foster Youth Status' = 'foster',
-          'Gender' = 'gender','Online' = 'online', 'Veteran Status' = 'veteran',
+          'Gender' = 'gender','Online' = 'online', 'Veteran Status' = 'veteran'
           )
 
 # Exemption status

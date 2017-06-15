@@ -571,7 +571,7 @@ shinyServer(function(input, output, session) {
   
   # Reset comparisons if they are hidden
   observe({
-    if (input$demoE == 'None') {
+    if (input$demoE == 'None' | input$collegeE == 'Collegewide') {
       reset('compareE')
     }
   })  
