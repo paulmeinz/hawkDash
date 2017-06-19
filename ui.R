@@ -71,7 +71,7 @@ exempt <- c('No','Yes')
 
 # Output Options
 sssp <- c(Assessment = 'assess', 'Ed Plan' = 'edPlan', 
-          Orientation = 'orientation', 'Counseling' = 'counsel')
+          Orientation = 'orientation', 'Counseling/Follow-up' = 'counsel')
 
 
 #---------------------------POPOVER MESSAGES------------------------------------

@@ -440,7 +440,10 @@ shinyServer(function(input, output, session) {
     txt <- '<strong>
       Displaying the percentage of enrolled students that completed ALL the 
       matriculation elements you selected (Assessment, Ed Plan, 
-      and/or Orientation) during or before a given term. 
+      Orientation, and/or Counseling) during or before a given term. For the
+      purposes of this dashboard,
+      Assessment, Ed Plan, and Orientation are counted districtwide, whereas
+      counseling is counted only at CRC.
       Groups with headcounts less than 10 will not be displayed.  MOUSE OVER 
       BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
       </strong>'
