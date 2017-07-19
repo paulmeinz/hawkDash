@@ -50,7 +50,8 @@ acad <- acad[order(acad)]
 
 # Special (non academic) programs
 special <- c(CalWORKS = 'calwork', CARE = 'care', EOPS = 'eops',
-             Diop = 'diop', DSPS = 'dsps', Puente = 'puente', MESA = 'mesa')
+             Diop = 'diop', DSPS = 'dsps', Puente = 'puente', MESA = 'mesa',
+             Honors = 'honors')
 
 # Compare options
 compare <- c('No','Yes')
