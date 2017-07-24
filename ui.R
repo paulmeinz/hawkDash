@@ -269,11 +269,11 @@ shinyUI(fluidPage(
           bsPopover('sssp','<strong> Select one or many </strong>', popM1,
                     'right', options = list(container = 'body')),
           
-          radioButtons('exempt', 'Include students who are not required
-                       to complete the Steps to Success?', exempt,
+          radioButtons('exempt', 'Include students who were exempt, new 
+                        transfer matriculated, and/or grandfathered?', exempt,
                        inline = TRUE),
           
-          bsPopover('exempt','<strong> Include exempted students? </strong>', 
+          bsPopover('exempt','<strong> Select Yes or No </strong>', 
                     popM2,
                     'right', options = list(container = 'body')),
                  
