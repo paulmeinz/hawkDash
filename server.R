@@ -113,8 +113,8 @@ shinyServer(function(input, output, session) {
       }
       if(input$demoA != 'None') {
         txt <- '<strong> Displaying the % representation of a demographic 
-          among all applicants. Groups with headcounts less than 10 will not be 
-          displayed. MOUSE OVER BARS TO VIEW EXACT NUMBERS AND HEADCOUNTS. 
+          among all applicants. MOUSE OVER BARS TO VIEW EXACT NUMBERS AND 
+          HEADCOUNTS. 
           </strong>'
       }
     }
@@ -124,7 +124,6 @@ shinyServer(function(input, output, session) {
         but may not exactly match end of term enrollment counts (like those 
         displayed in the enrollment tab of this dashboard). This is because 
         additional data validation and cleaning happens after enrollment.
-        Groups with headcounts less than 10 will not be displayed.
         MOUSE OVER BARS TO VIEW EXACT NUMBERS AND COUNTS. </strong>'
 
       if (input$compareA == 'Yes') {
@@ -435,8 +434,7 @@ shinyServer(function(input, output, session) {
       purposes of this dashboard,
       Assessment, Ed Plan, and Orientation are counted districtwide, whereas
       counseling is counted only at CRC.
-      Groups with headcounts less than 10 will not be displayed.  MOUSE OVER 
-      BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
+      MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
       </strong>'
     
     if(input$compareM == 'Yes') {
@@ -675,8 +673,8 @@ shinyServer(function(input, output, session) {
  
     if(input$demoE != 'None') {
       txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
-        the selected demographic collegwide. Groups with headcounts less than 10 
-        will not be displayed. MOUSE OVER BARS TO VIEW RAW NUMBERS. </strong>'
+        the selected demographic collegwide. MOUSE OVER BARS TO VIEW RAW 
+        NUMBERS. </strong>'
     }
 
     if(input$compareE == 'Yes') {
@@ -946,7 +944,6 @@ shinyServer(function(input, output, session) {
   txt <- '<strong> Displaying success rates. A success rate is
     calculated by counting the total number of A, B, C, and P grades and 
     dividing by the total number of enrollments (including W&#39;s). 
-    Note that groups with enrollment counts less than 20 will not be displayed. 
     MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
   
   if (input$compareDem == 'Yes') {
