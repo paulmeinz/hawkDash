@@ -98,10 +98,6 @@ shinyServer(function(input, output, session) {
     temp$repAll <- round(temp$repAll, 2)
     temp$repOut <- round(temp$repOut, 2)
     
-    if (nrow(temp) > 0) {
-      temp <- temp[temp$headcount >= 10,]
-    }
-    
     temp
   })
 
@@ -419,11 +415,6 @@ shinyServer(function(input, output, session) {
     if (input$demoM != 'None') {
       names(temp)[2] <- 'demoCol'
     }
-    
-    # Remove N less than ten
-    if (nrow(temp) > 0) {
-      temp <- temp[temp$hcGrp >= 10,]
-    }
         
     # Round these numbers for equity plot tooltips
     temp$outRep <- round(temp$outRep, 2)
@@ -669,9 +660,6 @@ shinyServer(function(input, output, session) {
         temp$progProp <- round(temp$progProp, 2)
         temp$colProp <- round(temp$colProp, 2)
       }
-      
-      # Suppress small Ns so that prop indexes arent outliers.
-      temp <- temp[temp$unduplicated >= 10, ]
       
     }
     
@@ -946,11 +934,6 @@ shinyServer(function(input, output, session) {
       temp$termCont <- as.numeric(temp$term)
       temp$suc <- round(temp$suc, 2)
       temp[temp$type == 'Program', 'type'] <- 'Selected Program'
-    }
-    
-    # Suppress small Ns
-    if (nrow(temp) > 0) {
-      temp <- temp[temp$den >= 20, ]
     }
 
     temp
