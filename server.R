@@ -197,7 +197,7 @@ shinyServer(function(input, output, session) {
           
         # Execute code and set other features
         n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-                 width = 50, rotateLabels = -25)
+                 width = 50, rotateLabels = -70)
         n1$yAxis(axisLabel='Number of Applicants', width = 50)
         n1$chart(forceY = c(floor(.9 * min(acc()$headcount)),
                             floor(1.1 * max(acc()$headcount))),
@@ -768,9 +768,9 @@ shinyServer(function(input, output, session) {
       
       # Execute code and set other features
       n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-               width = 50, rotateLabels = -25)
+               width = 50, rotateLabels = -70)
       n1$yAxis(axisLabel='Enrollment', width = 50)
-      n1$chart(forceY = c(mn, mx),
+      n1$chart(forceY = c(mn, mx), 
                margin = list(left = 63, bottom = 63, right = 63),
                color = colors, size = 5, 
                
@@ -1054,7 +1054,7 @@ shinyServer(function(input, output, session) {
         
         # Execute code and set other features
         n1$xAxis(tickFormat = codeForm, tickValues = codeVal, 
-                 rotateLabels = -25)
+                 rotateLabels = -70)
         n1$yAxis(axisLabel = 'Course Success Rate (%)', 
                  width = 50)
         n1$chart(forceY = c(0, 100),
