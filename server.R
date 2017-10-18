@@ -19,6 +19,10 @@ colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999",
 # Compare options
 compare <- c('No', 'Yes')
 
+# Applicant Valid Demographics
+demoA <- c('None', 'status', 'ethnicity', 'firstgen', 'foster', 'gender', 
+           'calworks', 'dsps', 'eops', 'veteran')
+
 # Define server logic
 shinyServer(function(input, output, session) {
 
@@ -44,6 +48,9 @@ shinyServer(function(input, output, session) {
     
     # Determine the group by factors, if "None" is selected only use term
     demo <- input$demoA
+    if (!(input$demoA %in% demoA)) {
+      demo <- 'None'
+    }
     dots <- c("term", demo)
     dots <- dots[dots != 'None', drop = F]
     
