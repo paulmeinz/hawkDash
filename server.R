@@ -23,6 +23,14 @@ compare <- c('No', 'Yes')
 demoA <- c('None', 'status', 'ethnicity', 'firstgen', 'foster', 'gender', 
            'calworks', 'dsps', 'eops', 'veteran')
 
+# All Other Dash Valid Demographics
+demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
+          'Disability Status' = 'disability', Ethnicity = 'ethnicity',
+          'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
+          'Foster Youth Status' = 'foster',
+          'Gender' = 'gender','Online' = 'online', 'Veteran Status' = 'veteran'
+)
+
 # Define server logic
 shinyServer(function(input, output, session) {
 
