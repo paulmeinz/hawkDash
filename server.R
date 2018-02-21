@@ -56,7 +56,7 @@ shinyServer(function(input, output, session) {
     
     # Determine the group by factors, if "None" is selected only use term
     demo <- input$demoA
-    if (!(input$demoA %in% demoA)) {
+    if (!(demo %in% demoA)) {
       demo <- 'None'
     }
     dots <- c("term", demo)
