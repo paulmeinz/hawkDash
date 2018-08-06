@@ -13,7 +13,7 @@ matric <- enroll %>%
   filter(strm > 1143) # we dont have data in spring 14 or before
 
 # Set Colors
-colors <- c("#D55E00", "#0072B2", "#E69F00", "#009E73", "#999999", 
+colors <- c("#E87722", "#001A72", "#E69F00", "#009E73", "#999999", 
             "#F0E442", "#000000", "#56B4E9", "#CC79A7", "#999900")
 
 # Compare options
