@@ -156,7 +156,7 @@ shinyUI(fluidPage(
   theme = 'style.css',
   useShinyjs(),
   
-  navbarPage(title = 'CRC HawkDash',
+  navbarPage(title = 'CRC HawkDash', id = 'navbar',
              
 #---------------------------INTRO PAGE------------------------------------------             
 
@@ -164,6 +164,9 @@ shinyUI(fluidPage(
     tabPanel('Welcome!',
       fluidRow(id = 'welcome-top',
                column(12,
+                      br(),
+                      br(),
+                      br(),
                       h1(id = 'welcome-header',
                          "Welcome to the CRC HawkDash!"),
                       p(class = 'welcome-text', id = 'specific',
@@ -174,6 +177,9 @@ shinyUI(fluidPage(
                )
       ),
       fluidRow(id = 'welcome-mid',
+               br(),
+               br(),
+               br(),
                column(6,
                       p(class = 'welcome-text', id = 'specific',
                         "If you have questions, please contact:",

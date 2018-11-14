@@ -70,5 +70,12 @@ p.help {
 	padding-top: 20px;
 }
 
-
+#navbar li a[data-value='Welcome!'],
+#navbar li a[data-value='Application Data (Access)'],
+#navbar li a[data-value='Matriculation Data (SSSP)'],
+#navbar li a[data-value='Enrollment Data'],
+#navbar li a[data-value='Course Success Data'] {
+	font-weight: bold;
+	color: #001A72;
+}
 
