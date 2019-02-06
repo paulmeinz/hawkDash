@@ -237,7 +237,7 @@ shinyServer(function(input, output, session) {
         # Set plot features
         n1$yAxis(axisLabel='% of Applicants Who Enrolled', width = 50)
         n1$xAxis(rotateLabels = -25)
-        n1$chart(forceY = c(0, 100), tooltipContent = 
+        n1$chart(forceY = c(0, 100), color = colors, tooltipContent = 
         "#! 
         function(key, x, y, e) { 
           return '<p> <strong>' + x + '</strong> </p>' + 
