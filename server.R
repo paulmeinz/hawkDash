@@ -34,6 +34,20 @@ demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
 # Define server logic
 shinyServer(function(input, output, session) {
 
+
+################################################################################
+  
+#                              URL PARAMETER SELECT
+  
+################################################################################
+
+  observe({
+    query <- parseQueryString(session$clientData$url_search)
+    if(!is.null(query$tab)) {
+      tab <- query$tab
+      updateTabsetPanel(session, 'navbar', tab)
+    }
+  })  
   
 ################################################################################
   
