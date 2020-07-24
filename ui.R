@@ -155,13 +155,6 @@ popS2 <- subNew(popS2)
 shinyUI(fluidPage(
   theme = 'style.css',
   useShinyjs(),
-  
-  navbarPage(title = 'CRC HawkDash', id = 'navbar',
-             
-#---------------------------ENROLLMENT TAB--------------------------------------
-    
-
-    tabPanel(title = 'Enrollment Data',
       sidebarLayout(
         sidebarPanel(
           radioButtons('collegeE', 
@@ -215,4 +208,4 @@ shinyUI(fluidPage(
       )           
     )
 
-)))
+)
