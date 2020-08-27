@@ -698,7 +698,11 @@ shinyServer(function(input, output, session) {
  
   output$defE <- renderUI({
     txt <- '<strong> Displaying duplicated and unduplicated 
-        headcounts. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
+        headcounts. Note: For academic programs, work experience enrollments are 
+        counted under the "WEXP" subject code. For example, AMT 498 is counted
+        towards work experience enrollments. As such, the enrollments in AMT
+        may be slightly different than a locally generated report.
+        MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
  
     if(input$demoE != 'None') {
       txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
@@ -972,7 +976,11 @@ shinyServer(function(input, output, session) {
   output$defS <- renderUI ({
   txt <- '<strong> Displaying success rates. A success rate is
     calculated by counting the total number of A, B, C, and P grades and 
-    dividing by the total number of enrollments (including W&#39;s). 
+    dividing by the total number of enrollments (including W&#39;s). Note: 
+    For academic programs, work experience enrollments are 
+    counted under the "WEXP" subject code. For example, AMT 498 is counted
+    towards WEXP course success rates. As such, success rates in AMT
+    may be slightly different than a locally generated report.
     MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
   
   if (input$compareDem == 'Yes') {
