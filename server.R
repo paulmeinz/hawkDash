@@ -700,9 +700,9 @@ shinyServer(function(input, output, session) {
     txt <- '<strong> Displaying duplicated and unduplicated 
         headcounts. Note: For academic programs, work experience enrollments are 
         counted under the "WEXP" subject code. For example, AMT 498 is counted
-        as WEXP enrollments. As such, the enrollments in AMT
-        may be slightly different than a locally generated report.
-        MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
+        as WEXP enrollments. As such, the enrollments in AMT and other programs
+        with work experience courses may be slightly different than a locally 
+        generated report. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
  
     if(input$demoE != 'None') {
       txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
@@ -978,9 +978,10 @@ shinyServer(function(input, output, session) {
     calculated by counting the total number of A, B, C, and P grades and 
     dividing by the total number of enrollments (including W&#39;s). Note: 
     For academic programs, work experience enrollments are 
-    counted under the "WEXP" subject code. For example, AMT 498 are counted with 
-    WEXP course success rates. As such, success rates in AMT
-    may be slightly different than a locally generated report.
+    counted under the "WEXP" subject code. For example, AMT 498 enrollments are
+    used in the calculation of WEXP success rates. As such, success rates in AMT and 
+    other programs with work experience courses may be slightly different than 
+    a locally generated report.
     MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
   
   if (input$compareDem == 'Yes') {
