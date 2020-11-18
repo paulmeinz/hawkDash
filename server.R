@@ -151,7 +151,11 @@ shinyServer(function(input, output, session) {
  
   output$defE <- renderUI({
     txt <- '<strong> Displaying duplicated and unduplicated 
-        headcounts. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
+        headcounts. Note: For academic programs, work experience enrollments are 
+        counted under the "WEXP" subject code. For example, AMT 498 is counted as 
+        WEXP enrollments. As such, the enrollments in AMT and other programs with 
+        work experience courses may be slightly different than a locally generated 
+        report. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS </strong>'
  
     if(input$demoE != 'None') {
       txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
