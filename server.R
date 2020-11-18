@@ -132,8 +132,17 @@ shinyServer(function(input, output, session) {
   output$defS <- renderUI ({
   txt <- '<strong> Displaying success rates. A success rate is
     calculated by counting the total number of A, B, C, and P grades and 
-    dividing by the total number of enrollments (including W&#39;s). 
-    MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS AND COUNTS. </strong>'
+  dividing by the total number of enrollments (including W&#39;s). MOUSE OVER 
+  BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
+  <br>
+  <br>
+  Note: For academic programs, work experience enrollments are 
+  counted under the "WEXP" subject code. 
+  <br>
+  <br>
+  Note: Spring 2020 success rates may be an outlier for a given program because
+  of increased EW and incomplete grades. As such, interpret this term with caution.
+  </strong>'
   
   if (input$compareDem == 'Yes') {
     txt <- '<strong> Displaying proportionality indexes. 
