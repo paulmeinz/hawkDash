@@ -1017,8 +1017,9 @@ shinyServer(function(input, output, session) {
     BARS TO VIEW SPECIFIC NUMBERS AND COUNTS.
     <br>
     <br>
-    Note: For academic programs, work experience enrollments are
-    counted under the "WEXP" subject code.
+    Note: As of V1.1, WEXP enrollments are now counted within each program. Success
+    rates and enrollments may have changed slightly. All WEXP enrollments (198,
+    298, 498) are still counted if you select the "WEXP" subject code.
     <br>
     <br>
     Note: Spring 2020 success rates may be an outlier for a given program because
