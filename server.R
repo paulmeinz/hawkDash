@@ -647,20 +647,25 @@ shinyServer(function(input, output, session) {
 
     # If program is selected do this disag (same as above but with program filt)
     if (input$collegeE != 'Collegewide') {
-      temp <- enroll %>%
-        subset(seq_along(term) %in% grep(terms, term) &
-                 (filt %in% input$acadE  | input$specialE == filt)) %>%
-        group_by_(.dots = dots) %>%
-        summarise(duplicated = n(), unduplicated = n_distinct(emplid)) %>%
+      if (input$collegeE == 'Academic Programs' & is.null(input$acadE)) {
+        temp <- college
+      } else {
+        temp <- enroll %>%
+          subset(seq_along(term) %in% grep(terms, term) &
+                   (filt %in% input$acadE  | input$specialE == filt)) %>%
+          group_by_(.dots = dots) %>%
+          summarise(duplicated = n(), unduplicated = n_distinct(emplid)) %>%
 
-        # Left join again (see previous)
-        left_join(undup <- enroll %>%
-                    subset(seq_along(term) %in% grep(terms, term) &
-                             (filt %in% input$acadE  |
-                                input$specialE == filt)) %>%
-                    group_by(term) %>%
-                    summarise(undup = n_distinct(emplid))) %>%
-        mutate(proportion = unduplicated/undup * 100)
+          # Left join again (see previous)
+          left_join(undup <- enroll %>%
+                      subset(seq_along(term) %in% grep(terms, term) &
+                               (filt %in% input$acadE  |
+                                  input$specialE == filt)) %>%
+                      group_by(term) %>%
+                      summarise(undup = n_distinct(emplid))) %>%
+          mutate(proportion = unduplicated/undup * 100)
+      }
+
     }
 
     # If no demo is selected restructure the data to plot dup/undup
