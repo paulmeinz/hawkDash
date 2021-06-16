@@ -714,11 +714,10 @@ shinyServer(function(input, output, session) {
         headcounts. MOUSE OVER LINE TO VIEW SPECIFIC NUMBERS
         <br>
         <br>
-        Note: For academic programs, work experience enrollments are
-        counted under the "WEXP" subject code. For example, AMT 498 is counted
-        as WEXP enrollments. As such, the enrollments in AMT and other programs
-        with work experience courses may be slightly different than a locally
-        generated report.  </strong>'
+        Note: As of version 1.1, WEXP enrollments are now counted within programs.
+        As a result, success rates/enrollments may have changed very slightly since
+        your last visit. Additionally, all WEXP enrollments will still be counted
+        under the WEXP subject code when selected. </strong>'
 
     if(input$demoE != 'None') {
       txt <- '<strong> Displaying the proportion of UNDUPLICATED headcount for
