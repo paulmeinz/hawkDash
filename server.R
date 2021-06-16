@@ -603,14 +603,18 @@ shinyServer(function(input, output, session) {
     # Determine filter columns, subject by default.
     prog <- input$collegeE
     print(input$acadE)
+
     # If work experience is selected, combine all WEXP by using wexp column
     if (is.null(input$acadE)) {
       filtCol = 'subject'
+
     } else if ('WEXP' %in% input$acadE) {
       filtCol <- 'wexp'
+
     } else {
       filtCol = 'subject'
     }
+
     filtCol[prog == 'Student Support or Cohort Programs'] <- input$specialE
     oldNames <- names(enroll)
     names(enroll)[names(enroll) == filtCol] <- 'filt'
@@ -647,8 +651,10 @@ shinyServer(function(input, output, session) {
 
     # If program is selected do this disag (same as above but with program filt)
     if (input$collegeE != 'Collegewide') {
+
       if (input$collegeE == 'Academic Programs' & is.null(input$acadE)) {
         temp <- college
+
       } else {
         temp <- enroll %>%
           subset(seq_along(term) %in% grep(terms, term) &
@@ -916,7 +922,17 @@ shinyServer(function(input, output, session) {
 
     # Determine filter columns, subject by default.
     prog <- input$collegeS
-    filtCol <- 'subject'
+
+    if (is.null(input$acadS)) {
+      filtCol = 'subject'
+
+    } else if ('WEXP' %in% input$acadS) {
+      filtCol <- 'wexp'
+
+    } else {
+      filtCol = 'subject'
+    }
+
     filtCol[prog == 'Student Support or Cohort Programs'] <- input$specialS
     names(enroll)[names(enroll) == filtCol] <- 'filt'
 
@@ -945,6 +961,11 @@ shinyServer(function(input, output, session) {
 
     # If program is selected do this disag
     if (input$collegeS != 'Collegewide') {
+
+      if (input$collegeS == 'Academic Programs' & is.null(input$acadS)) {
+        temp <- college
+
+      } else {
       temp <- enroll %>%
         subset(seq_along(term) %in% grep(terms, term) &
                (filt %in% input$acadS  | input$specialS == filt)) %>%
@@ -952,6 +973,7 @@ shinyServer(function(input, output, session) {
         summarise(suc = mean(success), num = sum(success), den = n()) %>%
         mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
                progProp = den/sum(den) * 100)
+      }
     }
 
     # Final manipulations based on input
