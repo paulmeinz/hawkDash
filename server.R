@@ -160,7 +160,7 @@ shinyServer(function(input, output, session) {
         MOUSE OVER BARS TO VIEW EXACT NUMBERS AND COUNTS. </strong>'
 
       if (input$compareA == 'Yes') {
-        txt <- '<strong> Displaying percentage point gaps (PPG). In this case, a
+        txt <- '<strong> Displaying percentage point gaps (PPGs). In this case, a
           PPG is calculated by taking a group&#39;s enrollment percent and subtracting
           the enrollment percent for all applicants. A value below 0 means a
           group is enrolling at lower than average rates, perhaps indicating
@@ -331,8 +331,8 @@ shinyServer(function(input, output, session) {
 
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                   forceY = c(floor(1.0 * max(acc()$equity)),
-                              floor(1.0 * max(acc()$equity))),
+                   forceY = c(-1.0 * max(acc()$equity),
+                              1.0 * max(acc()$equity)),
                    tooltipContent = "#!
                  function(key, x, y, e) {
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' +
@@ -348,7 +348,7 @@ shinyServer(function(input, output, session) {
                  '</p>'
                  } !#")
 
-          n1$yAxis(axisLabel = 'Proportionality Index',
+          n1$yAxis(axisLabel = 'Percentage Point Gap',
                    width = 50)
         }
       }
@@ -413,14 +413,14 @@ shinyServer(function(input, output, session) {
     temp <- matric %>%
       subset(seq_along(term) %in% grep(terms, term) &
              Proportion == 100) %>%
-      group_by_(.dots = dots) %>%
+      group_by(.dots = dots) %>%
 
       # N Completing outcomes by grp
       summarise(outGrp = n_distinct(emplid)) %>%
 
       # The headcount by group (the denominator for the rate)
       left_join(x <- matric %>%
-                  group_by_(.dots = dots) %>%
+                  group_by(.dots = dots) %>%
                   summarise(hcGrp = n_distinct(emplid))) %>%
 
       # Total completing the outcome collegewide (for equity calc)
@@ -468,7 +468,7 @@ shinyServer(function(input, output, session) {
 
     if(input$compareM == 'Yes') {
       txt <- ' <strong>
-        Displaying percentage point gaps (PPG). In this case, a PPG
+        Displaying percentage point gaps (PPGs). In this case, a PPG
         is calculated by taking a group&#39;s percentage completion
         of the selected matriculation elements and
         subtracting the average completion rate of these elements for all students. 
@@ -574,6 +574,8 @@ shinyServer(function(input, output, session) {
                      '<br/>'
                    '</p>'
                  } !#")
+        
+        n1$yAxis(axisLabel = 'Percentage Point Gap')
       }
     }
 
@@ -652,6 +654,7 @@ shinyServer(function(input, output, session) {
     # If program is selected do this disag (same as above but with program filt)
     if (input$collegeE != 'Collegewide') {
 
+      # Keep collegewide unless something is selected
       if (input$collegeE == 'Academic Programs' & is.null(input$acadE)) {
         temp <- college
 
@@ -698,13 +701,13 @@ shinyServer(function(input, output, session) {
         temp <- temp %>%
           left_join(college,
                     by = c('term' = 'term', 'demoCol' = 'demoCol')) %>%
-          mutate(proportion = proportion.x/proportion.y * 100) %>%
+          mutate(proportion = proportion.x - proportion.y) %>%
           select(-c(duplicated.x, duplicated.y, unduplicated.y,
                     undup.x, undup.y)) %>%
           rename(unduplicated = unduplicated.x, progProp = proportion.x,
                  colProp = proportion.y)
-        temp$progProp <- round(temp$progProp, 2)
-        temp$colProp <- round(temp$colProp, 2)
+        temp$progProp <- round(temp$progProp, 1)
+        temp$colProp <- round(temp$colProp, 1)
       }
 
     }
@@ -732,12 +735,12 @@ shinyServer(function(input, output, session) {
     }
 
     if(input$compareE == 'Yes') {
-      txt <- '<strong> Displaying proportionality indexes for the selected
-        demographic in the selected program(s). The proportionality index
-        is calculated by taking the representation of a demographic group
-        in the selected program and dividing by that group&#39;s
-        representation collegewide. This ratio is multiplied by 100. A ratio
-        below 100 may indicate an access issue to the selected program
+      txt <- '<strong> Percentage point gaps (PPGs) for the selected
+        demographic in the selected program(s). A PPG is calculated by 3
+        taking the representation of a demographic group
+        in the selected program and subtracting that group&#39;s
+        representation collegewide.  A value
+        below 0 may indicate an access issue to the selected program
         because a particular group is accessing the program at a lower
         rate than expected. MOUSE OVER BARS TO VIEW SPECIFIC VALUES.'
       }
@@ -872,10 +875,11 @@ shinyServer(function(input, output, session) {
                     type = "multiBarChart",
                     width = session$clientData[["output_plot2_width"]])
 
-        n1$yAxis(axisLabel = 'Proportionality Index', width = 50)
+        n1$yAxis(axisLabel = 'Percentage Point Gap', width = 50)
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(0, max(enrollment()$proportion) + 10),
+                 forceY = c(-1.0 * max(enrollment()$proportion), 
+                            1.0 * max(enrollment()$proportion)),
                  tooltipContent = "#!
                  function(key, x, y, e) {
                    return '<p> <strong>' + key + '</strong> </p>' +
@@ -953,8 +957,8 @@ shinyServer(function(input, output, session) {
       subset(seq_along(term) %in% grep(terms, term)) %>%
       group_by_(.dots = dots) %>%
       summarise(suc = mean(success), num = sum(success), den = n()) %>%
-      mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
-             progProp = den/sum(den) * 100)
+      mutate(overallSuc = sum(num)/sum(den), outProp = suc,
+             progProp = sum(num)/sum(den))
 
     # Store collegewide for comparisons
     college <- temp
@@ -971,8 +975,8 @@ shinyServer(function(input, output, session) {
                (filt %in% input$acadS  | input$specialS == filt)) %>%
         group_by_(.dots = dots) %>%
         summarise(suc = mean(success), num = sum(success), den = n()) %>%
-        mutate(overallSuc = sum(num)/sum(den), outProp = num/sum(num) * 100,
-               progProp = den/sum(den) * 100)
+        mutate(overallSuc = sum(num)/sum(den), outProp = suc,
+               progProp = sum(num)/sum(den))
       }
     }
 
@@ -983,9 +987,9 @@ shinyServer(function(input, output, session) {
 
       # If equity comparison is slected divide by overall success
       if (input$compareDem == 'Yes') {
-        temp$suc <- temp$suc/temp$overallSuc * 100
-        temp$outProp <- round(temp$outProp, 2)
-        temp$progProp <- round(temp$progProp, 2)
+        temp$suc <- temp$suc - temp$overallSuc
+        temp$outProp <- round(temp$outProp, 1)
+        temp$progProp <- round(temp$progProp, 1)
 
       }
     }
@@ -1027,13 +1031,12 @@ shinyServer(function(input, output, session) {
      </strong>'
 
   if (input$compareDem == 'Yes') {
-    txt <- '<strong> Displaying proportionality indexes.
-      For course success, the proportionality index is calculated by taking
-      the (%) representation of a given group among successful enrollments
-      (A, B, C, or P grades) and dividing by the (%) representation of that
-      same group among all enrollments. This ratio is multiplied by 100. A
-      value below 100 may indicate disproportionate impact such that a student
-      group may be succeeding at a lower rate than expected.
+    txt <- '<strong> Displaying percentage point gaps (PPGs).
+      For course success, a ppg is calculated by taking
+      the success rate for a given group and subtracting the overall success
+      rate for all students.  A
+      value below 0 may indicate disproportionate impact such that a student
+      group has a below average success rate.
       MOUSE OVER BARS TO VIEW SPECIFIC VALUES. </strong>'
   }
 
@@ -1176,18 +1179,19 @@ shinyServer(function(input, output, session) {
 
       if(input$compareDem == 'Yes') {
 
-        n1$yAxis(axisLabel='Proportionality Index', width = 50)
-        n1$chart(forceY = c(0, max(success()$suc) + 10),
+        n1$yAxis(axisLabel='Percentage Point Gap', width = 50)
+        n1$chart(forceY = c(-1.0 * max(success()$suc), 
+                            1.0 * max(success()$suc)),
                  tooltipContent = "#!
                  function(key, x, y, e){
                  return '<p> <strong>' + key + '</strong> </p>' +
                  '<p>' + x + ': <strong>' + y + '</strong> </p>' +
                  '<p>' +
-                   'This group constituted ' + e.point.outProp + '%' +
+                   'This group had a ' + e.point.outProp + '%' +
                    '<br/>' +
-                   ' of successful enrollments and ' +
+                   ' success rate compared to ' +
                    '<br/>' +
-                   e.point.progProp + '% of enrollments ' +
+                   e.point.progProp + '% for all students ' +
                    '<br/>' +
                    'in the selected program(s).' +
                  '</p>'
