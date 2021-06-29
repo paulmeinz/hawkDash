@@ -93,16 +93,18 @@ shinyServer(function(input, output, session) {
 
       # Filter terms and group by selected factors and summarize
       subset(seq_along(term) %in% grep(terms, term)) %>%
-      group_by_(.dots = dots) %>%
+      group_by(.dots = dots) %>%
       summarise(headcount = n_distinct(emplid), # Headcount by grouping
                 enrolled = mean(enroll), # Percent that enrolled by grouping
                 tot = sum(enroll)) %>% # Overall number that enrolled
 
       # Create additional variables for Equity and custom tooltips
-      mutate(repOut = tot/sum(tot) * 100, outTot = tot/100, # Rep in enrolled
-             repAll = headcount/sum(headcount) * 100, # Rep in all applicants
-             headcountAll = sum(headcount)) %>% # Collegewide headcount
-      mutate(equity = repOut/repAll * 100) %>% # Calc equity index
+      mutate(repOut = tot/sum(tot) * 100, # Rep in enrolled (unused) 
+             outTot = tot/100, # Total enrolled
+             repAll = headcount/sum(headcount) * 100, # Rep in all applicants (unused)
+             headcountAll = sum(headcount), # Collegewide headcount
+             totalEnroll = sum(tot)/sum(headcount)) %>% # Collegewide enrollment
+      mutate(equity = enrolled - totalEnroll) %>% # Calc equity index
       select(-c(tot))
 
     # Remove small sample sizes (less than 10) if temp is populated
@@ -124,8 +126,10 @@ shinyServer(function(input, output, session) {
     temp$termCont <- as.numeric(temp$term)
 
     # Round for custom tooltips
-    temp$repAll <- round(temp$repAll, 2)
-    temp$repOut <- round(temp$repOut, 2)
+    #temp$repAll <- round(temp$repAll, 2) unused but left here
+    #temp$repOut <- round(temp$repOut, 2) unused but left here
+    temp$enrolled <- round(temp$enrolled, 1)
+    temp$totalEnroll <- round(temp$totalEnroll, 1)
 
     temp
   })
@@ -156,12 +160,10 @@ shinyServer(function(input, output, session) {
         MOUSE OVER BARS TO VIEW EXACT NUMBERS AND COUNTS. </strong>'
 
       if (input$compareA == 'Yes') {
-        txt <- '<strong> Displaying proportionality indexes. In this case, the
-          proportionality index is calculated by taking a group&#39;s percent
-          representation amongst enrolled applicants and dividing by the same
-          group&#39;s representation among all applicants.
-          This ratio is multiplied by 100. A value below 100 means a
-          group is enrolling at lower rates than expected, perhaps indicating
+        txt <- '<strong> Displaying percentage point gaps (PPG). In this case, a
+          PPG is calculated by taking a group&#39;s enrollment percent and subtracting
+          the enrollment percent for all applicants. A value below 0 means a
+          group is enrolling at lower than average rates, perhaps indicating
           a barrier to access. MOUSE OVER BARS TO DISPLAY
           SPECIFIC VALUES. </strong>'
       }
@@ -329,8 +331,8 @@ shinyServer(function(input, output, session) {
 
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                   forceY = c(floor(1.1 * max(acc()$equity)),
-                              floor(.9 * min(acc()$equity))),
+                   forceY = c(floor(1.0 * max(acc()$equity)),
+                              floor(1.0 * max(acc()$equity))),
                    tooltipContent = "#!
                  function(key, x, y, e) {
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' +
@@ -338,13 +340,11 @@ shinyServer(function(input, output, session) {
                    x + ': ' + '<strong>' + y  + '</strong>' +
                  '</p>' +
                  '<p>' +
-                   'This group constituted ' + e.point.repOut + '%' +
-                   '<br/>' +
-                   'of the students that enrolled' +
+                   'This group enrolled at a rate of ' + e.point.enrolled + '%' +
                    '<br/>' +
                    'after applying' +
                    '<br/>' +
-                   'and ' + e.point.repAll + '% of all applicants.'
+                   'compared to ' + e.point.totalEnroll + '% of all applicants.'
                  '</p>'
                  } !#")
 
@@ -435,9 +435,9 @@ shinyServer(function(input, output, session) {
                   group_by(term) %>%
                   summarise(colTot = n_distinct(emplid))) %>%
       mutate(Prop = outGrp/hcGrp * 100, # Proportion completing
-             outRep = outGrp/outTot * 100, # Outcome representation (equity num)
-             colRep = hcGrp/colTot * 100) %>% # Colleg rep (equity den)
-      mutate(Equity = outRep/colRep * 100)
+             outRep = outGrp/hcGrp * 100, # Outcome representation (equity num)
+             colRep = outTot/colTot * 100) %>% # Colleg rep (equity den)
+      mutate(Equity = (outRep - colRep))
 
 
     if (input$demoM != 'None') {
@@ -445,8 +445,8 @@ shinyServer(function(input, output, session) {
     }
 
     # Round these numbers for equity plot tooltips
-    temp$outRep <- round(temp$outRep, 2)
-    temp$colRep <- round(temp$colRep, 2)
+    temp$outRep <- round(temp$outRep, 1)
+    temp$colRep <- round(temp$colRep, 1)
 
     temp
   })
@@ -468,11 +468,11 @@ shinyServer(function(input, output, session) {
 
     if(input$compareM == 'Yes') {
       txt <- ' <strong>
-        Displaying proportionality indexes. In this case, the proportionality
-        index is calculated by taking a group&#39;s representation among the
-        students that completed the selected matriculation elements and
-        dividing by that group&#39;s representation on campus. This ratio is
-        multiplied by 100. A value below 100 means a particular group is
+        Displaying percentage point gaps (PPG). In this case, a PPG
+        is calculated by taking a group&#39;s percentage completion
+        of the selected matriculation elements and
+        subtracting the average completion rate of these elements for all students. 
+        A value below 0 means a particular group is
         completing matriculation elements at a lower rate than expected,
         perhapts indicating disproportionate impact.
         MOUSE OVER BARS TO VIEW SPECIFIC NUMBERS. </strong>'
@@ -558,17 +558,17 @@ shinyServer(function(input, output, session) {
 
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(0, max(matriculation()$Equity) + 10),
+                 forceY = c(-1.0 * min(matriculation()$Equity), 
+                             1.0 * max(matriculation()$Equity)),
                  tooltipContent = "#!
                  function(key, x, y, e) {
                  return '<p> <strong>' + key + '</strong> </p>' +
                    '<p>' + x + ': <strong>' + y + '</strong> </p>' +
                    '<p>' +
-                     'This group constituted ' + e.point.outRep + '%' +
+                     'This group completed the selected matriculation elements at a rate of ' + 
+                     e.point.outRep + '%' +
                      '<br/>' +
-                     'of students completing the' +
-                     '<br/>' +
-                     'selected outcome(s) and' +
+                     'compared to ' +
                      '<br/>' +
                      e.point.colRep + '% of students collegewide.' +
                      '<br/>'
