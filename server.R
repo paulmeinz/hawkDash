@@ -331,8 +331,8 @@ shinyServer(function(input, output, session) {
 
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                   forceY = c(-1.0 * max(acc()$equity),
-                              1.0 * max(acc()$equity)),
+                   forceY = c(-1.0 * max(abs(acc()$equity)),
+                              1.0 * max(abs(acc()$equity))),
                    tooltipContent = "#!
                  function(key, x, y, e) {
                  return '<p>' + '<strong>' + key + '</strong>' + '</p>' +
@@ -558,8 +558,8 @@ shinyServer(function(input, output, session) {
 
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(-1.0 * min(matriculation()$Equity), 
-                             1.0 * max(matriculation()$Equity)),
+                 forceY = c(-1.0 * max(abs(matriculation()$Equity)), 
+                             1.0 * max(abs(matriculation()$Equity))),
                  tooltipContent = "#!
                  function(key, x, y, e) {
                  return '<p> <strong>' + key + '</strong> </p>' +
@@ -878,8 +878,8 @@ shinyServer(function(input, output, session) {
         n1$yAxis(axisLabel = 'Percentage Point Gap', width = 50)
         n1$chart(showControls = F, reduceXTicks = F,
                  color = colors,
-                 forceY = c(-1.0 * max(enrollment()$proportion), 
-                            1.0 * max(enrollment()$proportion)),
+                 forceY = c(-1.0 * max(abs(enrollment()$proportion)), 
+                            1.0 * max(abs(enrollment()$proportion))),
                  tooltipContent = "#!
                  function(key, x, y, e) {
                    return '<p> <strong>' + key + '</strong> </p>' +
@@ -1180,8 +1180,8 @@ shinyServer(function(input, output, session) {
       if(input$compareDem == 'Yes') {
 
         n1$yAxis(axisLabel='Percentage Point Gap', width = 50)
-        n1$chart(forceY = c(-1.0 * max(success()$suc), 
-                            1.0 * max(success()$suc)),
+        n1$chart(forceY = c(-1.0 * max(abs(success()$suc)), 
+                            1.0 * max(abs(success()$suc))),
                  tooltipContent = "#!
                  function(key, x, y, e){
                  return '<p> <strong>' + key + '</strong> </p>' +
