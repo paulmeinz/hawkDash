@@ -374,6 +374,7 @@ shinyServer(function(input, output, session) {
 
 ################################################################################
 
+  # --------------------Reactive UX --------------------------------------------
 
   # Reset comparisons if they are hidden
   observe({
@@ -381,6 +382,24 @@ shinyServer(function(input, output, session) {
       reset('compareM')
     }
   })
+  
+  # toggle access term help
+  observe({
+    if(is.null(input$termM))
+    {toggle(id = 'helpM2pop', anim = TRUE)}
+    if(!is.null(input$termM))
+    {hideElement(id = 'helpM2pop', anim = TRUE)}
+  })
+  
+  # Toggle equity button div
+  observe({
+    if(input$demoM != 'None')
+    {toggle(id = 'compareMpop', anim = TRUE)}
+    if(input$demoM == 'None')
+    {hideElement(id = 'compareMpop', anim = TRUE)}
+  })
+  
+  # ----------------------------------------------------------------------------
 
   # Create matriculation dataset for plotting
   matriculation <- reactive({
@@ -489,19 +508,6 @@ shinyServer(function(input, output, session) {
     HTML(txt)
   })
 
-  output$helpM2 <- renderUI({
-    term <- input$termM
-    txt <- ''
-
-    if (is.null(term)) {
-      txt <- "<p class = 'help'> Select a term by checking the boxes
-        above. Selecting both Fall and Spring will display data for
-        fall and spring over five years.</p>"
-    }
-
-    HTML(txt)
-  })
-
   output$histM <- renderChart({
 
     # Render this plot if no demos are selected
@@ -599,6 +605,51 @@ shinyServer(function(input, output, session) {
 
 ################################################################################
 
+  #-----------Reactive UX ------------------------------------------------------
+  
+  # toggle program select
+  observe({
+    if(input$collegeE == 'Academic Programs')
+    {toggle(id = 'acadEpop', anim = TRUE)}
+    if(input$collegeE != 'Academic Programs')
+    {hideElement(id = 'acadEpop', anim = TRUE)}
+  })
+  
+  # toggle enrollment subject help
+  observe({
+    if(input$collegeE == 'Academic Programs' & is.null(input$acadE))
+    {toggle(id = 'helpE1pop', anim = TRUE)}
+    if(input$collegeE == 'Academic Programs' & !is.null(input$acadE)|
+       input$collegeE != 'Academic Programs')
+    {hideElement(id = 'helpE1pop', anim = TRUE)}
+  })
+  
+  # toggle special programs select
+  observe({
+    if(input$collegeE == 'Student Support or Cohort Programs')
+    {toggle(id = 'specialEpop', anim = TRUE)}
+    if(input$collegeE != 'Student Support or Cohort Programs')
+    {hideElement(id = 'specialEpop', anim = TRUE)}
+  })
+  
+  # toggle term help
+  observe({
+    if(is.null(input$termE))
+    {toggle(id = 'helpE2pop', anim = TRUE)}
+    if(!is.null(input$termE))
+    {hideElement(id = 'helpE2pop', anim = TRUE)}
+  })
+  
+  # toggle term help
+  observe({
+    if(input$demoE != 'None' & (
+       input$collegeE == 'Student Support or Cohort Programs' |
+       input$collegeE == 'Academic Programs' & !is.null(input$acadE)))
+    {toggle(id = 'demoEpop', anim = TRUE)}
+    if(input$demoE == 'None' | input$collegeE == 'Collegewide'|
+       input$collegeE == 'Academic Programs' & is.null(input$acadE))
+    {hideElement(id = 'demoEpop', anim = TRUE)}
+  })
 
   # Reset comparisons if they are hidden
   observe({
@@ -753,35 +804,6 @@ shinyServer(function(input, output, session) {
         rate than expected. MOUSE OVER BARS TO VIEW SPECIFIC VALUES.'
       }
 
-
-    HTML(txt)
-  })
-
-  output$helpE1 <- renderUI({
-    prog <- input$acadE
-    col <- input$collegeE
-    txt <- ''
-
-    if (is.null(prog) & col == 'Academic Programs') {
-      txt <- "<p class = 'help'> Select a program by clicking in the box above.
-      You can type a subject prefix (e.g., MATH) or pick out of
-      the menu. Picking multiple will combine results across programs.
-      Delete selections with backspace. </p>"
-    }
-
-    HTML(txt)
-  })
-
-
-  output$helpE2 <- renderUI({
-    term <- input$termE
-    txt <- ''
-
-    if (is.null(term)) {
-      txt <- "<p class = 'help'> Select a term by checking the boxes
-      above. Selecting both Fall and Spring will display data for
-      fall and spring over five years.</p>"
-    }
 
     HTML(txt)
   })

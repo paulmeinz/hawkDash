@@ -286,16 +286,18 @@ shinyUI(fluidPage(
           bsPopover('termM',
                     '<strong> What terms would you like to see? </strong>',
                     popTerm, 'right', options = list(container = 'body')),
-
-          conditionalPanel(condition = "input.termM == ''",
-                           htmlOutput('helpM2')),
+          
+          hidden(div(id = 'helpM2pop',
+                 p(class = 'help','Select a term by checking the boxes
+                   above. Selecting both Fall and Spring will display data for
+                   fall and spring over five years.'))),
 
           selectInput('demoM', 'View trends for a particular demographic group?'
                       , demo),
-
-          conditionalPanel(condition = "input.demoM != 'None'",
-                           radioButtons('compareM','Evaluate Equity?', compare,
-                                        inline = TRUE)),
+          
+          hidden(div(id = 'compareMpop',
+                     radioButtons('compareM','Evaluate Equity?', compare,
+                                  inline = TRUE))),
 
           bsPopover('compareM', '<strong> Evaluate equity? </strong>', popM3,
                     'right', options = list(container = 'body'))
@@ -322,20 +324,21 @@ shinyUI(fluidPage(
                        'Would you like to view enrollment data for:',
                         trends),
 
-          conditionalPanel(condition = "input.collegeE == 'Academic Programs'",
-                           selectInput('acadE', 'Select program(s)',acad,
-                                       multiple = TRUE)),
-
-          conditionalPanel(condition = "
-                           input.collegeE == 'Academic Programs' &&
-                           input.acadE == null",
-                           htmlOutput('helpE1')),
-
-          conditionalPanel(condition =
-                           "input.collegeE ==
-                           'Student Support or Cohort Programs'",
-                           selectInput('specialE', 'Select a program',
-                                       special)),
+          hidden(div(id = 'acadEpop',
+                     selectInput('acadE', 'Select program(s)',acad,
+                                 multiple = TRUE))),
+          
+          hidden(div(id = 'helpE1pop',
+                     p(class = 'help','Select a program by clicking in 
+                       the box above. You can 
+                       type a subject prefix (e.g., MATH) or pick out of
+                       the menu. Picking multiple will combine results across 
+                       programs. Delete selections with backspace. Collegewide
+                       data displays when no program is selected.'))),
+          
+          hidden(div(id = 'specialEpop',
+                     selectInput('specialE', 'Select a program',
+                                 special))),
 
           checkboxGroupInput('termE', 'What terms would you like to see?',
                              term, inline = TRUE, selected = 'Fall'),
@@ -343,17 +346,18 @@ shinyUI(fluidPage(
           bsPopover('termE',
                     '<strong> What terms would you like to see? </strong>',
                     popTerm, 'right', options = list(container = 'body')),
-
-          conditionalPanel(condition = "input.termE == ''",
-                           htmlOutput('helpE2')),
+          
+          hidden(div(id = 'helpE2pop',
+                     p(class = 'help', 'Select a term by checking the boxes
+                       above. Selecting both Fall and Spring will display 
+                       data for fall and spring over five years.'))),
 
           selectInput('demoE', 'View trends for a particular demographic group?'
                       , demo),
-
-          conditionalPanel(condition = "input.demoE != 'None'
-                           && input.collegeE != 'Collegewide'",
-                           radioButtons('compareE','Evaluate equity?',
-                                        compare, inline = TRUE)),
+          
+          hidden(div(id = 'demoEpop',
+                     radioButtons('compareE','Evaluate equity?',
+                                  compare, inline = TRUE))),
 
           bsPopover('compareE', '<strong> Evaluate Equity? </strong>', popE2,
                     'right', options = list(container = 'body'))
