@@ -1,5 +1,5 @@
 .navbar-brand {
-	background-color: #001A72;
+	background-color: #00263D;
 	font-size: 175%;
 }
 
@@ -59,7 +59,7 @@ p.help {
 }
 
 .tab-pane {
-	background-image: url('dashboard-patterns_horizontal stripes.jpg');
+	background-color: #00263D;
 
 }
 

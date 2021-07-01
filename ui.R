@@ -9,7 +9,7 @@ source('utilFuncs.R')
 # Load standard data
 load('enrollment.rdata')
 
-crcLink <- "https://researchapps.crc.losrios.edu/CRC_Research_Data_Request_Form"
+crcLink <- "https://crclosrios.co1.qualtrics.com/jfe/form/SV_86cJqok0Qj1Lrdr"
 
 
 ################################################################################
@@ -98,11 +98,9 @@ popA2 <- 'Selecting <strong> Yes </strong> will display data only for applicants
   Valley, Calvine, Rio Cazadero, and Transition High.'
 popA2 <- subNew(popA2)
 
-popA3 <- "Selecting <strong> Yes </strong> will calculate a proportionality
-  index by taking the percent representation of a group in student
-  enrollees and dividing by the representation of that group in all
-  applicants. The resulting ratio is multiplied by 100. A ratio below
-  100 may indicate an access issue."
+popA3 <- "Selecting <strong> Yes </strong> will calculate a percentage
+  point gap by subtracting the enrollment rate for a group from the enrollment
+  rate for all students. A value below zero may indicate an access issue."
 popA3 <- subNew(popA3)
 
 popM1 <- 'Checking multiple boxes will display data for enrolled students who
@@ -116,19 +114,17 @@ popM2 <- 'Checking <strong> Yes </strong> will include students who have been
   exempted, new transfer matriculated, or grandfathered.'
 popM2 <- subNew(popM2)
 
-popM3 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
-  index by taking the percent representation of a group among students
-  that completed the selected outcomes (Assessment, Ed Plan, and/or
-  Orientation) and dividing by the representation of that group amongst
-  all enrolled students. The resulting ratio is multiplied by 100.
-  A ratio below 100 may indicate disproportionate impact.'
+popM3 <- 'Selecting <strong> Yes </strong> will calculate a percentage point gap
+  by taking the percent of students that completed the selected outcomes
+  (Assessment, Ed Plan, and/or Orientation) and subtracting the percentage of 
+  all students that completed the same outcomes. A value below zero may indicate 
+  disproportionate impact.'
 popM3 <- subNew(popM3)
 
-popE2 <- 'Selecting <strong> Yes </strong> will calculate a proportionality
-  index by taking the percent representation of a group in the selected
-  program(s) and dividing by the representation of that group
-  collegewide. The resulting ratio is multiplied by 100. A ratio below
-  100 may indicate an access issue.'
+popE2 <- 'Selecting <strong> Yes </strong> will calculate a percentage point
+  gap by taking the percent representation of a group in the selected
+  program(s) and dsubtracting the representation of that group
+  collegewide. A value below 0 may indicate an access issue.'
 popE2 <- subNew(popE2)
 
 popS1 <- 'Selecting <strong> Yes </strong> will display a trend graph with
@@ -136,12 +132,10 @@ popS1 <- 'Selecting <strong> Yes </strong> will display a trend graph with
   representing the collegwide success rates.'
 popS1 <- subNew(popS1)
 
-popS2 <- "Selecting <strong> Yes </strong> will calculate a proportionality
-  index. This index is calculated by taking the percent representation
-  among successful enrollments for a given group and dividing by the
-  representation of that group in collegwide enrollments. The resulting
-  ratio is multiplied by 100. A value below 100 may indicate
-  disproportionate impact."
+popS2 <- "Selecting <strong> Yes </strong> will calculate a percentage point
+  gap. The percentage point gap is calculated by subtracting the success rate
+  for all students from the success rate for a given group. 
+  A value below 0 may indicate disproportionate impact."
 popS2 <- subNew(popS2)
 
 
