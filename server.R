@@ -55,6 +55,8 @@ shinyServer(function(input, output, session) {
 
 ################################################################################
 
+  # --------------------Reactive UX --------------------------------------------
+  
 
   # Reset comparisons if they are hidden
   observe({
@@ -62,7 +64,26 @@ shinyServer(function(input, output, session) {
       reset('compareA')
     }
   })
+  
+  # toggle access term help
+  observe({
+    if(is.null(input$termA))
+    {toggle(id = 'helpA2pop', anim = TRUE)}
+    if(!is.null(input$termA))
+    {hideElement(id = 'helpA2pop', anim = TRUE)}
+  })
+  
+  # toggle equity button
+  observe({
+    if(input$demoA != 'None' & 
+               input$outcome == '% of Applicants that Enroll')
+    {toggle(id = 'compareApop', anim = TRUE)}
+    if(input$demoA == 'None')
+    {hideElement(id = 'compareApop', anim = TRUE)}
+  })
 
+  #-----------------------------------------------------------------------------
+  
   # Create access dataset for plotting. I could do this inside a render* func
   # But this opens the door for other plots and/or an event reactive button
   # In the event of changes...
@@ -167,19 +188,6 @@ shinyServer(function(input, output, session) {
           a barrier to access. MOUSE OVER BARS TO DISPLAY
           SPECIFIC VALUES. </strong>'
       }
-    }
-
-    HTML(txt)
-  })
-
-  output$helpA2 <- renderUI({
-    term <- input$termA
-    txt <- ''
-
-    if (is.null(term)) {
-      txt <- "<p class = 'help'> Select a term by checking the boxes
-      above. Selecting both Fall and Spring will display data for
-      fall and spring over five years.</p>"
     }
 
     HTML(txt)

@@ -148,6 +148,7 @@ popS2 <- subNew(popS2)
 
 shinyUI(fluidPage(
   theme = 'style.css',
+  
   useShinyjs(),
 
   navbarPage(title = 'CRC HawkDash', id = 'navbar',
@@ -227,18 +228,20 @@ shinyUI(fluidPage(
           bsPopover('termA',
                     '<strong> What terms would you like to see? </strong>',
                     popTerm, 'right', options = list(container = 'body')),
-
-          conditionalPanel(condition = "input.termA == ''",
-                           htmlOutput('helpA2')),
+          
+          hidden(div(id = 'helpA2pop',
+                 p(class = 'help', 'Select a term by checking the boxes
+                   above. Selecting both Fall and Spring will display data for
+                   fall and spring over five years.')
+                 )),
 
           selectInput('demoA',
                       'View trends for a particular demographic group?',
                       demoA),
-
-          conditionalPanel(condition = "input.demoA != 'None' &
-                           input.outcome == '% of Applicants that Enroll'",
-                           radioButtons('compareA','Evaluate Equity?',
-                                         compare, inline = TRUE)),
+          
+          hidden(div(id = 'compareApop',
+                     radioButtons('compareA','Evaluate Equity?',
+                                  compare, inline = TRUE))),
 
           bsPopover('compareA', '<strong> Evaluate equity? </strong>',
                     popA3, 'right',
