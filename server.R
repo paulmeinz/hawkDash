@@ -992,12 +992,17 @@ shinyServer(function(input, output, session) {
 
   # toggle college compare
   observe({
-    if(input$collegeS == 'Academic Programs' & !is.null(input$acadS) |
+    if((input$collegeS == 'Academic Programs' & !is.null(input$acadS) |
        input$collegeS == 'Student Support or Cohort Programs')
+       & input$demoS == 'None')
     {show(id = 'compareColpop', anim = TRUE)}
+    print(input$collegeS == 'Academic Programs' & !is.null(input$acadS) |
+            input$collegeS == 'Student Support or Cohort Programs')
     if(input$demoS != 'None' | input$collegeS == 'Collegewide' |
        is.null(input$acadS))
     {hideElement(id = 'compareColpop', anim = TRUE)}
+    print(input$demoS != 'None' | input$collegeS == 'Collegewide' |
+            is.null(input$acadS))
   })
   
   # Reset comparisons if they are hidden
