@@ -60,7 +60,7 @@ compare <- c('No','Yes')
 term <- c('Fall','Spring')
 
 # Demographic options
-demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
+demo <- c(None = 'None', Age = 'age',
           'Disability Status' = 'disability', Ethnicity = 'ethnicity',
           'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
           'Foster Youth Status' = 'foster',
@@ -392,7 +392,8 @@ shinyUI(fluidPage(
                      p(class = 'help', 'Select a program by clicking in the box above.
                        You can type a subject prefix (e.g., MATH) or pick out of
                        the menu. Picking multiple will combine results across programs.
-                       Delete selections with backspace.'))),
+                       Delete selections with backspace. Collegewide
+                       data displays when no program is selected.'))),
           
           hidden(div(id = 'specialSpop',
                      selectInput('specialS', 'Select a program',

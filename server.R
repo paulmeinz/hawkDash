@@ -24,7 +24,7 @@ demoA <- c('None', 'status', 'ethnicity', 'firstgen', 'foster', 'gender',
            'calworks', 'dsps', 'eops', 'veteran')
 
 # All Other Dash Valid Demographics
-demo <- c(None = 'None', Age = 'age', 'Basic Skills' = 'basicskills',
+demo <- c(None = 'None', Age = 'age', 
           'Disability Status' = 'disability', Ethnicity = 'ethnicity',
           'Enrollment Status' = 'status', 'First Generation' = 'firstgen',
           'Foster Youth Status' = 'foster',
@@ -535,6 +535,8 @@ shinyServer(function(input, output, session) {
                    e.point.hcGrp + ' students.' +
                  '</p>'
                } !#")
+      n1$yAxis(axisLabel = 'Percentage Completed',
+               width = 50)
     }
 
     # If demo is not None
@@ -561,6 +563,9 @@ shinyServer(function(input, output, session) {
                      e.point.hcGrp + ' students.' +
                    '</p>'
                  } !#")
+        
+        n1$yAxis(axisLabel = 'Percentage Completed',
+                 width = 50)
       }
 
       # Make this plot with comparisons
@@ -589,7 +594,8 @@ shinyServer(function(input, output, session) {
                    '</p>'
                  } !#")
         
-        n1$yAxis(axisLabel = 'Percentage Point Gap')
+        n1$yAxis(axisLabel = 'Percentage Point Gap',
+                 width = 50)
       }
     }
 
@@ -657,6 +663,8 @@ shinyServer(function(input, output, session) {
       reset('compareE')
     }
   })
+  
+  #-----------------------------------------------------------------------------
 
   # Create enrollment dataset for plotting
   enrollment <- reactive({
@@ -795,7 +803,7 @@ shinyServer(function(input, output, session) {
 
     if(input$compareE == 'Yes') {
       txt <- '<strong> Percentage point gaps (PPGs) for the selected
-        demographic in the selected program(s). A PPG is calculated by 3
+        demographic in the selected program(s). A PPG is calculated by
         taking the representation of a demographic group
         in the selected program and subtracting that group&#39;s
         representation collegewide.  A value
@@ -981,14 +989,6 @@ shinyServer(function(input, output, session) {
     if(input$demoS == 'None')
     {hideElement(id = 'compareDempop', anim = TRUE)}
   })
-  
-  "
-                           (input.collegeS == 'Academic Programs' &&
-                           input.acadS != null ||
-                           input.collegeS ==
-                           'Student Support or Cohort Programs') &&
-                           input.demoS == 'None'
-                           "
 
   # toggle college compare
   observe({
@@ -1010,6 +1010,8 @@ shinyServer(function(input, output, session) {
       reset('compareDem')
     }
   })
+  
+  #-----------------------------------------------------------------------------
 
   # Create success dataset
   success <- reactive({

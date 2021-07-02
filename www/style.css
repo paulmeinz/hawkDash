@@ -8,13 +8,9 @@
 }
 
 p.help {
-	background-color: #ffbf80;
+	background-color: #FFCB13;
 	border-radius:10px;
 	text-align: center;
-}
-
-#compareDem, #compareCol, #compareA, #compareM, #compareE {
-	background-color: #d9d9d9;
 }
 
 #defA, #defS, #defM, #defE {
