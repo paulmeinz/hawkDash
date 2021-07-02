@@ -68,7 +68,7 @@ shinyServer(function(input, output, session) {
   # toggle access term help
   observe({
     if(is.null(input$termA))
-    {toggle(id = 'helpA2pop', anim = TRUE)}
+    {show(id = 'helpA2pop', anim = TRUE)}
     if(!is.null(input$termA))
     {hideElement(id = 'helpA2pop', anim = TRUE)}
   })
@@ -77,8 +77,8 @@ shinyServer(function(input, output, session) {
   observe({
     if(input$demoA != 'None' & 
                input$outcome == '% of Applicants that Enroll')
-    {toggle(id = 'compareApop', anim = TRUE)}
-    if(input$demoA == 'None')
+    {show(id = 'compareApop', anim = TRUE)}
+    if(input$demoA == 'None' | input$outcome != '% of Applicants that Enroll')
     {hideElement(id = 'compareApop', anim = TRUE)}
   })
 
@@ -386,7 +386,7 @@ shinyServer(function(input, output, session) {
   # toggle access term help
   observe({
     if(is.null(input$termM))
-    {toggle(id = 'helpM2pop', anim = TRUE)}
+    {show(id = 'helpM2pop', anim = TRUE)}
     if(!is.null(input$termM))
     {hideElement(id = 'helpM2pop', anim = TRUE)}
   })
@@ -394,7 +394,7 @@ shinyServer(function(input, output, session) {
   # Toggle equity button div
   observe({
     if(input$demoM != 'None')
-    {toggle(id = 'compareMpop', anim = TRUE)}
+    {show(id = 'compareMpop', anim = TRUE)}
     if(input$demoM == 'None')
     {hideElement(id = 'compareMpop', anim = TRUE)}
   })
@@ -616,7 +616,7 @@ shinyServer(function(input, output, session) {
   # toggle program select
   observe({
     if(input$collegeE == 'Academic Programs')
-    {toggle(id = 'acadEpop', anim = TRUE)}
+    {show(id = 'acadEpop', anim = TRUE)}
     if(input$collegeE != 'Academic Programs')
     {hideElement(id = 'acadEpop', anim = TRUE)}
   })
@@ -624,7 +624,7 @@ shinyServer(function(input, output, session) {
   # toggle enrollment subject help
   observe({
     if(input$collegeE == 'Academic Programs' & is.null(input$acadE))
-    {toggle(id = 'helpE1pop', anim = TRUE)}
+    {show(id = 'helpE1pop', anim = TRUE)}
     if(input$collegeE == 'Academic Programs' & !is.null(input$acadE)|
        input$collegeE != 'Academic Programs')
     {hideElement(id = 'helpE1pop', anim = TRUE)}
@@ -633,7 +633,7 @@ shinyServer(function(input, output, session) {
   # toggle special programs select
   observe({
     if(input$collegeE == 'Student Support or Cohort Programs')
-    {toggle(id = 'specialEpop', anim = TRUE)}
+    {show(id = 'specialEpop', anim = TRUE)}
     if(input$collegeE != 'Student Support or Cohort Programs')
     {hideElement(id = 'specialEpop', anim = TRUE)}
   })
@@ -641,7 +641,7 @@ shinyServer(function(input, output, session) {
   # toggle term help
   observe({
     if(is.null(input$termE))
-    {toggle(id = 'helpE2pop', anim = TRUE)}
+    {show(id = 'helpE2pop', anim = TRUE)}
     if(!is.null(input$termE))
     {hideElement(id = 'helpE2pop', anim = TRUE)}
   })
@@ -651,7 +651,7 @@ shinyServer(function(input, output, session) {
     if(input$demoE != 'None' & (
        input$collegeE == 'Student Support or Cohort Programs' |
        input$collegeE == 'Academic Programs' & !is.null(input$acadE)))
-    {toggle(id = 'demoEpop', anim = TRUE)}
+    {show(id = 'demoEpop', anim = TRUE)}
     if(input$demoE == 'None' | input$collegeE == 'Collegewide'|
        input$collegeE == 'Academic Programs' & is.null(input$acadE))
     {hideElement(id = 'demoEpop', anim = TRUE)}
@@ -952,7 +952,7 @@ shinyServer(function(input, output, session) {
   # toggle program select
   observe({
     if(input$collegeS == 'Academic Programs')
-    {toggle(id = 'acadSpop', anim = TRUE)}
+    {show(id = 'acadSpop', anim = TRUE)}
     if(input$collegeS != 'Academic Programs')
     {hideElement(id = 'acadSpop', anim = TRUE)}
   })
@@ -960,7 +960,7 @@ shinyServer(function(input, output, session) {
   # toggle enrollment subject help
   observe({
     if(input$collegeS == 'Academic Programs' & is.null(input$acadS))
-    {toggle(id = 'helpS1pop', anim = TRUE)}
+    {show(id = 'helpS1pop', anim = TRUE)}
     if(input$collegeS == 'Academic Programs' & !is.null(input$acadS)|
        input$collegeS != 'Academic Programs')
     {hideElement(id = 'helpS1pop', anim = TRUE)}
@@ -969,7 +969,7 @@ shinyServer(function(input, output, session) {
   # toggle special programs select
   observe({
     if(input$collegeS == 'Student Support or Cohort Programs')
-    {toggle(id = 'specialSpop', anim = TRUE)}
+    {show(id = 'specialSpop', anim = TRUE)}
     if(input$collegeS != 'Student Support or Cohort Programs')
     {hideElement(id = 'specialSpop', anim = TRUE)}
   })
@@ -977,7 +977,7 @@ shinyServer(function(input, output, session) {
   # toggle term help
   observe({
     if(is.null(input$termS))
-    {toggle(id = 'helpS2pop', anim = TRUE)}
+    {show(id = 'helpS2pop', anim = TRUE)}
     if(!is.null(input$termS))
     {hideElement(id = 'helpS2pop', anim = TRUE)}
   })
@@ -985,7 +985,7 @@ shinyServer(function(input, output, session) {
   # toggle equity eval
   observe({
     if(input$demoS != 'None')
-    {toggle(id = 'compareDempop', anim = TRUE)}
+    {show(id = 'compareDempop', anim = TRUE)}
     if(input$demoS == 'None')
     {hideElement(id = 'compareDempop', anim = TRUE)}
   })
@@ -994,7 +994,7 @@ shinyServer(function(input, output, session) {
   observe({
     if(input$collegeS == 'Academic Programs' & !is.null(input$acadS) |
        input$collegeS == 'Student Support or Cohort Programs')
-    {toggle(id = 'compareColpop', anim = TRUE)}
+    {show(id = 'compareColpop', anim = TRUE)}
     if(input$demoS != 'None' | input$collegeS == 'Collegewide' |
        is.null(input$acadS))
     {hideElement(id = 'compareColpop', anim = TRUE)}
