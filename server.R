@@ -640,7 +640,7 @@ shinyServer(function(input, output, session) {
     {hideElement(id = 'helpE2pop', anim = TRUE)}
   })
   
-  # toggle term help
+  # toggle equity question
   observe({
     if(input$demoE != 'None' & (
        input$collegeE == 'Student Support or Cohort Programs' |
@@ -696,7 +696,7 @@ shinyServer(function(input, output, session) {
     # Calculate collegewide enrollment by default
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
-      group_by_(.dots = dots) %>%
+      group_by(.dots = dots) %>%
       summarise(duplicated = n(), unduplicated = n_distinct(emplid)) %>%
 
       # Left join collegwide unduplicated to use as the denom for rep
@@ -721,7 +721,7 @@ shinyServer(function(input, output, session) {
         temp <- enroll %>%
           subset(seq_along(term) %in% grep(terms, term) &
                    (filt %in% input$acadE  | input$specialE == filt)) %>%
-          group_by_(.dots = dots) %>%
+          group_by(.dots = dots) %>%
           summarise(duplicated = n(), unduplicated = n_distinct(emplid)) %>%
 
           # Left join again (see previous)
@@ -939,7 +939,67 @@ shinyServer(function(input, output, session) {
 
 ################################################################################
 
+  #-----------Reactive UX ------------------------------------------------------
+  
+  # toggle program select
+  observe({
+    if(input$collegeS == 'Academic Programs')
+    {toggle(id = 'acadSpop', anim = TRUE)}
+    if(input$collegeS != 'Academic Programs')
+    {hideElement(id = 'acadSpop', anim = TRUE)}
+  })
+  
+  # toggle enrollment subject help
+  observe({
+    if(input$collegeS == 'Academic Programs' & is.null(input$acadS))
+    {toggle(id = 'helpS1pop', anim = TRUE)}
+    if(input$collegeS == 'Academic Programs' & !is.null(input$acadS)|
+       input$collegeS != 'Academic Programs')
+    {hideElement(id = 'helpS1pop', anim = TRUE)}
+  })
+  
+  # toggle special programs select
+  observe({
+    if(input$collegeS == 'Student Support or Cohort Programs')
+    {toggle(id = 'specialSpop', anim = TRUE)}
+    if(input$collegeS != 'Student Support or Cohort Programs')
+    {hideElement(id = 'specialSpop', anim = TRUE)}
+  })
+  
+  # toggle term help
+  observe({
+    if(is.null(input$termS))
+    {toggle(id = 'helpS2pop', anim = TRUE)}
+    if(!is.null(input$termS))
+    {hideElement(id = 'helpS2pop', anim = TRUE)}
+  })
+  
+  # toggle equity eval
+  observe({
+    if(input$demoS != 'None')
+    {toggle(id = 'compareDempop', anim = TRUE)}
+    if(input$demoS == 'None')
+    {hideElement(id = 'compareDempop', anim = TRUE)}
+  })
+  
+  "
+                           (input.collegeS == 'Academic Programs' &&
+                           input.acadS != null ||
+                           input.collegeS ==
+                           'Student Support or Cohort Programs') &&
+                           input.demoS == 'None'
+                           "
 
+  # toggle college compare
+  observe({
+    if(input$collegeS == 'Academic Programs' & !is.null(input$acadS) |
+       input$collegeS == 'Student Support or Cohort Programs')
+    {toggle(id = 'compareColpop', anim = TRUE)}
+    if(input$demoS != 'None' | input$collegeS == 'Collegewide' |
+       is.null(input$acadS))
+    {hideElement(id = 'compareColpop', anim = TRUE)}
+  })
+  
   # Reset comparisons if they are hidden
   observe({
     if (input$collegeS == 'Collegewide') {
@@ -985,7 +1045,7 @@ shinyServer(function(input, output, session) {
     # Calculate collegewide by default
     temp <- enroll %>%
       subset(seq_along(term) %in% grep(terms, term)) %>%
-      group_by_(.dots = dots) %>%
+      group_by(.dots = dots) %>%
       summarise(suc = mean(success), num = sum(success), den = n()) %>%
       mutate(overallSuc = sum(num)/sum(den), outProp = suc,
              progProp = sum(num)/sum(den))
@@ -1003,7 +1063,7 @@ shinyServer(function(input, output, session) {
       temp <- enroll %>%
         subset(seq_along(term) %in% grep(terms, term) &
                (filt %in% input$acadS  | input$specialS == filt)) %>%
-        group_by_(.dots = dots) %>%
+        group_by(.dots = dots) %>%
         summarise(suc = mean(success), num = sum(success), den = n()) %>%
         mutate(overallSuc = sum(num)/sum(den), outProp = suc,
                progProp = sum(num)/sum(den))
@@ -1072,36 +1132,6 @@ shinyServer(function(input, output, session) {
 
     HTML(txt)
   })
-
-  output$helpS1 <- renderUI({
-    prog <- input$acadS
-    col <- input$collegeS
-    txt <- ''
-
-    if (is.null(prog) & col == 'Academic Programs') {
-      txt <- "<p class = 'help'> Select a program by clicking in the box above.
-        You can type a subject prefix (e.g., MATH) or pick out of
-        the menu. Picking multiple will combine results across programs.
-        Delete selections with backspace. </p>"
-    }
-
-    HTML(txt)
-  })
-
-
-  output$helpS2 <- renderUI({
-    term <- input$termS
-    txt <- ''
-
-    if (is.null(term)) {
-      txt <- "<p class = 'help'> Select a term by checking the boxes
-        above. Selecting both Fall and Spring will display data for
-        fall and spring over five years.</p>"
-    }
-
-    HTML(txt)
-    })
-
 
   output$histS <- renderChart({
 

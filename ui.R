@@ -383,21 +383,20 @@ shinyUI(fluidPage(
           radioButtons('collegeS', 'Would you like to view course success data
                        for:',
                        trends),
-
-          conditionalPanel(condition = "input.collegeS == 'Academic Programs'",
-                           selectInput('acadS', 'Select program(s)', acad,
-                                       multiple = TRUE)),
-
-          conditionalPanel(condition = "
-                           input.collegeS == 'Academic Programs' &&
-                           input.acadS == null",
-                           htmlOutput('helpS1')),
-
-          conditionalPanel(condition =
-                           "input.collegeS ==
-                           'Student Support or Cohort Programs'",
-                           selectInput('specialS', 'Select a program',
-                                       special)),
+          
+          hidden(div(id = 'acadSpop',
+                     selectInput('acadS', 'Select program(s)', acad,
+                                 multiple = TRUE))),
+          
+          hidden(div(id = 'helpS1pop',
+                     p(class = 'help', 'Select a program by clicking in the box above.
+                       You can type a subject prefix (e.g., MATH) or pick out of
+                       the menu. Picking multiple will combine results across programs.
+                       Delete selections with backspace.'))),
+          
+          hidden(div(id = 'specialSpop',
+                     selectInput('specialS', 'Select a program',
+                                 special))),
 
           checkboxGroupInput('termS', 'What terms would you like to see?',
                              term, inline = TRUE, selected = 'Fall'),
@@ -405,30 +404,27 @@ shinyUI(fluidPage(
           bsPopover('termS',
                     '<strong> What terms would you like to see? </strong>',
                     popTerm, 'right', options = list(container = 'body')),
-
-          conditionalPanel(condition = "input.termS == ''",
-                           htmlOutput('helpS2')),
+          
+          hidden(div(id = 'helpS2pop',
+                     p(class = 'help', 'Select a term by checking the boxes
+                       above. Selecting both Fall and Spring will display data 
+                       for fall and spring over five years.'))),
 
           selectInput('demoS', 'Would you like to view trends for
                       a particular demographic group?', demo),
-
-          conditionalPanel(condition = "input.demoS != 'None'",
-                           radioButtons('compareDem','Evaluate equity?',
-                                       compare, inline = TRUE)),
+          
+          hidden(div(id = 'compareDempop',
+                     radioButtons('compareDem','Evaluate equity?',
+                                  compare, inline = TRUE))),
 
           bsPopover('compareDem',
                     '<strong> Evaluate equity? </strong>',
                     popS2, 'right', options = list(container = 'body')),
+          
+          hidden(div(id = 'compareColpop',
+                     radioButtons('compareCol','Compare to collegewide?',
+                                  compare, inline = TRUE))),
 
-          conditionalPanel(condition = "
-                           (input.collegeS == 'Academic Programs' &&
-                           input.acadS != null ||
-                           input.collegeS ==
-                           'Student Support or Cohort Programs') &&
-                           input.demoS == 'None'
-                           ",
-                           radioButtons('compareCol','Compare to collegewide?',
-                                       compare, inline = TRUE)),
           bsPopover('compareCol',
                     '<strong> Compare to collegwide? </strong>',
                     popS1, 'right', options = list(container = 'body'))
