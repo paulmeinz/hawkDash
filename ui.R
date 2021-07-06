@@ -151,13 +151,13 @@ shinyUI(fluidPage(
   
   useShinyjs(),
 
-  navbarPage(title = 'CRC HawkDash', id = 'navbar',
+
 
 
 #---------------------------ENROLLMENT TAB--------------------------------------
 
 
-    tabPanel(title = 'Enrollment Data',
+
       sidebarLayout(
         sidebarPanel(
           radioButtons('collegeE',
